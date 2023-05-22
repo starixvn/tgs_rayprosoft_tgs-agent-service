@@ -60,7 +60,7 @@ push-nuget:
     - main
   script:
     - dotnet restore
-    - dotnet pack -c $BuildConfiguration "Tgs.Agent.Client/Tgs.Agent.Client.Client.csproj" --no-restore
+    - dotnet pack -c $BuildConfiguration "Tgs.Agent.Client/Tgs.Agent.Client.csproj" --no-restore
     - dotnet nuget push "Tgs.Agent.Client/bin/$BuildConfiguration/*.nupkg" -s "raypro-baget" -k $NugetApiKey --skip-duplicate
   artifacts:
     name: Nuget
