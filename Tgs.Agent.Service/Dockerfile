@@ -7,8 +7,6 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 ARG BuildConfiguration=Release
-RUN --mount=type=secret,id=nuget,dst=/pat cp /pat ~/.nuget/NuGet/NuGet.Config
-RUN dotnet nuget remove source 'Microsoft Visual Studio Offline Packages' || true
 WORKDIR /src
 COPY ["Tgs.Agent.Service/Tgs.Agent.Service.csproj", "Tgs.Agent.Service/"]
 COPY ["Tgs.Agent.Core/Tgs.Agent.Core.csproj", "Tgs.Agent.Core/"]
