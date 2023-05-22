@@ -13,11 +13,11 @@ COPY ["Tgs.Agent.Core/Tgs.Agent.Core.csproj", "Tgs.Agent.Core/"]
 RUN dotnet restore "Tgs.Agent.Service/Tgs.Agent.Service.csproj"
 COPY . .
 WORKDIR "/src/Tgs.Agent.Service"
-RUN dotnet build "Tgs.Agent.Service.csproj" -c ${BuildConfiguration} -o /app/build
+RUN dotnet build "Tgs.Agent.Service.csproj" -c $BuildConfiguration -o /app/build
 
 FROM build AS publish
 ARG BuildConfiguration
-RUN dotnet publish "Tgs.Agent.Service.csproj" -c ${BuildConfiguration} -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Tgs.Agent.Service.csproj" -c $BuildConfiguration -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
