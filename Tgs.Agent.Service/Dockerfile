@@ -8,6 +8,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 ARG BuildConfiguration=Release
 WORKDIR /src
+COPY ["NuGet.config", "."]
 COPY ["Tgs.Agent.Service/Tgs.Agent.Service.csproj", "Tgs.Agent.Service/"]
 COPY ["Tgs.Agent.Core/Tgs.Agent.Core.csproj", "Tgs.Agent.Core/"]
 RUN dotnet restore "Tgs.Agent.Service/Tgs.Agent.Service.csproj"
