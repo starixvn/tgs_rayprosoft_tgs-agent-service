@@ -8,12 +8,12 @@ image:
   repository: pgtgs/agent-service
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "dev"
 
 imagePullSecrets:
   - name: dockerhub
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: "agent-service"
+fullnameOverride: "agent-service"
 
 serviceAccount:
   # Specifies whether a service account should be created
