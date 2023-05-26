@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services
     .AddHttpClient()
+    .AddCore()
     .AddRepository((sp, optionsBuilder) =>
     {
         var connectionString = sp.GetRequiredService<IConfiguration>().GetConnectionString("Tgs");

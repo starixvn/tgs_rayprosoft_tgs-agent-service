@@ -9,8 +9,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
-using Tgs.Agent.Core.RepositoryModels;
-using Microsoft.EntityFrameworkCore.InMemory;
+using Tgs.Agent.Repositories.RepositoryModels;
+
 namespace Tgs.Agent.IntegrationTest;
 
 extern alias agent;

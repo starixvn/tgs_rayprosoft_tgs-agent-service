@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tgs.Agent.Client;
-using Tgs.Agent.Core.RepositoryModels;
 
 namespace Tgs.Agent.IntegrationTest
 {
