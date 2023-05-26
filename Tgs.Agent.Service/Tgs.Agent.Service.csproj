@@ -26,6 +26,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Tgs.Agent.Core\Tgs.Agent.Core.csproj" />
+		<ProjectReference Include="..\Tgs.Agent.Repositories\Tgs.Agent.Repositories.csproj" />
 	</ItemGroup>
 
 </Project>

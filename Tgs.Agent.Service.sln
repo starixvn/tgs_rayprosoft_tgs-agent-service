@@ -7,9 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Agent.Service", "Tgs.Ag
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Agent.Core", "Tgs.Agent.Core\Tgs.Agent.Core.csproj", "{6FF3DC69-BDE0-491F-8467-F280EBA59636}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.Agent.IntegrationTest", "Tgs.Agent.Integration\Tgs.Agent.IntegrationTest.csproj", "{7D36A736-D45D-48D8-BFC9-0CAEFF46B20D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Agent.IntegrationTest", "Tgs.Agent.Integration\Tgs.Agent.IntegrationTest.csproj", "{7D36A736-D45D-48D8-BFC9-0CAEFF46B20D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.Agent.Client", "Tgs.Agent.Client\Tgs.Agent.Client.csproj", "{D231162C-901C-47AC-B30F-061B62DBBCB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Agent.Client", "Tgs.Agent.Client\Tgs.Agent.Client.csproj", "{D231162C-901C-47AC-B30F-061B62DBBCB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.Agent.Repositories", "Tgs.Agent.Repositories\Tgs.Agent.Repositories.csproj", "{96F9FF09-FA99-4C06-875F-9386F70C86E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.Agent.UnitTests", "Tgs.Agent.UnitTests\Tgs.Agent.UnitTests.csproj", "{173EF2B3-3337-4F43-9728-885A447C844E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,14 @@ Global
 		{D231162C-901C-47AC-B30F-061B62DBBCB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D231162C-901C-47AC-B30F-061B62DBBCB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D231162C-901C-47AC-B30F-061B62DBBCB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96F9FF09-FA99-4C06-875F-9386F70C86E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96F9FF09-FA99-4C06-875F-9386F70C86E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96F9FF09-FA99-4C06-875F-9386F70C86E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96F9FF09-FA99-4C06-875F-9386F70C86E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{173EF2B3-3337-4F43-9728-885A447C844E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{173EF2B3-3337-4F43-9728-885A447C844E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{173EF2B3-3337-4F43-9728-885A447C844E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{173EF2B3-3337-4F43-9728-885A447C844E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

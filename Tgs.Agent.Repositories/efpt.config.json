@@ -9,7 +9,7 @@
    "OutputContextPath": null,
    "OutputPath": "RepositoryModels",
    "PreserveCasingWithRegex": true,
-   "ProjectRootNamespace": "Tgs.Agent.Core",
+   "ProjectRootNamespace": "Tgs.Agent.Repositories",
    "Schemas": null,
    "SelectedHandlebarsLanguage": 0,
    "SelectedToBeGenerated": 0,

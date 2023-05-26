@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace Tgs.Agent.Core.RepositoryModels;
+namespace Tgs.Agent.Repositories.RepositoryModels;
 
 public partial class tgsContext : DbContext
 {
