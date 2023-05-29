@@ -4,7 +4,7 @@
 //using Tgs.PlayerService.Client;
 //using Tgs.ServiceUtility;
 
-//namespace Tgs.Agent.Core.Application;
+//namespace Tgs.Agent.Core.ApplicationServices;
 
 //internal class AgentGroupCountInfoQuery : IGetService<GetAgentGroupCountInfoRequest,
 //    GetAgentGroupCountInfoModel>

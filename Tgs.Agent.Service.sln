@@ -7,9 +7,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Agent.Service", "Tgs.Ag
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Agent.Core", "Tgs.Agent.Core\Tgs.Agent.Core.csproj", "{6FF3DC69-BDE0-491F-8467-F280EBA59636}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.Agent.IntegrationTest", "Tgs.Agent.Integration\Tgs.Agent.IntegrationTest.csproj", "{7D36A736-D45D-48D8-BFC9-0CAEFF46B20D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Agent.IntegrationTest", "Tgs.Agent.Integration\Tgs.Agent.IntegrationTest.csproj", "{7D36A736-D45D-48D8-BFC9-0CAEFF46B20D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.Agent.Client", "Tgs.Agent.Client\Tgs.Agent.Client.csproj", "{D231162C-901C-47AC-B30F-061B62DBBCB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.Agent.Client", "Tgs.Agent.Client\Tgs.Agent.Client.csproj", "{D231162C-901C-47AC-B30F-061B62DBBCB6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "方案項目", "方案項目", "{A84C4ED8-ADD3-4735-AD3D-4DE1EBF711B0}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		NuGet.config = NuGet.config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgentRepositories", "AgentRepositories\AgentRepositories.csproj", "{80A81132-FA10-45A8-86BD-670FF91FEA06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgentRepositories.UnitTests", "AgentRepositories.UnitTests\AgentRepositories.UnitTests.csproj", "{D8CF8963-1A54-4B63-B51D-B2A67882DE5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agent.Core.UnitTests", "Agent.Core.UnitTests\Agent.Core.UnitTests.csproj", "{EA875B74-24C3-491B-A2C5-5078393525B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +45,18 @@ Global
 		{D231162C-901C-47AC-B30F-061B62DBBCB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D231162C-901C-47AC-B30F-061B62DBBCB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D231162C-901C-47AC-B30F-061B62DBBCB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80A81132-FA10-45A8-86BD-670FF91FEA06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80A81132-FA10-45A8-86BD-670FF91FEA06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80A81132-FA10-45A8-86BD-670FF91FEA06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80A81132-FA10-45A8-86BD-670FF91FEA06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8CF8963-1A54-4B63-B51D-B2A67882DE5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8CF8963-1A54-4B63-B51D-B2A67882DE5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8CF8963-1A54-4B63-B51D-B2A67882DE5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8CF8963-1A54-4B63-B51D-B2A67882DE5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA875B74-24C3-491B-A2C5-5078393525B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA875B74-24C3-491B-A2C5-5078393525B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA875B74-24C3-491B-A2C5-5078393525B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA875B74-24C3-491B-A2C5-5078393525B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -9,13 +8,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
-using Tgs.Agent.Core.RepositoryModels;
-using Microsoft.EntityFrameworkCore.InMemory;
+using Tgs.Agent.Repositories.Entities;
+
 namespace Tgs.Agent.IntegrationTest;
 
-extern alias agent;
-
-internal class AgentTestApplication : WebApplicationFactory<agent::Program>
+internal class AgentTestApplication : WebApplicationFactory<Program>
 {
     private readonly Action<IWebHostBuilder>? _webHostConfigure;
 
@@ -40,13 +37,13 @@ internal class AgentTestApplication : WebApplicationFactory<agent::Program>
                     }))
             .Replace(ServiceDescriptor.Singleton(sp =>
             {
-                var dbContextOptionsBuilder = new DbContextOptionsBuilder<tgsContext>();
+                var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
                 _ = dbContextOptionsBuilder
                     .UseInMemoryDatabase(Guid.NewGuid().ToString())
                     .ConfigureWarnings(x => x.Ignore(
                         InMemoryEventId.TransactionIgnoredWarning));
 
-                return new tgsContext(dbContextOptionsBuilder.Options);
+                return new TgsContext(dbContextOptionsBuilder.Options);
             })));
 
         _webHostConfigure?.Invoke(builder);

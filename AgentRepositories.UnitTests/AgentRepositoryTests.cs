@@ -1,0 +1,131 @@
+﻿using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Tgs.Agent.Repositories;
+using Tgs.Agent.Repositories.Entities;
+
+namespace AgentRepositories.UnitTests;
+
+public class AgentRepositoryTests
+{
+    [Test]
+    public async Task Get_Agent_By_Id()
+    {
+        var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+        _ = dbContextOptionsBuilder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(x => x.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning));
+
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+        var agentId = Guid.Parse("30945e96-a762-4b6e-9acb-0266727528d7");
+
+        var agent = new Agent
+        {
+            Id = agentId,
+            Password = Encoding.UTF8.GetBytes("123"),
+            Salt = Encoding.UTF8.GetBytes("456"),
+            InvitationCode = "5kiqhx",
+            Username = "username",
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>(),
+            ParentAgentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31"),
+            RealName = "realName",
+            Phone = "phone",
+            Email = "email"
+        };
+
+        _ = await dbContext.Agents.AddAsync(agent);
+
+        var sut = new AgentRepository(dbContext);
+
+        var actual = await sut.GetAgentByIdAsync(agentId);
+
+        Assert.NotNull(actual);
+        Assert.AreEqual(actual!.Id, agentId);
+    }
+
+    [Test]
+    public async Task Set_Agent_Info()
+    {
+        var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+        _ = dbContextOptionsBuilder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(x => x.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning));
+
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+        var realName = "realName";
+        var email = "email";
+        var phone = "phone";
+
+        var agent = new Agent
+        {
+            Id = agentId,
+            Password = Encoding.UTF8.GetBytes("123"),
+            Salt = Encoding.UTF8.GetBytes("456"),
+            InvitationCode = "5kiqhx",
+            Username = "username",
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>(),
+            RealName = "abc",
+            Email = "abc",
+            Phone = "abc",
+        };
+
+        _ = await dbContext.Agents.AddAsync(agent);
+
+        var sut = new AgentRepository(dbContext);
+
+        await sut.SetAgentInfoAsync(agentId, realName, email, phone);
+
+        var actual = await dbContext.Agents.FirstOrDefaultAsync(x => x.Id == agentId);
+
+        Assert.NotNull(actual);
+        Assert.AreEqual(actual!.RealName, realName);
+        Assert.AreEqual(actual!.Email, email);
+        Assert.AreEqual(actual!.Phone, phone);
+    }
+
+    [Test]
+    public async Task Set_Password()
+    {
+        var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+        _ = dbContextOptionsBuilder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(x => x.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning));
+
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+        var agent = new Agent
+        {
+            Id = agentId,
+            Password = Encoding.UTF8.GetBytes("123"),
+            Salt = Encoding.UTF8.GetBytes("456"),
+            InvitationCode = "5kiqhx",
+            Username = "username",
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>(),
+        };
+
+        _ = await dbContext.Agents.AddAsync(agent);
+
+        var sut = new AgentRepository(dbContext);
+
+        var newPassword = Encoding.UTF8.GetBytes("123456");
+        var newSalt = Encoding.UTF8.GetBytes("456789");
+
+        await sut.SetPasswordAsync(agentId, newPassword, newSalt);
+
+        var actual = await dbContext.Agents.FirstOrDefaultAsync(x => x.Id == agentId);
+
+        Assert.NotNull(actual);
+        Assert.AreEqual(actual!.Password, newPassword);
+        Assert.AreEqual(actual!.Salt, newSalt);
+    }
+}
