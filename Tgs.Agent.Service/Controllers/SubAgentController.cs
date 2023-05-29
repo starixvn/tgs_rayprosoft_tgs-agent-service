@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Tgs.Agent.Core.ApplicationServices;
-using Tgs.Agent.Service.Models;
 using Tgs.ServiceUtility;
+using Tgs.Agent.Service.ViewModels;
 
 namespace Tgs.Agent.Service.Controllers;
 

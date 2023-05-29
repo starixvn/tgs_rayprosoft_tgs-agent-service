@@ -1,4 +1,4 @@
-﻿namespace Tgs.Agent.Service.Models;
+﻿namespace Tgs.Agent.Service.ViewModels;
 
 public record AgentGroupCountInfo
 {
