@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
@@ -76,13 +76,19 @@ builder.Services
                         ext => httpContext.Request.Path.Value.EndsWith($".{ext}")));
         };
     });
-builder.Services.AddProfileViewer();
+builder.Services
+    .AddProfileViewer()
+    .AddInterceptionService()
+    .AddServiceUtiltiyInterceptors();
 
-builder.Services.AddPlayerServiceClient((options, sp) =>
-{
-    var config = sp.GetRequiredService<IConfiguration>();
-    options.BaseUrl = config.GetValue<Uri>("AgentService:PlayerServiceBaseUrl")!;
-});
+builder.Services
+    .AddCore()
+    .AddPlayerServiceClient((options, sp) =>
+    {
+        var config = sp.GetRequiredService<IConfiguration>();
+        options.BaseUrl = config.GetValue<Uri>("AgentService:PlayerServiceBaseUrl")!;
+    })
+    .AddSecurity();
 
 builder.Services.AddHealthChecks();
 

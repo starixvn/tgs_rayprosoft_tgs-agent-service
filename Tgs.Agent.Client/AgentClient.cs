@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
+using System.Text.Json;
 using Tgs.Agent.Client.Models;
 
 namespace Tgs.Agent.Client;
@@ -6,25 +8,51 @@ namespace Tgs.Agent.Client;
 public class AgentClient : IAgentClient
 {
     private readonly HttpClient _client;
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new() { PropertyNameCaseInsensitive = true };
+
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true
+    };
 
     public AgentClient(HttpClient client)
     {
         _client = client;
     }
 
-    public async IAsyncEnumerable<ChildAgentInfoModel> GetChildAgentInfosAsync(GetChildAgentInfosRequest request)
+    public async IAsyncEnumerable<ChildAgentInfoModel> GetChildAgentInfosAsync(
+        GetChildAgentInfosRequest request,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var response = await _client
-            .GetAsync($"/api/agent/allChildAgents/{request.AgentId}")
+            .GetAsync($"/api/agent/allChildAgents/{request.AgentId}", cancellationToken)
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();
 
-        var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+        var contentJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
-        await foreach (var playerCountInfo in JsonSerializer.DeserializeAsyncEnumerable<ChildAgentInfoModel>(
-                           contentStream,
-                           _jsonSerializerOptions)) yield return playerCountInfo!;
+        var playerCountInfos = JsonSerializer.Deserialize<ChildAgentInfoModel[]>(contentJson, _jsonSerializerOptions);
+
+        foreach (var playerCountInfo in playerCountInfos!)
+            yield return playerCountInfo;
+    }
+
+    public async ValueTask ResetSubAgentPasswordAsync(ResetSubAgentPasswordRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .PostAsJsonAsync("/api/subAgent/resetPassword", request, _jsonSerializerOptions, cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
+
+    public async ValueTask SetSubAgentInfoAsync(SetSubAgentInfoRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .PostAsJsonAsync("/api/subAgent/setInfo", request, _jsonSerializerOptions, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
     }
 }

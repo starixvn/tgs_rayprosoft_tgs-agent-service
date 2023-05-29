@@ -22,11 +22,12 @@
 		<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc8" />
 		<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc8" />
 		<PackageReference Include="ProfileViewer.OpenTelemetry.Exporter" Version="0.2.1" />
+		<PackageReference Include="Tgs.Interceptors" Version="0.2.1" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\AgentRepositories\AgentRepositories.csproj" />
 		<ProjectReference Include="..\Tgs.Agent.Core\Tgs.Agent.Core.csproj" />
-		<ProjectReference Include="..\Tgs.Agent.Repositories\Tgs.Agent.Repositories.csproj" />
 	</ItemGroup>
 
 </Project>
