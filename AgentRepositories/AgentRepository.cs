@@ -48,7 +48,10 @@ internal class AgentRepository : IAgentRepository
             .FindAsync(new object?[] { agentId }, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        agent!.RealName = realName;
+        if (agent is null)
+            return;
+
+        agent.RealName = realName;
         agent.Email = email;
         agent.Phone = phone;
         agent.UpdatedOn = DateTime.UtcNow;
