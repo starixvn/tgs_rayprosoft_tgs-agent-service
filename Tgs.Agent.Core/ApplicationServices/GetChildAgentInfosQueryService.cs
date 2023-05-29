@@ -3,15 +3,17 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Agent.Core.ApplicationServices;
 
-internal class ChildAgentInfosQuery : IQueryService<GetChildAgentInfosRequest, ChildAgentInfoModel>
+internal class GetChildAgentInfosQueryService : IQueryService<GetChildAgentInfosQuery, ChildAgentInfoModel>
 {
     private readonly IAgentRepository _repository;
 
-    public ChildAgentInfosQuery(IAgentRepository repository)
+    public GetChildAgentInfosQueryService(IAgentRepository repository)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
 
-    public IAsyncEnumerable<ChildAgentInfoModel> QueryAsync(GetChildAgentInfosRequest query, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<ChildAgentInfoModel> QueryAsync(
+        GetChildAgentInfosQuery query,
+        CancellationToken cancellationToken = default)
         => _repository.GetChildAgentInfosAsync(query.AgentId, cancellationToken);
 }

@@ -12,9 +12,9 @@ public class ChildAgentInfosQueryTests
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
 
-        var sut = new ChildAgentInfosQuery(fakeAgentRepository);
+        var sut = new GetChildAgentInfosQueryService(fakeAgentRepository);
 
-        var query = new GetChildAgentInfosRequest(Guid.NewGuid());
+        var query = new GetChildAgentInfosQuery(Guid.NewGuid());
 
         _ = await sut.QueryAsync(query).ToArrayAsync();
 

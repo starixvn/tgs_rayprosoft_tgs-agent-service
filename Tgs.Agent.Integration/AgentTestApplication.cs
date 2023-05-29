@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
+
 using Tgs.Agent.Repositories.Entities;
 
 namespace Tgs.Agent.IntegrationTest;

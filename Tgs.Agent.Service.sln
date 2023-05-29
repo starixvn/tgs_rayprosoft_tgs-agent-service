@@ -17,11 +17,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "方案項目", "方案項�
 		NuGet.config = NuGet.config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgentRepositories", "AgentRepositories\AgentRepositories.csproj", "{80A81132-FA10-45A8-86BD-670FF91FEA06}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgentRepositories", "AgentRepositories\AgentRepositories.csproj", "{80A81132-FA10-45A8-86BD-670FF91FEA06}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgentRepositories.UnitTests", "AgentRepositories.UnitTests\AgentRepositories.UnitTests.csproj", "{D8CF8963-1A54-4B63-B51D-B2A67882DE5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgentRepositories.UnitTests", "AgentRepositories.UnitTests\AgentRepositories.UnitTests.csproj", "{D8CF8963-1A54-4B63-B51D-B2A67882DE5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agent.Core.UnitTests", "Agent.Core.UnitTests\Agent.Core.UnitTests.csproj", "{EA875B74-24C3-491B-A2C5-5078393525B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agent.Core.UnitTests", "Agent.Core.UnitTests\Agent.Core.UnitTests.csproj", "{EA875B74-24C3-491B-A2C5-5078393525B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Tgs.Agent.Core.ApplicationServices;
 using Tgs.Agent.Core.Models;
 using Tgs.ServiceUtility;
 
@@ -10,7 +11,7 @@ public class AgentController : ControllerBase
 {
     [HttpGet("allChildAgents/{agentId:Guid}", Name = "GetChildAgentInfos")]
     public IAsyncEnumerable<ChildAgentInfoModel> GetChildAgentInfosAsync(
-        [FromServices] IQueryService<GetChildAgentInfosRequest, ChildAgentInfoModel> queryService,
+        [FromServices] IQueryService<GetChildAgentInfosQuery, ChildAgentInfoModel> queryService,
         Guid agentId)
         => queryService.QueryAsync(new(agentId), HttpContext.RequestAborted);
 }

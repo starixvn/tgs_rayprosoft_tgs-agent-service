@@ -79,4 +79,5 @@ public partial class Agent
     public virtual ICollection<Agent> InverseParentAgent { get; set; } = new List<Agent>();
 
     public virtual Agent? ParentAgent { get; set; }
+
 }

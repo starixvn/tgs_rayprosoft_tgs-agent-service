@@ -11,48 +11,14 @@ namespace Tgs.Agent.IntegrationTest
         public async Task Get_Child_Agent_Infos()
         {
             var fakeAgentRepository = Substitute.For<IAgentRepository>();
-            await using var web = TestSiteHelper.GetAgentServiceTestHost(services => 
+            await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
                 services.AddSingleton(fakeAgentRepository));
 
             var httpClient = web.CreateClient();
 
             var sut = new AgentClient(httpClient);
 
-            //var dbContext = web.Services.GetRequiredService<TgsContext>();
-
             var parentAgentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
-
-            //await dbContext.Agents.AddRangeAsync(new Repositories.Entities.Agent[]
-            //{
-            //    new Repositories.Entities.Agent{
-            //        Id = Guid.Parse("30945e96-a762-4b6e-9acb-0266727528d7"),
-            //        ParentAgentId = parentAgentId,
-            //        Password = Array.Empty<byte>(),
-            //        Salt = Array.Empty<byte>(),
-            //        Username = "agent1",
-            //        RealName = "agent1",
-            //        DefaultWalletId = Guid.NewGuid(),
-            //        WithdrawPassword = Array.Empty<byte>(),
-            //        WithdrawSalt = Array.Empty<byte>(),
-            //        InvitationCode = "InvitationCode",
-            //        Path = $"{parentAgentId:N}.{Guid.Parse("30945e96-a762-4b6e-9acb-0266727528d7"):N}"
-            //    },
-            //    new Repositories.Entities.Agent{
-            //        Id = Guid.Parse("16bf8af5-52a6-404c-924d-3292cb4bf6ef"),
-            //        ParentAgentId = parentAgentId,
-            //        Password = Array.Empty<byte>(),
-            //        Salt = Array.Empty<byte>(),
-            //        Username = "agent1",
-            //        RealName = "agent1",
-            //        DefaultWalletId = Guid.NewGuid(),
-            //        WithdrawPassword = Array.Empty<byte>(),
-            //        WithdrawSalt = Array.Empty<byte>(),
-            //        InvitationCode = "InvitationCode",
-            //        Path = $"{parentAgentId:N}.{Guid.Parse("16bf8af5-52a6-404c-924d-3292cb4bf6ef"):N}"
-            //    }
-            //});
-
-            //_ = await dbContext.SaveChangesAsync();
 
             _ = fakeAgentRepository
                 .GetChildAgentInfosAsync(parentAgentId, Arg.Any<CancellationToken>())
@@ -72,48 +38,10 @@ namespace Tgs.Agent.IntegrationTest
                     }
                 }.ToAsyncEnumerable());
 
-            var actual = await sut.GetChildAgentInfosAsync(new(parentAgentId)).ToArrayAsync();           
+            var actual = await sut.GetChildAgentInfosAsync(new(parentAgentId)).ToArrayAsync();
 
             Assert.AreEqual(2, actual.Length);
             Assert.AreEqual(parentAgentId, actual[0].ParentAgentId);
-            //CollectionAssert.AreEquivalent(expected, actual);
         }
-
-        //[Fact]
-        //public async Task Test()
-        //{
-        //    await using var web = new AgentTestApplication();
-
-        //    var httpClient = web.CreateClient();
-
-        //    var sut = new AgentClient(httpClient);
-
-        //    var dbContext = web.Services.GetRequiredService<tgsContext>();
-
-        //    var agentId = Guid.NewGuid();
-        //    var parentAgentId = Guid.NewGuid();
-
-        //    _ = await dbContext.Agents.AddAsync(new Agents
-        //    {
-        //        Id = agentId,
-        //        ParentAgentId = parentAgentId,
-        //        Password = Array.Empty<byte>(),
-        //        Salt = Array.Empty<byte>(),
-        //        Username = "agent1",
-        //        RealName = "agent1",
-        //        DefaultWalletId = Guid.NewGuid(),
-        //        WithdrawPassword = Array.Empty<byte>(),
-        //        WithdrawSalt = Array.Empty<byte>(),
-        //        InvitationCode = "InvitationCode",
-        //        Path = $"{parentAgentId:N}.{agentId:N}"
-        //    });
-
-        //    _ = await dbContext.SaveChangesAsync();
-
-        //    var response =  sut.GetChildAgentInfosAsync(new(parentAgentId));
-
-        //    Assert.NotNull(response);
-        //    Assert.Equal(response.FirstAsync().Result.ParentAgentId, parentAgentId);
-        //}
     }
 }

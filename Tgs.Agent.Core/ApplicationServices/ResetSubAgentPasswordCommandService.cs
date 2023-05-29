@@ -22,7 +22,9 @@ internal class ResetSubAgentPasswordCommandService : ICommandService<ResetSubAge
 
     public async ValueTask ExecuteAsync(ResetSubAgentPasswordCommand command, CancellationToken cancellationToken = default)
     {
-        var subAgent = await _agentRepository.GetAgentByIdAsync(command.SubAgentId, cancellationToken).ConfigureAwait(false);
+        var subAgent = await _agentRepository
+            .GetAgentByIdAsync(command.SubAgentId, cancellationToken)
+            .ConfigureAwait(false);
 
         if (subAgent == null)
             return;
@@ -30,10 +32,16 @@ internal class ResetSubAgentPasswordCommandService : ICommandService<ResetSubAge
         if (subAgent.ParentAgentId != command.AgentId)
             return;
 
-        var (newSalt, newPassword) = _passwordHandler.GenerateCredential(command.Password);
+        var (salt, hashedPassword) = _passwordHandler.GenerateCredential(command.Password);
 
-        await _agentRepository.SetPasswordAsync(command.SubAgentId, newPassword, newSalt, cancellationToken).ConfigureAwait(false);
+        await _agentRepository.SetPasswordAsync(
+            command.SubAgentId,
+            hashedPassword,
+            salt,
+            cancellationToken).ConfigureAwait(false);
 
-        _logger.LogInformation("Agent({agentId}) reset sub agent({subAgentId}) password", command.AgentId, command.SubAgentId);
+        _logger.LogInformation("Agent({agentId}) reset sub agent({subAgentId}) password",
+            command.AgentId,
+            command.SubAgentId);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Tgs.Agent.ApplicationServices;
 using Tgs.Agent.Core.ApplicationServices;
 using Tgs.Agent.Service.Models;
 using Tgs.ServiceUtility;

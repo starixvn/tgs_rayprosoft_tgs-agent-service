@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Agent.ApplicationServices;
+namespace Tgs.Agent.Core.ApplicationServices;
 
 internal class SetAgentInfoCommandService : ICommandService<SetAgentInfoCommand>
 {
@@ -18,7 +18,9 @@ internal class SetAgentInfoCommandService : ICommandService<SetAgentInfoCommand>
 
     public async ValueTask ExecuteAsync(SetAgentInfoCommand command, CancellationToken cancellationToken = default)
     {
-        var subAgent = await _agentRepository.GetAgentByIdAsync(command.SubAgentId, cancellationToken).ConfigureAwait(false);
+        var subAgent = await _agentRepository
+            .GetAgentByIdAsync(command.SubAgentId, cancellationToken)
+            .ConfigureAwait(false);
 
         if (subAgent == null)
             return;
