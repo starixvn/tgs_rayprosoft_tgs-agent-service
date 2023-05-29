@@ -30,4 +30,8 @@
     <ProjectReference Include="..\AgentRepositories\AgentRepositories.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="NUnit.Framework" />
+  </ItemGroup>
+
 </Project>
