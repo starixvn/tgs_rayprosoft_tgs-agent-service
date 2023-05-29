@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
-using NUnit.Framework;
 using Tgs.Agent;
 using Tgs.Agent.Core.ApplicationServices;
 using Tgs.Agent.Models;

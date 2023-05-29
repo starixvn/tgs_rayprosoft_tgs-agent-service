@@ -29,4 +29,8 @@
     <ProjectReference Include="..\Tgs.Agent.Core\Tgs.Agent.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="NUnit.Framework" />
+  </ItemGroup>
+
 </Project>

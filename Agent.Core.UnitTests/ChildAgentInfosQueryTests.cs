@@ -1,5 +1,4 @@
 ﻿using NSubstitute;
-using NUnit.Framework;
 using Tgs.Agent;
 using Tgs.Agent.Core.ApplicationServices;
 
