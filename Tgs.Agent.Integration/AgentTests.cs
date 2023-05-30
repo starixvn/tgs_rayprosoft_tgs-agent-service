@@ -96,9 +96,8 @@ namespace Tgs.Agent.IntegrationTest
             var sut = new AgentClient(httpClient);
 
             var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
-            var subAgentId = Guid.Parse("30945e96-a762-4b6e-9acb-0266727528d7");
 
-            await sut.SetAgentInfoAsync(new(agentId, subAgentId, "realName", "email", "phone"));
+            await sut.SetAgentInfoAsync(new(agentId, "realName", "email", "phone"));
         }
 
         [Test]
