@@ -12,7 +12,10 @@ public class AgentClient : IAgentClient
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true
+        WriteIndented = true,
+        Converters = {
+            new JsonStringEnumConverter()
+        }
     };
 
     public AgentClient(HttpClient client)

@@ -39,7 +39,7 @@ internal class AgentRepository : IAgentRepository
             agent.Wechat,
             agent.InvitationCode,
             agent.ParentAgentId,
-            new DateTimeOffset(agent.RegisteredOn, TimeSpan.FromHours(8D)),
+            new DateTimeOffset(agent.RegisteredOn),
             agent.Status,
             agent.Type,
             agent.LevelType,
