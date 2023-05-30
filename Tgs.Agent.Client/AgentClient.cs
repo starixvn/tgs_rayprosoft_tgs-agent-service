@@ -17,7 +17,23 @@ public class AgentClient : IAgentClient
 
     public AgentClient(HttpClient client)
     {
-        _client = client;
+        _client = client ?? throw new ArgumentNullException(nameof(client));
+    }
+
+    public async ValueTask<AgentInfoModel?> GetAgentInfoAsync(GetAgentInfoRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .GetAsync($"/api/agent/info/{request.AgentId}", cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+
+        var contentJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+        if (string.IsNullOrEmpty(contentJson))
+            return null;
+
+        return JsonSerializer.Deserialize<AgentInfoModel>(contentJson, _jsonSerializerOptions);
     }
 
     public async IAsyncEnumerable<ChildAgentInfoModel> GetChildAgentInfosAsync(
@@ -38,19 +54,19 @@ public class AgentClient : IAgentClient
             yield return playerCountInfo;
     }
 
-    public async ValueTask ResetSubAgentPasswordAsync(ResetSubAgentPasswordRequest request, CancellationToken cancellationToken = default)
+    public async ValueTask SetAgentPasswordAsync(SetAgentPasswordRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _client
-            .PostAsJsonAsync("/api/subAgent/resetPassword", request, _jsonSerializerOptions, cancellationToken)
+            .PatchAsJsonAsync("/api/agent/setPassword", request, _jsonSerializerOptions, cancellationToken)
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();
     }
 
-    public async ValueTask SetSubAgentInfoAsync(SetSubAgentInfoRequest request, CancellationToken cancellationToken = default)
+    public async ValueTask SetAgentInfoAsync(SetAgentInfoRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _client
-            .PostAsJsonAsync("/api/subAgent/setInfo", request, _jsonSerializerOptions, cancellationToken: cancellationToken)
+            .PatchAsJsonAsync("/api/agent/setInfo", request, _jsonSerializerOptions, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();
