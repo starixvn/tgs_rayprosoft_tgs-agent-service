@@ -2,6 +2,5 @@
 
 public class SetAgentPasswordViewModel
 {
-    public Guid AgentId { get; set; }
     public string Password { get; set; } = default!;
 }

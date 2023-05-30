@@ -23,7 +23,7 @@ public class AgentClient : IAgentClient
     public async ValueTask<AgentInfoModel?> GetAgentInfoAsync(GetAgentInfoRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _client
-            .GetAsync($"/api/agent/info/{request.AgentId}", cancellationToken)
+            .GetAsync($"/api/agent/{request.AgentId}", cancellationToken)
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();
@@ -57,7 +57,7 @@ public class AgentClient : IAgentClient
     public async ValueTask SetAgentPasswordAsync(SetAgentPasswordRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _client
-            .PatchAsJsonAsync("/api/agent/setPassword", request, _jsonSerializerOptions, cancellationToken)
+            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:password", request, _jsonSerializerOptions, cancellationToken)
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();
@@ -66,7 +66,7 @@ public class AgentClient : IAgentClient
     public async ValueTask SetAgentInfoAsync(SetAgentInfoRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _client
-            .PatchAsJsonAsync("/api/agent/setInfo", request, _jsonSerializerOptions, cancellationToken: cancellationToken)
+            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:info", request, _jsonSerializerOptions, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();

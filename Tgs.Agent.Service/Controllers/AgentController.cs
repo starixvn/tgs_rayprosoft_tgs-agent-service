@@ -10,7 +10,7 @@ namespace Tgs.Agent.Service.Controllers;
 [ApiController]
 public class AgentController : ControllerBase
 {
-    [HttpGet("info/{agentId}", Name = "GetAgentInfo")]
+    [HttpGet("{agentId}", Name = "GetAgentInfo")]
     public async ValueTask<AgentInfoViewModel?> GetAgentInfoAsync(
         [FromServices] IGetService<GetAgentInfoQuery, AgentInfo?> getService,
         Guid agentId)
@@ -61,25 +61,27 @@ public class AgentController : ControllerBase
         }
     }
 
-    [HttpPatch("setInfo", Name = "SetAgentInfo")]
+    [HttpPatch("{agentId}:info", Name = "SetAgentInfo")]
     public ValueTask SetAgentInfoAsync(
        [FromServices] ICommandService<SetAgentInfoCommand> commandService,
-       [FromBody] SetAgentInfoViewModel request)
+       [FromBody] SetAgentInfoViewModel request,
+       Guid agentId)
         => commandService.ExecuteAsync(
         new SetAgentInfoCommand(
-                    request.AgentId,
+                    agentId,
                     request.RealName,
                     request.Email,
                     request.Phone),
             HttpContext.RequestAborted);
 
-    [HttpPatch("setPassword", Name = "SetPassword")]
+    [HttpPatch("{agentId}:password", Name = "SetPassword")]
     public ValueTask SetPasswordAsync(
         [FromServices] ICommandService<SetAgentPasswordCommand> commandService,
-        [FromBody] SetAgentPasswordViewModel request)
+        [FromBody] SetAgentPasswordViewModel request,
+        Guid agentId)
         => commandService.ExecuteAsync(
                 new(
-                    request.AgentId,
+                    agentId,
                     request.Password),
             HttpContext.RequestAborted);
 }
