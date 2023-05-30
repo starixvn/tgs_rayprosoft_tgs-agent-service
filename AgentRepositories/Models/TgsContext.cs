@@ -16,6 +16,10 @@ public partial class TgsContext : DbContext
 
     public virtual DbSet<Agent> Agents { get; set; }
 
+    public virtual DbSet<AgentDividend> AgentDividends { get; set; }
+
+    public virtual DbSet<Player> Players { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -23,6 +27,8 @@ public partial class TgsContext : DbContext
             .HasPostgresExtension("pg_trgm");
 
             modelBuilder.ApplyConfiguration(new Configurations.AgentConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.AgentDividendConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.PlayerConfiguration());
         OnModelCreatingPartial(modelBuilder);
     }
 

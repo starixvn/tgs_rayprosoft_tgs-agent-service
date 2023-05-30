@@ -33,7 +33,8 @@ public class AgentRepositoryTests
             ParentAgentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31"),
             RealName = "realName",
             Phone = "phone",
-            Email = "email"
+            Email = "email",
+            RegisteredOn = new DateTime(2000,1,1),
         };
 
         _ = await dbContext.Agents.AddAsync(agent);

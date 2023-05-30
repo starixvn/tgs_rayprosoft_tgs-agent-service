@@ -1,5 +1,4 @@
 ﻿using Tgs.Agent.Core.Models;
-using Tgs.Agent.Models;
 
 namespace Tgs.Agent;
 
@@ -11,5 +10,5 @@ public interface IAgentRepository
 
     public ValueTask SetAgentInfoAsync(Guid agentId, string? realName, string? email, string? phone, CancellationToken cancellationToken = default);
 
-    public ValueTask SetPasswordAsync(Guid agentId, byte[] newPassword, byte[] newSalt, CancellationToken cancellationToken = default);
+    public ValueTask SetPasswordAsync(Guid agentId, byte[] password, byte[] salt, CancellationToken cancellationToken = default);
 }

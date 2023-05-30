@@ -15,7 +15,15 @@
    "SelectedToBeGenerated": 0,
    "Tables": [
       {
+         "Name": "dbo.agent_dividends",
+         "ObjectType": 0
+      },
+      {
          "Name": "dbo.agents",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.players",
          "ObjectType": 0
       }
    ],
