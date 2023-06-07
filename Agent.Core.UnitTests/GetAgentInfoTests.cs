@@ -1,4 +1,5 @@
 ﻿using AutoFixture;
+using AutoFixture.NUnit3;
 using NSubstitute;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.ApplicationServices;
@@ -25,19 +26,16 @@ public class GetAgentInfoTests
     }
 
     [Test]
-    public async Task Get_Agent_Info_By_Username()
+    [AutoData]
+    public async Task Get_Agent_Info_By_Username(
+        AgentInfo agentInfo, 
+        GetAgentInfoByUsernameQuery query)
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
 
         var sut = new GetAgentInfoByUsernameQueryService(fakeAgentRepository);
 
-        var query = new GetAgentInfoByUsernameQuery(Guid.NewGuid(), "username");
-
-        var fixture = new Fixture();
-
-        var agentInfo = fixture.Create<AgentInfo>();
-
-        fakeAgentRepository.GetAgentByUsernameAsync(Arg.Any<Guid>(),Arg.Any<string>()).Returns(agentInfo);
+        fakeAgentRepository.GetAgentByUsernameAsync(Arg.Any<Guid>(), Arg.Any<string>()).Returns(agentInfo);
 
         var response = await sut.GetAsync(query);
 
