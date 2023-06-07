@@ -2,6 +2,7 @@
 using NSubstitute;
 using NUnit.Framework;
 using Tgs.Agent.Client;
+using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
 
 namespace Tgs.Agent.IntegrationTest
@@ -42,6 +43,45 @@ namespace Tgs.Agent.IntegrationTest
                     AccumulatedProfitSharing: 0M));
 
             var actual = await sut.GetAgentInfoAsync(new(agentId));
+
+            Assert.NotNull(actual);
+            Assert.AreEqual(agentId, actual!.Id);
+        }
+
+        [Test]
+        public async Task Get_Agent_Info_By_Username()
+        {
+            var fakeAgentRepository = Substitute.For<IAgentRepository>();
+            await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
+                services.AddSingleton(fakeAgentRepository));
+
+            var httpClient = web.CreateClient();
+
+            var sut = new AgentClient(httpClient);
+
+            var agentId = Guid.Parse("30945e96-a762-4b6e-9acb-0266727528d7");
+
+            _ = fakeAgentRepository
+                .GetAgentByUsernameAsync(Arg.Any<Guid>(),Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(new AgentInfo(
+                    agentId,
+                    Username: "agent1",
+                    RealName: null,
+                    Phone: null,
+                    Email: null,
+                    QQ: null,
+                    Wechat: null,
+                    InvitationCode: "wg5g8h",
+                    ParentAgentId: Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31"),
+                    RegisteredOn: DateTimeOffset.UtcNow,
+                    Status: 1,
+                    Type: 1,
+                    AgentLevelType: 1,
+                    DividendPercentage: 80M,
+                    PlayerNumber: 0,
+                    AccumulatedProfitSharing: 0M));
+
+            var actual = await sut.GetAgentInfoByUsernameAsync(new(Guid.NewGuid(),"username"));
 
             Assert.NotNull(actual);
             Assert.AreEqual(agentId, actual!.Id);

@@ -41,6 +41,37 @@ public class AgentController : ControllerBase
             info.AccumulatedProfitSharing);
     }
 
+    [HttpGet("info/{brandId}/{username}", Name = "GetAgentInfoByUsername")]
+    public async ValueTask<AgentInfoViewModel?> GetAgentInfoByUsernameAsync(
+        [FromServices] IGetService<GetAgentInfoByUsernameQuery, AgentInfo?> getService,
+        Guid brandId, string username)
+    {
+        var info = await getService
+            .GetAsync(new GetAgentInfoByUsernameQuery(brandId, username), HttpContext.RequestAborted)
+            .ConfigureAwait(false);
+
+        if (info is null)
+            return null;
+
+        return new AgentInfoViewModel(
+            info.Id,
+            info.Username,
+            info.RealName,
+            info.Phone,
+            info.Email,
+            info.QQ,
+            info.Wechat,
+            info.InvitationCode,
+            info.ParentAgentId,
+            info.RegisteredOn,
+            info.Status,
+            info.Type,
+            info.AgentLevelType,
+            info.DividendPercentage,
+            info.PlayerNumber,
+            info.AccumulatedProfitSharing);
+    }
+
     [HttpGet("allChildAgents/{agentId:Guid}", Name = "GetChildAgentInfos")]
     public async IAsyncEnumerable<ChildAgentInfoViewModel> GetChildAgentInfosAsync(
         [FromServices] IQueryService<GetChildAgentInfosQuery, ChildAgentInfoModel> queryService,

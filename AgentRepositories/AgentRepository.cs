@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Repositories.Entities;
 
@@ -27,7 +28,47 @@ internal class AgentRepository : IAgentRepository
             .SumAsync(x => x.BeforeDividendAmount ?? x.AgentDividendAmount, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        var playerNumber = agent.Players.Count(p => p.AgentId == id);
+        var playerNumber = await _tgsContext.Players
+            .CountAsync(p => p.AgentId == id, cancellationToken)
+            .ConfigureAwait(false);
+
+        return new AgentInfo(
+            agent.Id,
+            agent.Username,
+            agent.RealName,
+            agent.Phone,
+            agent.Email,
+            agent.Qq,
+            agent.Wechat,
+            agent.InvitationCode,
+            agent.ParentAgentId,
+            new DateTimeOffset(agent.RegisteredOn),
+            agent.Status,
+            agent.Type,
+            agent.LevelType,
+            agent.DividendPercentage,
+            playerNumber,
+            dividend);
+    }
+
+    public async ValueTask<AgentInfo?> GetAgentByUsernameAsync(Guid brandId, string username,
+        CancellationToken cancellationToken = default)
+    {
+        var agent = await _tgsContext.Agents
+            .FirstOrDefaultAsync(x => x.BrandId == brandId && x.Username == username, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (agent == null)
+            return null;
+
+        var dividend = await _tgsContext.AgentDividends
+            .Where(x => x.AgentId == agent.Id && x.SentOn == null)
+            .SumAsync(x => x.BeforeDividendAmount ?? x.AgentDividendAmount, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        var playerNumber = await _tgsContext.Players
+            .CountAsync(p => p.AgentId == agent.Id, cancellationToken)
+            .ConfigureAwait(false);
 
         return new AgentInfo(
             agent.Id,

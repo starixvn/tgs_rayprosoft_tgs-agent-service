@@ -40,6 +40,20 @@ public class AgentClient : IAgentClient
         return JsonSerializer.Deserialize<AgentInfoModel>(contentJson, _jsonSerializerOptions);
     }
 
+    public async ValueTask<AgentInfoModel?> GetAgentInfoByUsernameAsync(GetAgentInfoByUsernameRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .GetAsync($"/api/agent/info/{request.BrandId}/{request.Username}", cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+
+        var contentJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+        return string.IsNullOrEmpty(contentJson) ? null : JsonSerializer.Deserialize<AgentInfoModel>(contentJson, _jsonSerializerOptions);
+    }
+
     public async IAsyncEnumerable<ChildAgentInfoModel> GetChildAgentInfosAsync(
         GetChildAgentInfosRequest request,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
