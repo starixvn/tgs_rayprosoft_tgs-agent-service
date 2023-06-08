@@ -1,5 +1,5 @@
 ﻿using NSubstitute;
-using Tgs.Agent;
+using Tgs.Agent.Core;
 using Tgs.Agent.Core.ApplicationServices;
 
 namespace Agent.Core.UnitTests;

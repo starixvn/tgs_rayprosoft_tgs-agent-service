@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using NSubstitute;
-using Tgs.Agent;
+using Tgs.Agent.Core;
 using Tgs.Agent.Core.ApplicationServices;
 using Tgs.Core.Infrastructures.Security;
 

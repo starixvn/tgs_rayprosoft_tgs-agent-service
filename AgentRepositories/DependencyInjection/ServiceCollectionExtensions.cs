@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tgs.Agent;
+using Tgs.Agent.Core;
 using Tgs.Agent.Repositories;
 using Tgs.Agent.Repositories.Entities;
 

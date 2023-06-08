@@ -1,7 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using AutoFixture;
+using AutoFixture.NUnit3;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
 using Tgs.Agent.Client;
+using Tgs.Agent.Client.Models;
+using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
 
 namespace Tgs.Agent.IntegrationTest
@@ -45,6 +49,30 @@ namespace Tgs.Agent.IntegrationTest
 
             Assert.NotNull(actual);
             Assert.AreEqual(agentId, actual!.Id);
+        }
+
+        [Test]
+        [AutoData]
+        public async Task Get_Agent_Info_By_Username(
+            AgentInfo agentInfo, 
+            GetAgentInfoByUsernameRequest request)
+        {
+            var fakeAgentRepository = Substitute.For<IAgentRepository>();
+            await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
+                services.AddSingleton(fakeAgentRepository));
+
+            var httpClient = web.CreateClient();
+
+            var sut = new AgentClient(httpClient);
+
+            _ = fakeAgentRepository
+                .GetAgentByUsernameAsync(Arg.Any<Guid>(),Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(agentInfo);
+
+            var actual = await sut.GetAgentInfoByUsernameAsync(request);
+
+            Assert.NotNull(actual);
+            Assert.AreEqual(agentInfo.Id, actual!.Id);
         }
 
         [Test]
