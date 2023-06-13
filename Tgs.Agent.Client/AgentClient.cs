@@ -24,6 +24,15 @@ public class AgentClient : IAgentClient
         _client = client ?? throw new ArgumentNullException(nameof(client));
     }
 
+    public async ValueTask AddAgentAuditLogAsync(AddAgentAuditLogRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+           .PostAsJsonAsync("/api/auditlog", request, _jsonSerializerOptions, cancellationToken)
+           .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
+
     public async ValueTask<AgentInfoModel?> GetAgentInfoAsync(GetAgentInfoRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _client
@@ -76,6 +85,15 @@ public class AgentClient : IAgentClient
     {
         var response = await _client
             .PatchAsJsonAsync($"/api/agent/{request.AgentId}:password", request, _jsonSerializerOptions, cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
+
+    public async ValueTask SetAgentDividendPercentageAsync(SetAgentDividendPercentageRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:dividend", request, _jsonSerializerOptions, cancellationToken)
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();

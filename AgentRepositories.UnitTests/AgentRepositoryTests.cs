@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Tgs.Agent.Core.Models.Enums;
 using Tgs.Agent.Repositories;
 using Tgs.Agent.Repositories.Entities;
 
@@ -8,6 +9,45 @@ namespace AgentRepositories.UnitTests;
 
 public class AgentRepositoryTests
 {
+    [Test]
+    public async Task Add_Agent_Audit_Log()
+    {
+        var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+        _ = dbContextOptionsBuilder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(x => x.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning));
+
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+        var operation = AgentOperation.Info;
+        var id = Guid.Parse("7109b9ed-89f5-4f88-36b5-08d98d5fec0a");
+        var editUsername = "editUsername";
+
+        var agentAuditLog = new AgentAuditLog
+        {
+            Id = id,
+            AgentId = agentId,
+            CreatedByUsername = editUsername,
+            CreatedOn = DateTime.UtcNow,
+            Operation = (short)operation,
+        };
+
+        _ = await dbContext.AgentAuditLogs.AddAsync(agentAuditLog);
+        _ = await dbContext.SaveChangesAsync();
+
+        var sut = new AgentRepository(dbContext);
+
+        await sut.AddAgentAuditLogAsync(agentId, operation, editUsername);
+
+        var actual = await dbContext.AgentAuditLogs.FirstOrDefaultAsync(x => x.Id == id);
+
+        Assert.NotNull(actual);
+        Assert.AreEqual(actual!.AgentId, agentId);
+        Assert.AreEqual(actual!.CreatedByUsername, editUsername);
+    }
+
     [Test]
     public async Task Get_Agent_By_Id()
     {
@@ -34,10 +74,11 @@ public class AgentRepositoryTests
             RealName = "realName",
             Phone = "phone",
             Email = "email",
-            RegisteredOn = new DateTime(2000,1,1),
+            RegisteredOn = new DateTime(2000, 1, 1),
         };
 
         _ = await dbContext.Agents.AddAsync(agent);
+        _ = await dbContext.SaveChangesAsync();
 
         var sut = new AgentRepository(dbContext);
 
@@ -45,6 +86,86 @@ public class AgentRepositoryTests
 
         Assert.NotNull(actual);
         Assert.AreEqual(actual!.Id, agentId);
+    }
+
+    [Test]
+    public async Task Get_Agent_By_Username()
+    {
+        var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+        _ = dbContextOptionsBuilder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(x => x.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning));
+
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+        var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+        var username = "username";
+
+        var agent = new Agent
+        {
+            Id = Guid.Parse("30945e96-a762-4b6e-9acb-0266727528d7"),
+            BrandId = brandId,
+            Password = Encoding.UTF8.GetBytes("123"),
+            Salt = Encoding.UTF8.GetBytes("456"),
+            InvitationCode = "5kiqhx",
+            Username = "username",
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>(),
+            ParentAgentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31"),
+            RealName = "realName",
+            Phone = "phone",
+            Email = "email",
+            RegisteredOn = new DateTime(2000, 1, 1),
+        };
+
+        _ = await dbContext.Agents.AddAsync(agent);
+        _ = await dbContext.SaveChangesAsync();
+
+        var sut = new AgentRepository(dbContext);
+
+        var actual = await sut.GetAgentByUsernameAsync(brandId, username);
+
+        Assert.NotNull(actual);
+        Assert.AreEqual(actual!.Username, username);
+    }
+
+    [Test]
+    public async Task Set_Agent_Dividend_Percentage()
+    {
+        var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+        _ = dbContextOptionsBuilder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(x => x.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning));
+
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+        var agent = new Agent
+        {
+            Id = agentId,
+            Password = Encoding.UTF8.GetBytes("123"),
+            Salt = Encoding.UTF8.GetBytes("456"),
+            InvitationCode = "5kiqhx",
+            Username = "username",
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>(),
+            DividendPercentage = 70M
+        };
+
+        _ = await dbContext.Agents.AddAsync(agent);
+        _ = await dbContext.SaveChangesAsync();
+
+        var sut = new AgentRepository(dbContext);
+
+        await sut.SetAgentDividendPercentageAsync(agentId, 68M);
+
+        var actual = await dbContext.Agents.FirstOrDefaultAsync(x => x.Id == agentId);
+
+        Assert.NotNull(actual);
+        Assert.AreEqual(actual!.DividendPercentage, 68M);
     }
 
     [Test]
@@ -78,6 +199,7 @@ public class AgentRepositoryTests
         };
 
         _ = await dbContext.Agents.AddAsync(agent);
+        _ = await dbContext.SaveChangesAsync();
 
         var sut = new AgentRepository(dbContext);
 
@@ -115,6 +237,7 @@ public class AgentRepositoryTests
         };
 
         _ = await dbContext.Agents.AddAsync(agent);
+        _ = await dbContext.SaveChangesAsync();
 
         var sut = new AgentRepository(dbContext);
 

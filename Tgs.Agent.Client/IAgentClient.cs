@@ -4,6 +4,8 @@ namespace Tgs.Agent.Client;
 
 public interface IAgentClient
 {
+    ValueTask AddAgentAuditLogAsync(AddAgentAuditLogRequest request, CancellationToken cancellationToken = default);
+
     ValueTask<AgentInfoModel?> GetAgentInfoAsync(GetAgentInfoRequest request, CancellationToken cancellationToken = default);
 
     ValueTask<AgentInfoModel?> GetAgentInfoByUsernameAsync(GetAgentInfoByUsernameRequest request, CancellationToken cancellationToken = default);
@@ -11,6 +13,8 @@ public interface IAgentClient
     IAsyncEnumerable<ChildAgentInfoModel> GetChildAgentInfosAsync(GetChildAgentInfosRequest request, CancellationToken cancellationToken = default);
 
     ValueTask SetAgentInfoAsync(SetAgentInfoRequest request, CancellationToken cancellationToken = default);
+
+    ValueTask SetAgentDividendPercentageAsync(SetAgentDividendPercentageRequest request, CancellationToken cancellationToken = default);
 
     ValueTask SetAgentPasswordAsync(SetAgentPasswordRequest request, CancellationToken cancellationToken = default);
 }
