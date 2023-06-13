@@ -4,9 +4,9 @@ namespace Tgs.Agent.Core.ApplicationServices;
 
 internal class AddAgentAuditLogCommandService : ICommandService<AddAgentAuditLogCommand>
 {
-    private readonly IAgentAuditLogRepository _repository;
+    private readonly IAgentRepository _repository;
 
-    public AddAgentAuditLogCommandService(IAgentAuditLogRepository repository)
+    public AddAgentAuditLogCommandService(IAgentRepository repository)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }

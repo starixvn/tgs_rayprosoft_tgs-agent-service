@@ -10,7 +10,7 @@ public class AddAgentAuditLogTests
     [Test]
     public async Task Add_Agent_Audit_Log()
     {
-        var fakeAgentRepository = Substitute.For<IAgentAuditLogRepository>();
+        var fakeAgentRepository = Substitute.For<IAgentRepository>();
 
         var sut = new AddAgentAuditLogCommandService(fakeAgentRepository);
 
