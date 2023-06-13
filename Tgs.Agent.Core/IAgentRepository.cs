@@ -10,6 +10,8 @@ public interface IAgentRepository
 
     public IAsyncEnumerable<ChildAgentInfoModel> GetChildAgentInfosAsync(Guid agentId, CancellationToken cancellationToken = default);
 
+    public ValueTask SetAgentDividendPercentageAsync(Guid agentId, decimal dividendPercentage, CancellationToken cancellationToken = default);
+
     public ValueTask SetAgentInfoAsync(Guid agentId, string? realName, string? email, string? phone, CancellationToken cancellationToken = default);
 
     public ValueTask SetPasswordAsync(Guid agentId, byte[] password, byte[] salt, CancellationToken cancellationToken = default);

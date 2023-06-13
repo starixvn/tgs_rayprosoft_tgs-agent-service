@@ -97,9 +97,25 @@ internal class AgentRepository : IAgentRepository
             {
                 AgentId = x.Id,
                 AgentUsername = x.Username,
-                ParentAgentId = x.ParentAgentId!.Value
+                ParentAgentId = x.ParentAgentId!.Value,
+                DividendPercentage = x.DividendPercentage,
             })
             .ToAsyncEnumerable();
+
+    public async ValueTask SetAgentDividendPercentageAsync(Guid agentId, decimal dividendPercentage, CancellationToken cancellationToken = default)
+    {
+        var agent = await _tgsContext.Agents
+            .FindAsync(new object?[] { agentId }, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        if (agent is null)
+            return;
+
+        agent.DividendPercentage = dividendPercentage;
+        agent.UpdatedOn = DateTime.UtcNow;
+
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
 
     public async ValueTask SetAgentInfoAsync(Guid agentId, string? realName, string? email, string? phone, CancellationToken cancellationToken = default)
     {

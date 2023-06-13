@@ -129,6 +129,22 @@ namespace Tgs.Agent.IntegrationTest
         }
 
         [Test]
+        public async Task Set_Agent_Dividend_Percentage()
+        {
+            var fakeAgentRepository = Substitute.For<IAgentRepository>();
+            await using var web = TestSiteHelper.GetAgentServiceTestHost(services
+                => services.AddSingleton(fakeAgentRepository));
+
+            var httpClient = web.CreateClient();
+
+            var sut = new AgentClient(httpClient);
+
+            var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+            await sut.SetAgentDividendPercentageAsync(new(agentId, 68M));
+        }
+
+        [Test]
         public async Task Set_Agent_Password()
         {
             var fakeAgentRepository = Substitute.For<IAgentRepository>();

@@ -76,6 +76,8 @@ public partial class Agent
 
     public LTree Path { get; set; }
 
+    public virtual ICollection<AgentAuditLog> AgentAuditLogs { get; set; } = new List<AgentAuditLog>();
+
     public virtual ICollection<Agent> InverseParentAgent { get; set; } = new List<Agent>();
 
     public virtual Agent? ParentAgent { get; set; }

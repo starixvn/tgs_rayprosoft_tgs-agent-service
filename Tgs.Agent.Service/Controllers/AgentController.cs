@@ -88,6 +88,7 @@ public class AgentController : ControllerBase
                 AgentId = info.AgentId,
                 AgentUsername = info.AgentUsername,
                 ParentAgentId = info.ParentAgentId,
+                DividendPercentage = info.DividendPercentage,
             };
         }
     }
@@ -103,6 +104,17 @@ public class AgentController : ControllerBase
                     request.RealName,
                     request.Email,
                     request.Phone),
+            HttpContext.RequestAborted);
+
+    [HttpPatch("{agentId}:dividend", Name = "SetAgentDividendPercentage")]
+    public ValueTask SetAgentDividendPercentageAsync(
+       [FromServices] ICommandService<SetAgentDividendPercentageCommand> commandService,
+       [FromBody] SetAgentDividendPercentageViewModel request,
+       Guid agentId)
+        => commandService.ExecuteAsync(
+        new SetAgentDividendPercentageCommand(
+                    agentId,
+                    request.DividendPercentage),
             HttpContext.RequestAborted);
 
     [HttpPatch("{agentId}:password", Name = "SetPassword")]
