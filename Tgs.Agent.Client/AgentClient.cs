@@ -107,4 +107,13 @@ public class AgentClient : IAgentClient
 
         _ = response.EnsureSuccessStatusCode();
     }
+
+    public async ValueTask SetAgentContactAsync(SetAgentContactRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:contact", request, _jsonSerializerOptions, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
 }

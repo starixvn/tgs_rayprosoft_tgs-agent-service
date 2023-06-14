@@ -14,6 +14,8 @@ public interface IAgentClient
 
     ValueTask SetAgentInfoAsync(SetAgentInfoRequest request, CancellationToken cancellationToken = default);
 
+    ValueTask SetAgentContactAsync(SetAgentContactRequest request, CancellationToken cancellationToken = default);
+
     ValueTask SetAgentDividendPercentageAsync(SetAgentDividendPercentageRequest request, CancellationToken cancellationToken = default);
 
     ValueTask SetAgentPasswordAsync(SetAgentPasswordRequest request, CancellationToken cancellationToken = default);

@@ -1,5 +1,4 @@
-﻿using AutoFixture;
-using AutoFixture.NUnit3;
+﻿using AutoFixture.NUnit3;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
@@ -54,7 +53,7 @@ namespace Tgs.Agent.IntegrationTest
         [Test]
         [AutoData]
         public async Task Get_Agent_Info_By_Username(
-            AgentInfo agentInfo, 
+            AgentInfo agentInfo,
             GetAgentInfoByUsernameRequest request)
         {
             var fakeAgentRepository = Substitute.For<IAgentRepository>();
@@ -66,7 +65,7 @@ namespace Tgs.Agent.IntegrationTest
             var sut = new AgentClient(httpClient);
 
             _ = fakeAgentRepository
-                .GetAgentByUsernameAsync(Arg.Any<Guid>(),Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .GetAgentByUsernameAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
                 .Returns(agentInfo);
 
             var actual = await sut.GetAgentInfoByUsernameAsync(request);
@@ -125,7 +124,23 @@ namespace Tgs.Agent.IntegrationTest
 
             var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
 
-            await sut.SetAgentInfoAsync(new(agentId, "realName", "email", "phone"));
+            await sut.SetAgentInfoAsync(new(agentId, "realName"));
+        }
+
+        [Test]
+        public async Task Set_Agent_Contact()
+        {
+            var fakeAgentRepository = Substitute.For<IAgentRepository>();
+            await using var web = TestSiteHelper.GetAgentServiceTestHost(services
+                => services.AddSingleton(fakeAgentRepository));
+
+            var httpClient = web.CreateClient();
+
+            var sut = new AgentClient(httpClient);
+
+            var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+            await sut.SetAgentContactAsync(new(agentId, "email", "phone"));
         }
 
         [Test]

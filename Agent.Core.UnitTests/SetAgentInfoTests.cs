@@ -17,9 +17,7 @@ public class SetAgentInfoTests
 
         var command = new SetAgentInfoCommand(
             agentId,
-            "realName",
-            "email",
-            "phone");
+            "realName");
 
         await sut.ExecuteAsync(command);
 
@@ -27,8 +25,6 @@ public class SetAgentInfoTests
             .Received(1)
             .SetAgentInfoAsync(
                 Arg.Is(command.AgentId),
-                Arg.Is(command.RealName),
-                Arg.Is(command.Email),
-                Arg.Is(command.Phone));
+                Arg.Is(command.RealName));
     }
 }

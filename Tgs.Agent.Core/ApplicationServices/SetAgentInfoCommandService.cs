@@ -16,7 +16,5 @@ internal class SetAgentInfoCommandService : ICommandService<SetAgentInfoCommand>
         => _repository.SetAgentInfoAsync(
             command.AgentId,
             command.RealName,
-            command.Email,
-            command.Phone,
             cancellationToken);
 }
