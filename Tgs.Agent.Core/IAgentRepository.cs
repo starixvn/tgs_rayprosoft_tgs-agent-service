@@ -15,7 +15,9 @@ public interface IAgentRepository
 
     public ValueTask SetAgentDividendPercentageAsync(Guid agentId, decimal dividendPercentage, CancellationToken cancellationToken = default);
 
-    public ValueTask SetAgentInfoAsync(Guid agentId, string? realName, string? email, string? phone, CancellationToken cancellationToken = default);
+    public ValueTask SetAgentInfoAsync(Guid agentId, string? realName, CancellationToken cancellationToken = default);
+
+    public ValueTask SetAgentContactAsync(Guid agentId, string? email, string? phone, CancellationToken cancellationToken = default);
 
     public ValueTask SetPasswordAsync(Guid agentId, byte[] password, byte[] salt, CancellationToken cancellationToken = default);
 }

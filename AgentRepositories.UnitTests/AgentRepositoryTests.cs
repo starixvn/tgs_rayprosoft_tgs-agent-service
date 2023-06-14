@@ -181,6 +181,46 @@ public class AgentRepositoryTests
 
         var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
         var realName = "realName";
+
+        var agent = new Agent
+        {
+            Id = agentId,
+            Password = Encoding.UTF8.GetBytes("123"),
+            Salt = Encoding.UTF8.GetBytes("456"),
+            InvitationCode = "5kiqhx",
+            Username = "username",
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>(),
+            RealName = "abc",
+            Email = "abc",
+            Phone = "abc",
+        };
+
+        _ = await dbContext.Agents.AddAsync(agent);
+        _ = await dbContext.SaveChangesAsync();
+
+        var sut = new AgentRepository(dbContext);
+
+        await sut.SetAgentInfoAsync(agentId, realName);
+
+        var actual = await dbContext.Agents.FirstOrDefaultAsync(x => x.Id == agentId);
+
+        Assert.NotNull(actual);
+        Assert.AreEqual(actual!.RealName, realName);
+    }
+
+    [Test]
+    public async Task Set_Agent_Contact()
+    {
+        var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+        _ = dbContextOptionsBuilder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(x => x.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning));
+
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
         var email = "email";
         var phone = "phone";
 
@@ -203,12 +243,11 @@ public class AgentRepositoryTests
 
         var sut = new AgentRepository(dbContext);
 
-        await sut.SetAgentInfoAsync(agentId, realName, email, phone);
+        await sut.SetAgentContactAsync(agentId, email, phone);
 
         var actual = await dbContext.Agents.FirstOrDefaultAsync(x => x.Id == agentId);
 
         Assert.NotNull(actual);
-        Assert.AreEqual(actual!.RealName, realName);
         Assert.AreEqual(actual!.Email, email);
         Assert.AreEqual(actual!.Phone, phone);
     }

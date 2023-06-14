@@ -138,7 +138,7 @@ internal class AgentRepository : IAgentRepository
         _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async ValueTask SetAgentInfoAsync(Guid agentId, string? realName, string? email, string? phone, CancellationToken cancellationToken = default)
+    public async ValueTask SetAgentInfoAsync(Guid agentId, string? realName, CancellationToken cancellationToken = default)
     {
         var agent = await _tgsContext.Agents
             .FindAsync(new object?[] { agentId }, cancellationToken: cancellationToken)
@@ -148,8 +148,24 @@ internal class AgentRepository : IAgentRepository
             return;
 
         agent.RealName = realName;
-        agent.Email = email;
-        agent.Phone = phone;
+        agent.UpdatedOn = DateTime.UtcNow;
+
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async ValueTask SetAgentContactAsync(Guid agentId, string? email, string? phone, CancellationToken cancellationToken = default)
+    {
+        var agent = await _tgsContext.Agents
+            .FindAsync(new object?[] { agentId }, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        if (agent is null)
+            return;
+
+        if (!string.IsNullOrWhiteSpace(email))
+            agent.Email = email;
+        if (!string.IsNullOrWhiteSpace(phone))
+            agent.Phone = phone;
         agent.UpdatedOn = DateTime.UtcNow;
 
         _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

@@ -101,7 +101,17 @@ public class AgentController : ControllerBase
         => commandService.ExecuteAsync(
         new SetAgentInfoCommand(
                     agentId,
-                    request.RealName,
+                    request.RealName),
+            HttpContext.RequestAborted);
+
+    [HttpPatch("{agentId}:contact", Name = "SetAgentContact")]
+    public ValueTask SetAgentContactAsync(
+       [FromServices] ICommandService<SetAgentContactCommand> commandService,
+       [FromBody] SetAgentContactViewModel request,
+       Guid agentId)
+        => commandService.ExecuteAsync(
+        new SetAgentContactCommand(
+                    agentId,
                     request.Email,
                     request.Phone),
             HttpContext.RequestAborted);
