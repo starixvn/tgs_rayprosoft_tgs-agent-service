@@ -186,4 +186,26 @@ internal class AgentRepository : IAgentRepository
 
         _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
+
+    public async Task ClearNegativeCommissionAsync(Guid agentId, Guid clearByUserId,
+        CancellationToken cancellationToken = default)
+    {
+        var commissions = _tgsContext.AgentDividends
+            .Where(x => x.AgentId == agentId && x.SentOn == null)
+            .ToAsyncEnumerable();
+
+        await _tgsContext.AddRangeAsync(commissions.Select(x => new AgentClearCommissionRecord
+        {
+            AgentDividendId = x.Id,
+            CommissionAmount = x.AgentDividendAmount,
+            ClearByUserId = clearByUserId,
+            CreatedOn = DateTime.UtcNow,
+        }).ToEnumerable(), cancellationToken).ConfigureAwait(false);
+
+        await commissions.ForEachAsync(x => x.SentOn = DateTime.UtcNow, cancellationToken).ConfigureAwait(false);
+
+        _tgsContext.UpdateRange(commissions.ToEnumerable(), cancellationToken);
+
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
 }

@@ -19,4 +19,6 @@ public interface IAgentClient
     ValueTask SetAgentDividendPercentageAsync(SetAgentDividendPercentageRequest request, CancellationToken cancellationToken = default);
 
     ValueTask SetAgentPasswordAsync(SetAgentPasswordRequest request, CancellationToken cancellationToken = default);
+
+    ValueTask ClearAgentNegativeCommissionAsync(ClearAgentNegativeCommissionRequest request, CancellationToken cancellationToken = default);
 }
