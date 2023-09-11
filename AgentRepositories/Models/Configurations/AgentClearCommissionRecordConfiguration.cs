@@ -13,10 +13,13 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
     {
         public void Configure(EntityTypeBuilder<AgentClearCommissionRecord> entity)
         {
-            entity.HasKey(e => e.AgentDividendId).HasName("pk_agent_clear_commission_records_id");
+            entity.HasKey(e => e.Id).HasName("pk_agent_clear_commission_records_id");
 
             entity.ToTable("agent_clear_commission_records", "dbo");
 
+            entity.Property(e => e.Id)
+            .ValueGeneratedNever()
+            .HasColumnName("id");
             entity.Property(e => e.AgentDividendId).HasColumnName("agent_dividend_id");
             entity.Property(e => e.ClearByUserId).HasColumnName("clear_by_user_id");
             entity.Property(e => e.CommissionAmount).HasColumnName("commission_amount");

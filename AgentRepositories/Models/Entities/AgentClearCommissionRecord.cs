@@ -7,6 +7,8 @@ namespace Tgs.Agent.Repositories.Entities;
 
 public partial class AgentClearCommissionRecord
 {
+    public Guid Id { get; set; }
+
     public int AgentDividendId { get; set; }
 
     public decimal CommissionAmount { get; set; }

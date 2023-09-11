@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
+    <PackageReference Include="TGS.Core.Infrastructures.Extensions" Version="0.0.1" />
   </ItemGroup>
 
   <ItemGroup>

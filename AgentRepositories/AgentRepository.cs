@@ -3,6 +3,7 @@ using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Core.Models.Enums;
 using Tgs.Agent.Repositories.Entities;
+using TGS.Core.Infrastructures.Extensions;
 
 namespace Tgs.Agent.Repositories;
 
@@ -194,18 +195,25 @@ internal class AgentRepository : IAgentRepository
             .Where(x => x.AgentId == agentId && x.SentOn == null)
             .ToAsyncEnumerable();
 
-        await _tgsContext.AddRangeAsync(commissions.Select(x => new AgentClearCommissionRecord
-        {
-            AgentDividendId = x.Id,
-            CommissionAmount = x.AgentDividendAmount,
-            ClearByUserId = clearByUserId,
-            CreatedOn = DateTime.UtcNow,
-        }).ToEnumerable(), cancellationToken).ConfigureAwait(false);
+        await _tgsContext.AddRangeAsync(
+                commissions.Select(x => new AgentClearCommissionRecord
+                    {
+                        Id = GuidExtensions.NewSequentialGuid(),
+                        AgentDividendId = x.Id,
+                        CommissionAmount = x.AgentDividendAmount,
+                        ClearByUserId = clearByUserId,
+                        CreatedOn = DateTime.UtcNow,
+                    })
+                    .ToEnumerable(),
+                cancellationToken)
+            .ConfigureAwait(false);
 
-        await commissions.ForEachAsync(x => x.SentOn = DateTime.UtcNow, cancellationToken).ConfigureAwait(false);
+        await commissions.ForEachAsync(x => x.SentOn = DateTime.UtcNow, cancellationToken)
+            .ConfigureAwait(false);
 
         _tgsContext.UpdateRange(commissions.ToEnumerable(), cancellationToken);
 
-        _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 }
