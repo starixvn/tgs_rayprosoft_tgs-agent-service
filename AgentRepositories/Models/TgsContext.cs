@@ -14,9 +14,15 @@ public partial class TgsContext : DbContext
     {
     }
 
+    public TgsContext()
+    {
+    }
+
     public virtual DbSet<Agent> Agents { get; set; }
 
     public virtual DbSet<AgentAuditLog> AgentAuditLogs { get; set; }
+
+    public virtual DbSet<AgentClearCommissionRecord> AgentClearCommissionRecords { get; set; }
 
     public virtual DbSet<AgentDividend> AgentDividends { get; set; }
 
@@ -26,10 +32,12 @@ public partial class TgsContext : DbContext
     {
         modelBuilder
             .HasPostgresExtension("ltree")
-            .HasPostgresExtension("pg_trgm");
+            .HasPostgresExtension("pg_trgm")
+            .HasPostgresExtension("uuid-ossp");
 
             modelBuilder.ApplyConfiguration(new Configurations.AgentConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.AgentAuditLogConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.AgentClearCommissionRecordConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.AgentDividendConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.PlayerConfiguration());
         OnModelCreatingPartial(modelBuilder);

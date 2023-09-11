@@ -99,6 +99,16 @@ public class AgentClient : IAgentClient
         _ = response.EnsureSuccessStatusCode();
     }
 
+    public async ValueTask ClearAgentNegativeCommissionAsync(ClearAgentNegativeCommissionRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .PutAsync($"/api/agentCommission/clear/{request.AgentId}/{request.ClearByUserId}", null, cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
+
     public async ValueTask SetAgentInfoAsync(SetAgentInfoRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _client
