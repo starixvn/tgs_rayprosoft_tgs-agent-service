@@ -71,8 +71,7 @@ public class AgentCommission
         await fakeTgsContext.Received(1)
             .AddRangeAsync(Arg.Any<IEnumerable<AgentClearCommissionRecord>>(), Arg.Any<CancellationToken>());
 
-        fakeTgsContext.Received(1)
-            .UpdateRange(Arg.Any<IEnumerable<AgentDividend>>(), Arg.Any<CancellationToken>());
+        fakeTgsContext.AgentDividends.Received(1).UpdateRange(Arg.Any<IEnumerable<AgentDividend>>());
     }
 }
 

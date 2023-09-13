@@ -211,7 +211,7 @@ internal class AgentRepository : IAgentRepository
         await commissions.ForEachAsync(x => x.SentOn = DateTime.UtcNow, cancellationToken)
             .ConfigureAwait(false);
 
-        _tgsContext.UpdateRange(commissions.ToEnumerable(), cancellationToken);
+        _tgsContext.AgentDividends.UpdateRange(commissions.ToEnumerable());
 
         _ = await _tgsContext.SaveChangesAsync(cancellationToken)
             .ConfigureAwait(false);
