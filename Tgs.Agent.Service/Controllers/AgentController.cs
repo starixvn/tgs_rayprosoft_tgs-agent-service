@@ -143,5 +143,9 @@ public class AgentController : ControllerBase
         [FromServices] ICommandService<SetAgentPayPasswordCommand> commandService,
         [FromBody] SetAgentPayPasswordViewModel request,
         Guid agentId)
-        => commandService.ExecuteAsync(new SetAgentPayPasswordCommand(agentId, request.PayPassword));
+        => commandService.ExecuteAsync(
+            new SetAgentPayPasswordCommand(
+                agentId,
+                request.PayPassword),
+            HttpContext.RequestAborted);
 }
