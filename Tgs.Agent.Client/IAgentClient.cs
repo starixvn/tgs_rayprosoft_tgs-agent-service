@@ -21,4 +21,6 @@ public interface IAgentClient
     ValueTask SetAgentPasswordAsync(SetAgentPasswordRequest request, CancellationToken cancellationToken = default);
 
     ValueTask ClearAgentNegativeCommissionAsync(ClearAgentNegativeCommissionRequest request, CancellationToken cancellationToken = default);
+
+    ValueTask SetAgentPayPasswordAsync(SetAgentPayPasswordRequest request, CancellationToken cancellationToken = default);
 }

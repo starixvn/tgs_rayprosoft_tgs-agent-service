@@ -291,4 +291,44 @@ public class AgentRepositoryTests
         Assert.AreEqual(actual!.Password, newPassword);
         Assert.AreEqual(actual!.Salt, newSalt);
     }
+
+    [Test]
+    public async Task 更新代理提款密碼()
+    {
+        var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+        _ = dbContextOptionsBuilder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(x => x.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning));
+
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+        var agent = new Agent
+        {
+            Id = agentId,
+            Password = Encoding.UTF8.GetBytes("123"),
+            Salt = Encoding.UTF8.GetBytes("456"),
+            InvitationCode = "5kiqhx",
+            Username = "username",
+            WithdrawPassword = Encoding.UTF8.GetBytes("123"),
+            WithdrawSalt = Encoding.UTF8.GetBytes("456"),
+        };
+
+        _ = await dbContext.Agents.AddAsync(agent);
+        _ = await dbContext.SaveChangesAsync();
+
+        var sut = new AgentRepository(dbContext);
+
+        var newPassword = Encoding.UTF8.GetBytes("123456");
+        var newSalt = Encoding.UTF8.GetBytes("456789");
+
+        await sut.SetPayPasswordAsync(agentId, newPassword, newSalt);
+
+        var actual = await dbContext.Agents.FirstOrDefaultAsync(x => x.Id == agentId);
+
+        Assert.NotNull(actual);
+        Assert.AreEqual(actual!.WithdrawPassword, newPassword);
+        Assert.AreEqual(actual!.WithdrawSalt, newSalt);
+    }
 }

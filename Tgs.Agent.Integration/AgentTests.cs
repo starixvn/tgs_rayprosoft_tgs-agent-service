@@ -174,5 +174,21 @@ namespace Tgs.Agent.IntegrationTest
 
             await sut.SetAgentPasswordAsync(new(agentId, "password"));
         }
+
+        [Test]
+        public async Task 設置代理提款密碼()
+        {
+            var fakeAgentRepository = Substitute.For<IAgentRepository>();
+            await using var web = TestSiteHelper.GetAgentServiceTestHost(services
+                => services.AddSingleton(fakeAgentRepository));
+
+            var httpClient = web.CreateClient();
+
+            var sut = new AgentClient(httpClient);
+
+            var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+            await sut.SetAgentPayPasswordAsync(new(agentId, "password"));
+        }
     }
 }

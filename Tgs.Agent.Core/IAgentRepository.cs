@@ -22,4 +22,6 @@ public interface IAgentRepository
     public ValueTask SetPasswordAsync(Guid agentId, byte[] password, byte[] salt, CancellationToken cancellationToken = default);
 
     public Task ClearNegativeCommissionAsync(Guid agentId, Guid clearByUserId, CancellationToken cancellationToken = default);
+
+    public ValueTask SetPayPasswordAsync(Guid agentId, byte[] payPassword, byte[] paySalt, CancellationToken cancellationToken = default);
 }
