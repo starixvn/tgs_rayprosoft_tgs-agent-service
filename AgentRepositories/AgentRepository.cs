@@ -197,13 +197,13 @@ internal class AgentRepository : IAgentRepository
 
         await _tgsContext.AddRangeAsync(
                 commissions.Select(x => new AgentClearCommissionRecord
-                    {
-                        Id = GuidExtensions.NewSequentialGuid(),
-                        AgentDividendId = x.Id,
-                        CommissionAmount = x.AgentDividendAmount,
-                        ClearByUserId = clearByUserId,
-                        CreatedOn = DateTime.UtcNow,
-                    })
+                {
+                    Id = GuidExtensions.NewSequentialGuid(),
+                    AgentDividendId = x.Id,
+                    CommissionAmount = x.AgentDividendAmount,
+                    ClearByUserId = clearByUserId,
+                    CreatedOn = DateTime.UtcNow,
+                })
                     .ToEnumerable(),
                 cancellationToken)
             .ConfigureAwait(false);
@@ -214,6 +214,24 @@ internal class AgentRepository : IAgentRepository
         _tgsContext.AgentDividends.UpdateRange(commissions.ToEnumerable());
 
         _ = await _tgsContext.SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async ValueTask SetPayPasswordAsync(Guid agentId, byte[] payPassword, byte[] paySalt, CancellationToken cancellationToken = default)
+    {
+        var agent = await _tgsContext.Agents
+            .FindAsync(new object?[] { agentId }, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        if (agent is null)
+            return;
+
+        agent.WithdrawPassword = payPassword;
+        agent.WithdrawSalt = paySalt;
+        agent.UpdatedOn = DateTime.UtcNow;
+
+        _ = await _tgsContext
+            .SaveChangesAsync(cancellationToken)
             .ConfigureAwait(false);
     }
 }

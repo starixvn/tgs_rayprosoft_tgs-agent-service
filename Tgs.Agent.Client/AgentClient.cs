@@ -126,4 +126,13 @@ public class AgentClient : IAgentClient
 
         _ = response.EnsureSuccessStatusCode();
     }
+
+    public async ValueTask SetAgentPayPasswordAsync(SetAgentPayPasswordRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:pay-password", request, _jsonSerializerOptions, cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
 }
