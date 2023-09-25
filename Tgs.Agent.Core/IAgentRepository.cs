@@ -1,10 +1,15 @@
 ﻿using Tgs.Agent.Core.Models;
 using Tgs.Agent.Core.Models.Enums;
+using Tgs.Paging;
 
 namespace Tgs.Agent.Core;
 
 public interface IAgentRepository
 {
+    IAsyncEnumerable<AgentAuditLogInfo> QueryAgentAuditLogsAsync(AgenAuditLogQueryConditions conditions, Paging<AgentAuditLogInfo> paging, CancellationToken cancellationToken = default);
+
+    ValueTask<int> CountAgentAuditLogsAsync(AgenAuditLogQueryConditions conditions, CancellationToken cancellationToken = default);
+
     public ValueTask AddAgentAuditLogAsync(Guid agentId, AgentOperation operation, string editUsername, CancellationToken cancellationToken = default);
 
     public ValueTask<AgentInfo?> GetAgentByIdAsync(Guid id, CancellationToken cancellationToken = default);

@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Web;
 using Tgs.Agent.Client.Models;
 
 namespace Tgs.Agent.Client;
@@ -134,5 +135,49 @@ public class AgentClient : IAgentClient
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();
+    }
+
+    public async ValueTask<PagingResponse<AgentAuditLogInfo>> GetAgentAuditLogsAsync(
+        GetAgentAuditLogQueryConditions conditions,
+        Paging paging,
+        CancellationToken cancellationToken = default)
+    {
+        var queryStrings = HttpUtility.ParseQueryString(string.Empty);
+
+        queryStrings.Add("brand_id", conditions.BrandId.ToString());
+        queryStrings.Add("agent_id", conditions.AgentId.ToString());
+        queryStrings.Add("from", conditions.From.ToString("o"));
+        queryStrings.Add("to", conditions.To.ToString("o"));
+
+        if (paging.ShowAll == true)
+            queryStrings.Add("all", "true");
+        else
+        {
+            if (paging.Page != null)
+                queryStrings.Add("page", paging.Page.ToString());
+
+            if (paging.Rows != null)
+                queryStrings.Add("rows", paging.Rows.ToString());
+        }
+
+        if (!string.IsNullOrWhiteSpace(paging.SortBy))
+        {
+            queryStrings.Add("sort", paging.SortBy);
+
+            if (paging.IsDesc == true)
+                queryStrings.Add("desc", "true");
+        }
+
+        var response = await _client
+            .GetAsync($"/api/auditlog/{conditions.BrandId}?{queryStrings}", cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+
+        var contentJson = await response.Content
+            .ReadAsStringAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return JsonSerializer.Deserialize<PagingResponse<AgentAuditLogInfo>>(contentJson, _jsonSerializerOptions)!;
     }
 }
