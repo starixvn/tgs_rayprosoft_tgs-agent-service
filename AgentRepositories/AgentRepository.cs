@@ -3,6 +3,7 @@ using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Core.Models.Enums;
 using Tgs.Agent.Repositories.Entities;
+using Tgs.Paging;
 using TGS.Core.Infrastructures.Extensions;
 
 namespace Tgs.Agent.Repositories;
@@ -232,6 +233,47 @@ internal class AgentRepository : IAgentRepository
 
         _ = await _tgsContext
             .SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private IQueryable<AgentAuditLog> MakeAgentAuditLogQuery(AgenAuditLogQueryConditions conditions)
+    {
+        var dataQuery = _tgsContext.AgentAuditLogs.AsQueryable()
+            .Where(log => log.AgentId == conditions.AgentId
+                && log.Agent.BrandId == conditions.BrandId
+                && log.CreatedOn >= conditions.From.UtcDateTime
+                && log.CreatedOn < conditions.To.UtcDateTime);
+
+        return dataQuery;
+    }
+
+    public IAsyncEnumerable<AgentAuditLogInfo> QueryAgentAuditLogsAsync(
+        AgenAuditLogQueryConditions conditions,
+        Paging<AgentAuditLogInfo> paging,
+        CancellationToken cancellationToken = default)
+    {
+        var dataQuery = MakeAgentAuditLogQuery(conditions)
+            .Select(l => new AgentAuditLogInfo(
+                l.Id,
+                (AgentOperation)l.Operation,
+                l.CreatedByUsername,
+                l.CreatedOn))
+            .ToAsyncEnumerable();
+
+        dataQuery = dataQuery.ApplyOrderBy(paging);
+
+        if (paging.RowCount > 0)
+            dataQuery = dataQuery.ApplyPaging(paging);
+
+        return dataQuery;
+    }
+
+    public async ValueTask<int> CountAgentAuditLogsAsync(AgenAuditLogQueryConditions conditions, CancellationToken cancellationToken = default)
+    {
+        var dataQuery = MakeAgentAuditLogQuery(conditions);
+
+        return await dataQuery
+            .CountAsync(cancellationToken)
             .ConfigureAwait(false);
     }
 }

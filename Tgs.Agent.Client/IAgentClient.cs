@@ -4,6 +4,8 @@ namespace Tgs.Agent.Client;
 
 public interface IAgentClient
 {
+    ValueTask<PagingResponse<AgentAuditLogInfo>> GetAgentAuditLogsAsync(GetAgentAuditLogQueryConditions conditions, Paging paging, CancellationToken cancellationToken = default);
+
     ValueTask AddAgentAuditLogAsync(AddAgentAuditLogRequest request, CancellationToken cancellationToken = default);
 
     ValueTask<AgentInfoModel?> GetAgentInfoAsync(GetAgentInfoRequest request, CancellationToken cancellationToken = default);

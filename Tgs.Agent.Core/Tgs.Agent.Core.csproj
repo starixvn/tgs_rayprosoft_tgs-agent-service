@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Tgs.Core.Infrastructures.Security" Version="0.0.2" />
+    <PackageReference Include="Tgs.Paging.AsyncEnumerable" Version="1.2.1" />
     <PackageReference Include="Tgs.PlayerService.Client" Version="0.0.31" />
     <PackageReference Include="TGS.ServiceUtility" Version="0.2.0" />
   </ItemGroup>
