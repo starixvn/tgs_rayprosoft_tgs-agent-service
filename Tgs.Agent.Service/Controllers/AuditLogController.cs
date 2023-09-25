@@ -47,9 +47,9 @@ public class AuditLogController : ControllerBase
 
         var query = new GetAgentAuditLogQuery(brandId, logQuery.AgentId, logQuery.From, logQuery.To, sourcePaging);
 
-        var totalCount = await countService.GetAsync(query).ConfigureAwait(false);
+        var totalCount = await countService.GetAsync(query, HttpContext.RequestAborted).ConfigureAwait(false);
 
-        var items = queryService.QueryAsync(query)
+        var items = queryService.QueryAsync(query, HttpContext.RequestAborted)
             .Select(row => new AgentAuditLogInfoViewModel(
                 row.Id,
                 row.Operation,
