@@ -25,7 +25,7 @@ public class AuditLogController : ControllerBase
     [HttpGet("{brandId}", Name = "GetAgentAuditLog")]
     public async Task<PagingResponseViewModel<AgentAuditLogInfoViewModel>> GetAgentAuditLogAsync(
         [FromServices] IQueryService<GetAgentAuditLogQuery, AgentAuditLogInfo> queryService,
-        IGetService<GetAgentAuditLogQuery, int> countService,
+        [FromServices] IGetService<GetAgentAuditLogQuery, int> countService,
         Guid brandId,
         [FromQuery] AgentAuditLogQueryViewModel logQuery,
         [FromQuery] PagingViewModel paging)
