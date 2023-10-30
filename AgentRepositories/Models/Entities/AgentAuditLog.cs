@@ -11,11 +11,11 @@ public partial class AgentAuditLog
 
     public Guid AgentId { get; set; }
 
-    public short Operation { get; set; }
-
     public string CreatedByUsername { get; set; } = null!;
 
     public DateTime CreatedOn { get; set; }
+
+    public short Operation { get; set; }
 
     public virtual Agent Agent { get; set; } = null!;
 }

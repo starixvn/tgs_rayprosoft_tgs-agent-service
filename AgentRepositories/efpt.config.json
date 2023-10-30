@@ -1,59 +1,63 @@
 ﻿{
-   "CodeGenerationMode": 3,
-   "ContextClassName": "TgsContext",
-   "ContextNamespace": "Entities",
-   "DefaultDacpacSchema": null,
-   "FilterSchemas": false,
-   "IncludeConnectionString": false,
-   "ModelNamespace": "Entities",
-   "OutputContextPath": "Models",
-   "OutputPath": "Models\/Entities",
-   "PreserveCasingWithRegex": true,
-   "ProjectRootNamespace": "Tgs.Agent.Repositories",
-   "Schemas": null,
-   "SelectedHandlebarsLanguage": 0,
-   "SelectedToBeGenerated": 0,
-   "T4TemplatePath": null,
-   "Tables": [
-      {
-         "Name": "dbo.agent_audit_logs",
-         "ObjectType": 0
-      },
-      {
-         "Name": "dbo.agent_clear_commission_records",
-         "ObjectType": 0
-      },
-      {
-         "Name": "dbo.agent_dividends",
-         "ObjectType": 0
-      },
-      {
-         "Name": "dbo.agents",
-         "ObjectType": 0
-      },
-      {
-         "Name": "dbo.players",
-         "ObjectType": 0
-      }
-   ],
-   "UiHint": "tgs",
-   "UncountableWords": null,
-   "UseBoolPropertiesWithoutDefaultSql": true,
-   "UseDatabaseNames": false,
-   "UseDateOnlyTimeOnly": false,
-   "UseDbContextSplitting": true,
-   "UseFluentApiOnly": true,
-   "UseHandleBars": false,
-   "UseHierarchyId": false,
-   "UseInflector": true,
-   "UseLegacyPluralizer": false,
-   "UseManyToManyEntity": true,
-   "UseNoDefaultConstructor": false,
-   "UseNoObjectFilter": false,
-   "UseNodaTime": false,
-   "UseNullableReferences": true,
-   "UseSchemaFolders": false,
-   "UseSchemaNamespaces": false,
-   "UseSpatial": false,
-   "UseT4": false
+  "CodeGenerationMode": 3,
+  "ContextClassName": "TgsContext",
+  "ContextNamespace": "Entities",
+  "DefaultDacpacSchema": null,
+  "FilterSchemas": false,
+  "IncludeConnectionString": false,
+  "ModelNamespace": "Entities",
+  "OutputContextPath": "Models",
+  "OutputPath": "Models\/Entities",
+  "PreserveCasingWithRegex": true,
+  "ProjectRootNamespace": "Tgs.Agent.Repositories",
+  "Schemas": null,
+  "SelectedHandlebarsLanguage": 0,
+  "SelectedToBeGenerated": 0,
+  "T4TemplatePath": null,
+  "Tables": [
+    {
+      "Name": "dbo.agent_audit_logs",
+      "ObjectType": 0
+    },
+    {
+      "Name": "dbo.agent_clear_commission_records",
+      "ObjectType": 0
+    },
+    {
+      "Name": "dbo.agent_dividends",
+      "ObjectType": 0
+    },
+    {
+      "Name": "dbo.agent_event_source",
+      "ObjectType": 0
+    },
+    {
+      "Name": "dbo.agents",
+      "ObjectType": 0
+    },
+    {
+      "Name": "dbo.players",
+      "ObjectType": 0
+    }
+  ],
+  "UiHint": "tgs",
+  "UncountableWords": null,
+  "UseBoolPropertiesWithoutDefaultSql": true,
+  "UseDatabaseNames": false,
+  "UseDateOnlyTimeOnly": false,
+  "UseDbContextSplitting": true,
+  "UseFluentApiOnly": true,
+  "UseHandleBars": false,
+  "UseHierarchyId": false,
+  "UseInflector": true,
+  "UseLegacyPluralizer": false,
+  "UseManyToManyEntity": true,
+  "UseNoDefaultConstructor": false,  
+  "UseNoObjectFilter": false,
+  "UseNodaTime": false,
+  "UseNullableReferences": true,
+  "UseSchemaFolders": false,
+  "UseSchemaNamespaces": false,
+  "UseSpatial": false,
+  "UseT4": false
 }
