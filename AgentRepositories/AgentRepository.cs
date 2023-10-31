@@ -364,11 +364,12 @@ internal class AgentRepository : IAgentRepository
 
     private IQueryable<AgentEventSource> MakeAgentHistoriesQuery(AgentEventQueryConditions conditions)
     {
-        var dataQuery = from p in _tgsContext.AgentEventSources.AsQueryable()
-                        where p.AgentId == conditions.AgentId
-                            && p.CreatedOn >= conditions.From
-                            && p.CreatedOn < conditions.To
-                        select p;
+        var dataQuery =
+            from p in _tgsContext.AgentEventSources.AsQueryable()
+            where p.AgentId == conditions.AgentId
+                && p.CreatedOn >= conditions.From
+                && p.CreatedOn < conditions.To
+            select p;
 
         return dataQuery;
     }
