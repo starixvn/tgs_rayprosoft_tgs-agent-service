@@ -1,4 +1,5 @@
-﻿using Tgs.Agent.Core.Models;
+﻿using System.Text.Json;
+using Tgs.Agent.Core.Models;
 using Tgs.Agent.Core.Models.Enums;
 using Tgs.Paging;
 
@@ -29,4 +30,26 @@ public interface IAgentRepository
     public Task ClearNegativeCommissionAsync(Guid agentId, Guid clearByUserId, CancellationToken cancellationToken = default);
 
     public ValueTask SetPayPasswordAsync(Guid agentId, byte[] payPassword, byte[] paySalt, CancellationToken cancellationToken = default);
+
+    ValueTask<EventInfo?> GetAgentEventAsync(Guid eventId, CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<AgentHistoryInfo> QueryAgentEventAsync(
+        AgentEventQueryConditions conditions,
+        int skip = 0,
+        CancellationToken cancellationToken = default);
+
+    ValueTask UpdateAgentSnapshotAsync(
+        Guid agentId,
+        Guid snapshotId,
+        DateTime updatedOn,
+        CancellationToken cancellationToken = default);
+
+    ValueTask CreateAgentEventAsync(
+        Guid eventId,
+        Guid brandId,
+        Guid agentId,
+        EventAction action,
+        JsonDocument changeSets,
+        string? modifier,
+        CancellationToken cancellationToken = default);
 }

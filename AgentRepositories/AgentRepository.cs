@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Core.Models.Enums;
@@ -275,5 +276,100 @@ internal class AgentRepository : IAgentRepository
         return await dataQuery
             .CountAsync(cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    public async ValueTask<EventInfo?> GetAgentEventAsync(Guid eventId, CancellationToken cancellationToken = default)
+    {
+        var eventSource = await _tgsContext.AgentEventSources
+            .FirstOrDefaultAsync(p => p.Id == eventId, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        return eventSource is null
+            ? null
+            : new EventInfo(
+                Enum.Parse<EventAction>(eventSource.Action),
+                JsonDocument.Parse(eventSource.ChangeSets),
+                eventSource.ModifyUser,
+                eventSource.CreatedOn);
+    }
+
+    public IAsyncEnumerable<AgentHistoryInfo> QueryAgentEventAsync(AgentEventQueryConditions conditions, int skip = 0, CancellationToken cancellationToken = default)
+    {
+        var dataQuery = MakeAgentHistoriesQuery(conditions);
+
+        return dataQuery
+            .OrderByDescending(record => record.CreatedOn)
+            .Select(record => new
+            {
+                record.Id,
+                record.Action,
+                record.ModifyUser,
+                record.CreatedOn,
+            })
+            .Skip(skip)
+            .Take(1000)
+            .ToAsyncEnumerable()
+            .Select(row => new AgentHistoryInfo(
+                row.Id,
+                Enum.Parse<EventAction>(row.Action),
+                row.ModifyUser,
+                row.CreatedOn));
+    }
+
+    public async ValueTask UpdateAgentSnapshotAsync(Guid agentId, Guid snapshotId, DateTime updatedOn, CancellationToken cancellationToken = default)
+    {
+        var dbSnapshot = await _tgsContext.Agents
+            .FindAsync(new object?[] { agentId }, cancellationToken: cancellationToken)
+            .ConfigureAwait(false)
+            ?? (await _tgsContext.Agents.AddAsync(new Entities.Agent
+            {
+                Id = agentId
+            }, cancellationToken).ConfigureAwait(false)).Entity;
+
+        if (dbSnapshot.SnapshotEventId is null || dbSnapshot.SnapshotEventId.Value.CompareTo(snapshotId) == -1)
+        {
+            dbSnapshot.SnapshotEventId = snapshotId;
+            dbSnapshot.UpdatedOn = updatedOn;
+        }
+
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async ValueTask CreateAgentEventAsync(
+        Guid eventId,
+        Guid brandId,
+        Guid agentId,
+        EventAction action,
+        JsonDocument changeSets,
+        string? modifier,
+        CancellationToken cancellationToken = default)
+    {
+        _ = await _tgsContext.AgentEventSources.AddAsync(
+            new AgentEventSource
+            {
+                Id = eventId,
+                BrandId = brandId,
+                Action = action.ToString(),
+                AgentId = agentId,
+                ChangeSets = JsonSerializer.Serialize(changeSets),
+                ModifyUser = modifier,
+                CreatedOn = DateTime.UtcNow,
+            },
+            cancellationToken).ConfigureAwait(false);
+
+        _ = await _tgsContext
+            .SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private IQueryable<AgentEventSource> MakeAgentHistoriesQuery(AgentEventQueryConditions conditions)
+    {
+        var dataQuery = from p in _tgsContext.AgentEventSources.AsQueryable()
+                        where p.AgentId == conditions.AgentId
+                            && p.CreatedOn >= conditions.From
+                            && p.CreatedOn < conditions.To
+                        select p;
+
+        return dataQuery;
     }
 }

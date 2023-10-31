@@ -1,6 +1,9 @@
 ﻿using System.Text;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using NSubstitute;
+using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models.Enums;
 using Tgs.Agent.Repositories;
 using Tgs.Agent.Repositories.Entities;
@@ -454,5 +457,154 @@ public class AgentRepositoryTests
         var actual = await sut.CountAgentAuditLogsAsync(conditions);
 
         Assert.AreEqual(1, actual);
+    }
+
+    [Test]
+    public async Task 查詢Agent_Event_Source()
+    {
+        var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+        _ = dbContextOptionsBuilder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(x => x.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning));
+
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+        var eventId = Guid.NewGuid();
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+        var agentEvent = new AgentEventSource
+        {
+            Id = eventId,
+            Action = EventAction.Create.ToString(),
+            ChangeSets = "{}",
+            CreatedOn = DateTime.UtcNow.AddDays(-1),
+            BrandId = Guid.NewGuid(),
+            AgentId = agentId,
+        };
+
+        _ = await dbContext.AgentEventSources.AddAsync(agentEvent);
+        _ = await dbContext.SaveChangesAsync();
+
+        var sut = new AgentRepository(dbContext);
+
+        var newPassword = Encoding.UTF8.GetBytes("123456");
+        var newSalt = Encoding.UTF8.GetBytes("456789");
+
+        var actual = await sut
+            .QueryAgentEventAsync(new AgentEventQueryConditions(agentId, DateTime.Now.AddDays(-14), DateTime.Now))
+            .ToArrayAsync();
+
+        Assert.That(actual, Has.Length.EqualTo(1));
+        Assert.That(actual[0].EventId, Is.EqualTo(eventId));
+    }
+
+    [Test]
+    public async Task 查詢Agent_Event_Source細項()
+    {
+        var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+        _ = dbContextOptionsBuilder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(x => x.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning));
+
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+        var eventId = Guid.Parse("018a218f-b4cb-0000-0001-07e7e07dc945");
+        var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+        _ = await dbContext.AgentEventSources.AddAsync(new AgentEventSource
+        {
+            Id = eventId,
+            Action = EventAction.Create.ToString(),
+            BrandId = brandId,
+            ChangeSets = "{}",
+            CreatedOn = DateTime.UtcNow,
+            AgentId = agentId
+        });
+        _ = await dbContext.SaveChangesAsync();
+
+        var sut = new AgentRepository(dbContext);
+
+        var actual = await sut.GetAgentEventAsync(eventId);
+
+        Assert.That(actual, Is.Not.Null);
+        Assert.That(actual!.Action, Is.EqualTo(EventAction.Create));
+    }
+
+    [Test]
+    public async Task 更新Agent_Snapshot_Id()
+    {
+        var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+        _ = dbContextOptionsBuilder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(x => x.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning));
+
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+        
+
+        var eventId = Guid.Parse("01852e47-a829-0000-0001-07e6af979b15");
+        var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+        var agent = new Agent
+        {
+            Id = agentId,            
+            Password = Array.Empty<byte>(),
+            Salt = Array.Empty<byte>(),
+            Username = "username",
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>(),
+            SnapshotEventId = Guid.Parse("01852e47-a6ee-0000-0001-07e6af979b15"),
+            InvitationCode = "5kiqhx"
+        };
+
+        _ = await dbContext.Agents
+            .AddAsync(agent)
+            .ConfigureAwait(false);
+
+        _ = await dbContext.SaveChangesAsync();
+
+        var sut = new AgentRepository(dbContext);
+
+        await sut.UpdateAgentSnapshotAsync(
+            agentId,
+            eventId,
+            DateTime.UtcNow);
+
+        var actual = await dbContext.Agents.FirstAsync(x => x.Id == agentId);
+
+        Assert.That(actual.SnapshotEventId, Is.EqualTo(eventId));
+    }
+
+    [Test]
+    public async Task 新增Agent_Event_Source()
+    {
+        var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+        _ = dbContextOptionsBuilder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(x => x.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning));
+
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);        
+
+        var eventId = Guid.Parse("018a218f-b4cb-0000-0001-07e7e07dc945");
+        var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+        var sut = new AgentRepository(dbContext);
+
+        await sut.CreateAgentEventAsync(
+            eventId,
+            brandId,
+            agentId,
+            EventAction.Create,
+            JsonDocument.Parse("{}"),
+            "50ce61eb-8c9d-4f84-3cf6-08d9262ce1a5");
+
+        var actual = await dbContext.AgentEventSources.FirstAsync(x => x.Id == eventId);
+
+        Assert.That(actual.Id, Is.EqualTo(eventId));
     }
 }
