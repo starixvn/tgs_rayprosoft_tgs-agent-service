@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.AspNetCore.Mvc;
+using Tgs.Agent.Core;
 using Tgs.Agent.Core.ApplicationServices;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Service.ViewModels;
@@ -172,5 +173,18 @@ public class AgentController : ControllerBase
 
         return commandService
             .ExecuteAsync(command, HttpContext.RequestAborted);
+    }
+
+    [HttpPut("status/{agentId}", Name = "SetAgentStatus")]
+    [SuccessStatusCode(200, "Status set")]
+    public ValueTask SetPlayerStatusAsync(
+        [FromServices] ICommandService<SetAgentStatusCommand> setService,
+        [FromHeader(Name = "ModifyUserId")] string? modifyUserId,
+        Guid agentId,
+        [FromBody] AgentStatus status)
+    {
+        var command = new SetAgentStatusCommand(agentId, status, modifyUserId);
+
+        return setService.ExecuteAsync(command, HttpContext.RequestAborted);
     }
 }

@@ -52,12 +52,17 @@ public interface IAgentRepository
         Guid agentId,
         EventAction action,
         JsonDocument changeSets,
-        string? modifier,
+        string? modifyUserId,
         CancellationToken cancellationToken = default);
 
     ValueTask SetAgentPropertiesAsync(
         Guid brandId,
         Guid agentId,
         IEnumerable<IDataCommand> modifyCommands,
+        CancellationToken cancellationToken = default);
+
+    ValueTask SetAgentStatusAsync(
+        Guid agentId,
+        AgentStatus status,
         CancellationToken cancellationToken = default);
 }

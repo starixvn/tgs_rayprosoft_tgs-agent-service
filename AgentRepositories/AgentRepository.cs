@@ -343,7 +343,7 @@ internal class AgentRepository : IAgentRepository
         Guid agentId,
         EventAction action,
         JsonDocument changeSets,
-        string? modifier,
+        string? modifyUserId,
         CancellationToken cancellationToken = default)
     {
         _ = await _tgsContext.AgentEventSources.AddAsync(
@@ -354,7 +354,7 @@ internal class AgentRepository : IAgentRepository
                 Action = action.ToString(),
                 AgentId = agentId,
                 ChangeSets = JsonSerializer.Serialize(changeSets),
-                ModifyUser = modifier,
+                ModifyUser = modifyUserId,
                 CreatedOn = DateTime.UtcNow,
             },
             cancellationToken).ConfigureAwait(false);
@@ -402,6 +402,26 @@ internal class AgentRepository : IAgentRepository
                 .ExecuteAsync(context, cancellationToken)
                 .ConfigureAwait(false);
 
+        agent.UpdatedOn = DateTime.UtcNow;
+
+        _ = await _tgsContext
+            .SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async ValueTask SetAgentStatusAsync(Guid agentId, AgentStatus status, CancellationToken cancellationToken = default)
+    {
+        var agent = await _tgsContext.Agents
+            .FindAsync(new object?[]
+            {
+                agentId
+            }, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (agent == null)
+            return;
+
+        agent.Status = (short)status;
         agent.UpdatedOn = DateTime.UtcNow;
 
         _ = await _tgsContext

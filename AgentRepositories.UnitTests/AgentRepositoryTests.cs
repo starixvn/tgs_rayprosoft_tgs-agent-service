@@ -2,7 +2,6 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using NSubstitute;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models.Enums;
 using Tgs.Agent.Repositories;
@@ -542,7 +541,6 @@ public class AgentRepositoryTests
                 InMemoryEventId.TransactionIgnoredWarning));
 
         var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
-        
 
         var eventId = Guid.Parse("01852e47-a829-0000-0001-07e6af979b15");
         var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
@@ -550,7 +548,7 @@ public class AgentRepositoryTests
 
         var agent = new Agent
         {
-            Id = agentId,            
+            Id = agentId,
             Password = Array.Empty<byte>(),
             Salt = Array.Empty<byte>(),
             Username = "username",
@@ -587,7 +585,7 @@ public class AgentRepositoryTests
             .ConfigureWarnings(x => x.Ignore(
                 InMemoryEventId.TransactionIgnoredWarning));
 
-        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);        
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
 
         var eventId = Guid.Parse("018a218f-b4cb-0000-0001-07e7e07dc945");
         var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
@@ -606,5 +604,40 @@ public class AgentRepositoryTests
         var actual = await dbContext.AgentEventSources.FirstAsync(x => x.Id == eventId);
 
         Assert.That(actual.Id, Is.EqualTo(eventId));
+    }
+
+    [Test]
+    public async Task 變更代理狀態()
+    {
+        var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+        _ = dbContextOptionsBuilder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(x => x.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning));
+
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+        _ = await dbContext.Agents.AddAsync(new Agent()
+        {
+            Id = agentId,
+            Status = (short)AgentStatus.Enabled,
+            InvitationCode = "jhmdpi",
+            Password = Encoding.UTF8.GetBytes("password"),
+            Salt = Encoding.UTF8.GetBytes("salt"),
+            Username = "agentUsername",
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>()
+        });
+
+        var sut = new AgentRepository(dbContext);
+
+        await sut.SetAgentStatusAsync(
+            agentId,
+            AgentStatus.InBlacklist);
+
+        var actual = await dbContext.Agents.FirstAsync(x => x.Id == agentId);
+
+        Assert.AreEqual((short)AgentStatus.InBlacklist, actual.Status);
     }
 }

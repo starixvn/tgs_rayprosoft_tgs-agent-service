@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using Tgs.Agent.Client.Models;
+using Tgs.Agent.Client.Models.Enums;
 
 namespace Tgs.Agent.Client;
 
@@ -30,6 +31,12 @@ public interface IAgentClient
     ValueTask SetAgentPropertiesAsync(
         Guid agentId,
         IImmutableDictionary<AgentPropertyName, string?> properties,
+        string? modifyUserId = null,
+        CancellationToken cancellationToken = default);
+
+    ValueTask SetAgentStatusAsync(
+        Guid agentId,
+        AgentStatus agentStatus,
         string? modifyUserId = null,
         CancellationToken cancellationToken = default);
 }

@@ -44,9 +44,9 @@ namespace Tgs.Agent.IntegrationTest
                     InvitationCode: "wg5g8h",
                     ParentAgentId: Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31"),
                     RegisteredOn: DateTimeOffset.UtcNow,
-                    Status: AgentStatus.Enabled,
-                    Type: AgentType.Cash,
-                    AgentLevelType: AgentLevelType.Chief,
+                    Status: Core.AgentStatus.Enabled,
+                    Type: Core.AgentType.Cash,
+                    AgentLevelType: Core.AgentLevelType.Chief,
                     DividendPercentage: 80M,
                     PlayerNumber: 0,
                     AccumulatedProfitSharing: 0M,
@@ -211,9 +211,9 @@ namespace Tgs.Agent.IntegrationTest
                 "inviteCode",
                 null,
                 DateTimeOffset.UtcNow.AddMonths(-1),
-                AgentStatus.Enabled,
-                AgentType.Cash,
-                AgentLevelType.Chief,
+                Core.AgentStatus.Enabled,
+                Core.AgentType.Cash,
+                Core.AgentLevelType.Chief,
                 0m,
                 0,
                 0m,
@@ -298,6 +298,59 @@ namespace Tgs.Agent.IntegrationTest
             Assert.IsNull(actual.RealName);
             Assert.AreEqual("NewQq", actual.Qq);
             Assert.AreEqual("NewWechat", actual.Wechat);
+        }
+
+        [Test]
+        public async Task 設置代理狀態()
+        {
+            var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+            var fakeSystemClock = Substitute.For<ISystemClock>();
+            await using var web = TestSiteHelper.GetAgentServiceTestHost(services
+                => services
+                    .AddSingleton(fakeSerialNumberGenerator)
+                    .AddSingleton(fakeSystemClock));
+
+            var httpClient = web.CreateClient();
+
+            var sut = new AgentClient(httpClient);
+
+            var brandId = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
+            var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+            var status = Client.Models.Enums.AgentStatus.InBlacklist;
+            var modifyUserId = "50ce61eb-8c9d-4f84-3cf6-08d9262ce1a5";
+            var now = DateTimeOffset.UtcNow;
+
+            var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+            var agent = new Repositories.Entities.Agent
+            {
+                Id = agentId,
+                Status = (short)AgentStatus.Enabled,
+                BrandId = brandId,
+                Password = Array.Empty<byte>(),
+                Salt = Array.Empty<byte>(),
+                Username = "agentUsername",
+                RealName = "agentRealName",
+                WithdrawPassword = Array.Empty<byte>(),
+                WithdrawSalt = Array.Empty<byte>(),
+                InvitationCode = "hgq0m0",
+                RegisteredOn = DateTime.UtcNow.AddMonths(-1),
+            };
+
+            _ = await dbContext.Agents.AddAsync(agent);
+
+            _ = await dbContext.SaveChangesAsync();
+
+            _ = fakeSerialNumberGenerator
+                .GenerateAsync(Arg.Any<CancellationToken>())
+                .Returns(eventId);
+
+            _ = fakeSystemClock.UtcNow.Returns(now);
+
+            await sut.SetAgentStatusAsync(agentId, status, modifyUserId);
+
+            Assert.AreEqual((short)Client.Models.Enums.AgentStatus.InBlacklist, agent.Status);
         }
     }
 }
