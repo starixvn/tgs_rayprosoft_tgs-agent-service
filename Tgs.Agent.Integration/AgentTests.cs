@@ -1,4 +1,8 @@
-﻿using AutoFixture.NUnit3;
+﻿using System.Collections.Immutable;
+using System.Text;
+using System.Text.Json;
+using AutoFixture.NUnit3;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
@@ -6,6 +10,9 @@ using Tgs.Agent.Client;
 using Tgs.Agent.Client.Models;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
+using Tgs.Agent.Repositories.Entities;
+using Tgs.Core.Infrastructures.Security;
+using Tgs.SerialNumberGenerator;
 
 namespace Tgs.Agent.IntegrationTest
 {
@@ -37,12 +44,13 @@ namespace Tgs.Agent.IntegrationTest
                     InvitationCode: "wg5g8h",
                     ParentAgentId: Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31"),
                     RegisteredOn: DateTimeOffset.UtcNow,
-                    Status: 1,
-                    Type: 1,
-                    AgentLevelType: 1,
+                    Status: AgentStatus.Enabled,
+                    Type: AgentType.Cash,
+                    AgentLevelType: AgentLevelType.Chief,
                     DividendPercentage: 80M,
                     PlayerNumber: 0,
-                    AccumulatedProfitSharing: 0M));
+                    AccumulatedProfitSharing: 0M,
+                    BrandId: Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af")));
 
             var actual = await sut.GetAgentInfoAsync(new(agentId));
 
@@ -163,16 +171,66 @@ namespace Tgs.Agent.IntegrationTest
         public async Task Set_Agent_Password()
         {
             var fakeAgentRepository = Substitute.For<IAgentRepository>();
+            var fakePasswordHandler = Substitute.For<IPasswordHandler>();
+            var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+
             await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-                => services.AddSingleton(fakeAgentRepository));
+                => services
+                    .AddSingleton(fakeAgentRepository)
+                    .AddSingleton(fakePasswordHandler)
+                    .AddSingleton(fakeSerialNumberGenerator));
 
             var httpClient = web.CreateClient();
 
             var sut = new AgentClient(httpClient);
 
             var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+            var password = "password";
+            var modifyUserId = "50ce61eb-8c9d-4f84-3cf6-08d9262ce1a5";
+            var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+            var eventId = Guid.NewGuid();
+            var salt = Encoding.UTF8.GetBytes("salt");
+            var hashedPassword = Encoding.UTF8.GetBytes("password");
 
-            await sut.SetAgentPasswordAsync(new(agentId, "password"));
+            _ = fakePasswordHandler.GenerateCredential(password)
+                .Returns((salt, hashedPassword));
+
+            _ = fakeSerialNumberGenerator
+                .GenerateAsync(Arg.Any<CancellationToken>())
+                .Returns(eventId);
+
+            _ = fakeAgentRepository.GetAgentByIdAsync(agentId, Arg.Any<CancellationToken>())
+                .Returns(new AgentInfo(
+                Id: agentId,
+                Username: "agentUsername",
+                null,
+                null,
+                null,
+                null,
+                null,
+                "inviteCode",
+                null,
+                DateTimeOffset.UtcNow.AddMonths(-1),
+                AgentStatus.Enabled,
+                AgentType.Cash,
+                AgentLevelType.Chief,
+                0m,
+                0,
+                0m,
+                brandId));
+
+            await sut.SetAgentPasswordAsync(new(agentId, password, modifyUserId));
+
+            _ = fakeAgentRepository
+                .Received(1)
+                .SetPasswordAsync(Arg.Is(agentId), Arg.Is(hashedPassword), Arg.Is(salt), Arg.Any<CancellationToken>());
+
+            _ = fakeAgentRepository
+                .Received(1)
+                .CreateAgentEventAsync(Arg.Is(eventId), Arg.Is(brandId), Arg.Is(agentId), Arg.Is(EventAction.Update), Arg.Any<JsonDocument>(), Arg.Is(modifyUserId), Arg.Any<CancellationToken>());
+
+            _ = fakeAgentRepository.Received(1)
+                .UpdateAgentSnapshotAsync(Arg.Is(agentId), Arg.Is(eventId), Arg.Any<DateTime>(), Arg.Any<CancellationToken>());
         }
 
         [Test]
@@ -189,6 +247,57 @@ namespace Tgs.Agent.IntegrationTest
             var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
 
             await sut.SetAgentPayPasswordAsync(new(agentId, "password"));
+        }
+
+        [Test]
+        public async Task 設置代理屬性()
+        {
+            var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+            await using var web = TestSiteHelper.GetAgentServiceTestHost(services
+                => services.AddSingleton(fakeSerialNumberGenerator));
+
+            var httpClient = web.CreateClient();
+
+            var sut = new AgentClient(httpClient);
+
+            var brandId = Guid.NewGuid();
+            var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+            var modifyUserId = "50ce61eb-8c9d-4f84-3cf6-08d9262ce1a5";
+
+            var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+            _ = await dbContext.Agents.AddAsync(new Repositories.Entities.Agent
+            {
+                Id = agentId,
+                BrandId = brandId,
+                Password = Array.Empty<byte>(),
+                Salt = Array.Empty<byte>(),
+                Username = "agentUsername",
+                RealName = "agentRealName",
+                WithdrawPassword = Array.Empty<byte>(),
+                WithdrawSalt = Array.Empty<byte>(),
+                InvitationCode = "hgq0m0",
+                RegisteredOn = DateTime.UtcNow.AddMonths(-1),
+            });
+
+            _ = await dbContext.SaveChangesAsync();
+
+            var agentProperties = new Dictionary<Client.AgentPropertyName, string?>
+            {
+                [Client.AgentPropertyName.RealName] = null,
+                [Client.AgentPropertyName.Qq] = "NewQq",
+                [Client.AgentPropertyName.Wechat] = "NewWechat"
+            };
+
+            await sut.SetAgentPropertiesAsync(agentId, agentProperties.ToImmutableDictionary(), modifyUserId);
+
+            var actual = await dbContext.Agents
+                .Where(x => x.Id == agentId)
+                .FirstAsync();
+
+            Assert.IsNull(actual.RealName);
+            Assert.AreEqual("NewQq", actual.Qq);
+            Assert.AreEqual("NewWechat", actual.Wechat);
         }
     }
 }

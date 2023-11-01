@@ -1,4 +1,5 @@
-﻿using Tgs.Agent.Client.Models;
+﻿using System.Collections.Immutable;
+using Tgs.Agent.Client.Models;
 
 namespace Tgs.Agent.Client;
 
@@ -25,4 +26,10 @@ public interface IAgentClient
     ValueTask ClearAgentNegativeCommissionAsync(ClearAgentNegativeCommissionRequest request, CancellationToken cancellationToken = default);
 
     ValueTask SetAgentPayPasswordAsync(SetAgentPayPasswordRequest request, CancellationToken cancellationToken = default);
+
+    ValueTask SetAgentPropertiesAsync(
+        Guid agentId,
+        IImmutableDictionary<AgentPropertyName, string?> properties,
+        string? modifyUserId = null,
+        CancellationToken cancellationToken = default);
 }

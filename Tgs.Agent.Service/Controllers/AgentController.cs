@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Immutable;
+using Microsoft.AspNetCore.Mvc;
 using Tgs.Agent.Core.ApplicationServices;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Service.ViewModels;
 using Tgs.ServiceUtility;
+using Tgs.WebApi.Toolkits;
 
 namespace Tgs.Agent.Service.Controllers;
 
@@ -130,12 +132,14 @@ public class AgentController : ControllerBase
     [HttpPatch("{agentId}:password", Name = "SetPassword")]
     public ValueTask SetPasswordAsync(
         [FromServices] ICommandService<SetAgentPasswordCommand> commandService,
+        [FromHeader(Name = "ModifyUserId")] string? modifyUserId,
         [FromBody] SetAgentPasswordViewModel request,
         Guid agentId)
         => commandService.ExecuteAsync(
                 new(
                     agentId,
-                    request.Password),
+                    request.Password,
+                    modifyUserId),
             HttpContext.RequestAborted);
 
     [HttpPatch("{agentId}:pay-password", Name = "SetPayPassword")]
@@ -148,4 +152,25 @@ public class AgentController : ControllerBase
                 agentId,
                 request.PayPassword),
             HttpContext.RequestAborted);
+
+    [HttpPost("prop/{agentId}", Name = "SetAgentProperties")]
+    [SuccessStatusCode(200, "Set agent properties success")]
+    [FailStatusCode(400, "Input properties is empty")]
+    public ValueTask SetPlayerPropertiesAsync(
+        [FromServices] ICommandService<SetAgentPropertiesCommand> commandService,
+        [FromHeader(Name = "ModifyUserId")] string? modifyUserId,
+        Guid agentId,
+        [FromBody] IImmutableDictionary<string, string?> properties)
+    {
+        if (properties.Count == 0)
+            return new ValueTask(this.FailAsync(400, "Input properties is empty"));
+
+        var command = new SetAgentPropertiesCommand(
+            agentId,
+            properties,
+            modifyUserId);
+
+        return commandService
+            .ExecuteAsync(command, HttpContext.RequestAborted);
+    }
 }

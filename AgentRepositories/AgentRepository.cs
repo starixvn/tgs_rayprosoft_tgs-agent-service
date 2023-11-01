@@ -67,12 +67,13 @@ internal class AgentRepository : IAgentRepository
             agent.InvitationCode,
             agent.ParentAgentId,
             new DateTimeOffset(agent.RegisteredOn),
-            agent.Status,
-            agent.Type,
-            agent.LevelType,
+            (AgentStatus)agent.Status,
+            (AgentType)agent.Type,
+            (AgentLevelType)agent.LevelType,
             agent.DividendPercentage,
             playerNumber,
-            dividend);
+            dividend,
+            agent.BrandId);
     }
 
     public async ValueTask<AgentInfo?> GetAgentByUsernameAsync(Guid brandId, string username,
@@ -105,12 +106,13 @@ internal class AgentRepository : IAgentRepository
             agent.InvitationCode,
             agent.ParentAgentId,
             new DateTimeOffset(agent.RegisteredOn),
-            agent.Status,
-            agent.Type,
-            agent.LevelType,
+            (AgentStatus)agent.Status,
+            (AgentType)agent.Type,
+            (AgentLevelType)agent.LevelType,
             agent.DividendPercentage,
             playerNumber,
-            dividend);
+            dividend,
+            agent.BrandId);
     }
 
     public IAsyncEnumerable<ChildAgentInfoModel> GetChildAgentInfosAsync(Guid agentId, CancellationToken cancellationToken = default)
@@ -372,5 +374,38 @@ internal class AgentRepository : IAgentRepository
             select p;
 
         return dataQuery;
+    }
+
+    public async ValueTask<int> CountAgentEventAsync(AgentEventQueryConditions conditions, CancellationToken cancellationToken = default)
+        => await MakeAgentHistoriesQuery(conditions)
+            .CountAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+    public async ValueTask SetAgentPropertiesAsync(Guid brandId, Guid agentId, IEnumerable<IDataCommand> modifyCommands, CancellationToken cancellationToken = default)
+    {
+        var agent = await _tgsContext.Agents
+            .FindAsync(new object?[]
+            {
+                agentId
+            }, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (agent == null)
+            return;
+
+        var context = new AgentModifyCommandContext(
+            agent,
+            _tgsContext);
+
+        foreach (var command in modifyCommands)
+            await command
+                .ExecuteAsync(context, cancellationToken)
+                .ConfigureAwait(false);
+
+        agent.UpdatedOn = DateTime.UtcNow;
+
+        _ = await _tgsContext
+            .SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 }

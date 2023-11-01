@@ -1,4 +1,6 @@
-﻿namespace Tgs.Agent.Service.ViewModels;
+﻿using Tgs.Agent.Core;
+
+namespace Tgs.Agent.Service.ViewModels;
 
 public record AgentInfoViewModel(
     Guid Id,
@@ -11,9 +13,9 @@ public record AgentInfoViewModel(
     string InvitationCode,
     Guid? ParentAgentId,
     DateTimeOffset RegisteredOn,
-    short Status,
-    short Type,
-    int AgentLevelType,
+    AgentStatus Status,
+    AgentType Type,
+    AgentLevelType AgentLevelType,
     decimal DividendPercentage,
     int PlayerNumber,
     decimal AccumulatedProfitSharing);

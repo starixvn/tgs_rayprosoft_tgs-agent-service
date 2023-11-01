@@ -38,6 +38,8 @@ public interface IAgentRepository
         int skip = 0,
         CancellationToken cancellationToken = default);
 
+    ValueTask<int> CountAgentEventAsync(AgentEventQueryConditions conditions, CancellationToken cancellationToken = default);
+
     ValueTask UpdateAgentSnapshotAsync(
         Guid agentId,
         Guid snapshotId,
@@ -51,5 +53,11 @@ public interface IAgentRepository
         EventAction action,
         JsonDocument changeSets,
         string? modifier,
+        CancellationToken cancellationToken = default);
+
+    ValueTask SetAgentPropertiesAsync(
+        Guid brandId,
+        Guid agentId,
+        IEnumerable<IDataCommand> modifyCommands,
         CancellationToken cancellationToken = default);
 }
