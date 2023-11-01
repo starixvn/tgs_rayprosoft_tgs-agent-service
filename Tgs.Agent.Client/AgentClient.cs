@@ -1,9 +1,13 @@
-﻿using System.Net.Http.Json;
+﻿using System.Collections.Immutable;
+using System.Net.Http.Json;
+using System.Net.Mime;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
 using Tgs.Agent.Client.Models;
+using Tgs.Agent.Client.Models.Enums;
 
 namespace Tgs.Agent.Client;
 
@@ -84,8 +88,16 @@ public class AgentClient : IAgentClient
 
     public async ValueTask SetAgentPasswordAsync(SetAgentPasswordRequest request, CancellationToken cancellationToken = default)
     {
+        var requestContent = new StringContent(
+            JsonSerializer.Serialize(new { request.Password }, _jsonSerializerOptions),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
+
+        if (!string.IsNullOrWhiteSpace(request.ModifyUserId))
+            requestContent.Headers.Add("ModifyUserId", request.ModifyUserId);
+
         var response = await _client
-            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:password", request, _jsonSerializerOptions, cancellationToken)
+            .PatchAsync($"/api/agent/{request.AgentId}:password", requestContent, cancellationToken)
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();
@@ -179,5 +191,47 @@ public class AgentClient : IAgentClient
             .ConfigureAwait(false);
 
         return JsonSerializer.Deserialize<PagingResponse<AgentAuditLogInfo>>(contentJson, _jsonSerializerOptions)!;
+    }
+
+    public async ValueTask SetAgentPropertiesAsync(
+        Guid agentId,
+        IImmutableDictionary<AgentPropertyName, string?> properties,
+        string? modifyUserId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var requestContent = new StringContent(
+            JsonSerializer.Serialize(properties, _jsonSerializerOptions),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
+
+        if (!string.IsNullOrWhiteSpace(modifyUserId))
+            requestContent.Headers.Add("ModifyUserId", modifyUserId);
+
+        var response = await _client
+            .PostAsync($"/api/agent/prop/{agentId}", requestContent, cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
+
+    public async ValueTask SetAgentStatusAsync(
+        Guid agentId,
+        AgentStatus agentStatus,
+        string? modifyUserId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var requestContent = new StringContent(
+            JsonSerializer.Serialize(agentStatus, _jsonSerializerOptions),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
+
+        if (!string.IsNullOrWhiteSpace(modifyUserId))
+            requestContent.Headers.Add("ModifyUserId", modifyUserId);
+
+        var response = await _client
+            .PutAsync($"/api/agent/status/{agentId}", requestContent, cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
     }
 }

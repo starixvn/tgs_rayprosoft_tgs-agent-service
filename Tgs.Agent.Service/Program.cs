@@ -83,6 +83,7 @@ builder.Services
     .AddServiceUtiltiyInterceptors();
 
 builder.Services
+    .AddSerialNumberGenerator()
     .AddCore()
     .AddPlayerServiceClient((options, sp) =>
     {

@@ -10,9 +10,10 @@ public record AgentInfo(
     string InvitationCode,
     Guid? ParentAgentId,
     DateTimeOffset RegisteredOn,
-    short Status,
-    short Type,
-    int AgentLevelType,
+    AgentStatus Status,
+    AgentType Type,
+    AgentLevelType AgentLevelType,
     decimal DividendPercentage,
     int PlayerNumber,
-    decimal AccumulatedProfitSharing);
+    decimal AccumulatedProfitSharing,
+    Guid BrandId);

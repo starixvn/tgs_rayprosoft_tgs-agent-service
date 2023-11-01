@@ -55,9 +55,7 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
             .HasColumnName("lottery_rebate_percentage");
             entity.Property(e => e.ParentAgentId).HasColumnName("parent_agent_id");
             entity.Property(e => e.Password).HasColumnName("password");
-            entity.Property(e => e.Path)
-            .HasDefaultValueSql("''::ltree")
-            .HasColumnName("path");
+            entity.Property(e => e.Path).HasColumnName("path");
             entity.Property(e => e.Phone)
             .HasMaxLength(32)
             .HasColumnName("phone");
@@ -73,6 +71,7 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
             entity.Property(e => e.SlotRebatePercentage)
             .HasPrecision(18, 6)
             .HasColumnName("slot_rebate_percentage");
+            entity.Property(e => e.SnapshotEventId).HasColumnName("snapshot_event_id");
             entity.Property(e => e.SportsRebatePercentage)
             .HasPrecision(18, 6)
             .HasColumnName("sports_rebate_percentage");
@@ -94,7 +93,6 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
 
             entity.HasOne(d => d.ParentAgent).WithMany(p => p.InverseParentAgent)
             .HasForeignKey(d => d.ParentAgentId)
-            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("fk_agents_parent_agent_id");
 
             OnConfigurePartial(entity);
