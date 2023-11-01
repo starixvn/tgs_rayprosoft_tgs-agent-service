@@ -71,5 +71,8 @@ public class SetAgentPasswordTests
                 Arg.Is(EventAction.Update),
                 Arg.Any<JsonDocument>(),
                 Arg.Is(modifyUserId));
+
+        _ = fakeAgentRepository.Received(1)
+            .UpdateAgentSnapshotAsync(Arg.Is(agentId), Arg.Is(eventId), Arg.Any<DateTime>());
     }
 }
