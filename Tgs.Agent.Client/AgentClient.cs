@@ -236,7 +236,11 @@ public class AgentClient : IAgentClient
         _ = response.EnsureSuccessStatusCode();
     }
 
-    public IAsyncEnumerable<AgentHistoryInfo> GetAgentHistoriesAsync(GetAgentHistoriesQueryConditions conditions, int totalCount, int skip = 0, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<AgentHistoryInfo> GetAgentHistoriesAsync(
+        GetAgentHistoriesQueryConditions conditions,
+        int totalCount,
+        int skip = 0,
+        CancellationToken cancellationToken = default)
     {
         var queryStrings = HttpUtility.ParseQueryString(string.Empty);
 

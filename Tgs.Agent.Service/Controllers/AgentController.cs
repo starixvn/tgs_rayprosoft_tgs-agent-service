@@ -226,9 +226,9 @@ public class AgentController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("history/{eventId}", Name = "GetPlayerHistory")]
-    [SuccessStatusCode(200, "Player event info found")]
-    [FailStatusCode(404, "Player event info not found")]
+    [HttpGet("history/{eventId}", Name = "GetAgentHistory")]
+    [SuccessStatusCode(200, "Agent event info found")]
+    [FailStatusCode(404, "Agent event info not found")]
     public async ValueTask<AgentEventInfoViewModel?> GetAgentHistoryAsync(
         [FromServices] IGetService<GetAgentEventQuery, EventInfo> getService,
         Guid eventId)
