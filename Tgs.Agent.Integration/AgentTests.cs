@@ -352,5 +352,129 @@ namespace Tgs.Agent.IntegrationTest
 
             Assert.AreEqual((short)Client.Models.Enums.AgentStatus.InBlacklist, agent.Status);
         }
+
+        [Test]
+        public async Task 查詢代理歷史紀錄()
+        {
+            var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+            var fakeSystemClock = Substitute.For<ISystemClock>();
+            await using var web = TestSiteHelper.GetAgentServiceTestHost(services
+                => services
+                    .AddSingleton(fakeSerialNumberGenerator)
+                    .AddSingleton(fakeSystemClock));
+
+            var httpClient = web.CreateClient();
+
+            var sut = new AgentClient(httpClient);
+
+            var brandId = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
+            var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+            var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+            var agentEvent = new AgentEventSource
+            {
+                Id = eventId,
+                AgentId = agentId,
+                BrandId = brandId,
+                ChangeSets = "{}",
+                Action = EventAction.Create.ToString(),
+                CreatedOn = DateTime.UtcNow.AddDays(-1),
+            };
+
+            _ = await dbContext.AgentEventSources.AddAsync(agentEvent);
+
+            _ = await dbContext.SaveChangesAsync();
+
+            var conditions = new GetAgentHistoriesQueryConditions(agentId, DateTime.Now.AddDays(-14), DateTime.Now);
+
+            var actual = await sut.GetAgentHistoriesAsync(conditions, 10, 0).ToArrayAsync();
+
+            Assert.AreEqual(1, actual.Length);
+            Assert.AreEqual(Client.Models.Enums.EventAction.Create, actual[0].Action);
+            Assert.AreEqual(eventId, actual[0].EventId);
+        }
+
+        [Test]
+        public async Task 查詢代理歷史紀錄筆數()
+        {
+            var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+            var fakeSystemClock = Substitute.For<ISystemClock>();
+            await using var web = TestSiteHelper.GetAgentServiceTestHost(services
+                => services
+                    .AddSingleton(fakeSerialNumberGenerator)
+                    .AddSingleton(fakeSystemClock));
+
+            var httpClient = web.CreateClient();
+
+            var sut = new AgentClient(httpClient);
+
+            var brandId = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
+            var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+            var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+            var agentEvent = new AgentEventSource
+            {
+                Id = eventId,
+                AgentId = agentId,
+                BrandId = brandId,
+                ChangeSets = "{}",
+                Action = EventAction.Create.ToString(),
+                CreatedOn = DateTime.UtcNow.AddDays(-1),
+            };
+
+            _ = await dbContext.AgentEventSources.AddAsync(agentEvent);
+
+            _ = await dbContext.SaveChangesAsync();
+
+            var conditions = new GetAgentHistoriesQueryConditions(agentId, DateTime.Now.AddDays(-14), DateTime.Now);
+
+            var actual = await sut.CountAgentHistoriesAsync(conditions);
+
+            Assert.AreEqual(1, actual);
+        }
+
+        [Test]
+        public async Task 查詢代理歷史紀錄細項()
+        {
+            var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+            var fakeSystemClock = Substitute.For<ISystemClock>();
+            await using var web = TestSiteHelper.GetAgentServiceTestHost(services
+                => services
+                    .AddSingleton(fakeSerialNumberGenerator)
+                    .AddSingleton(fakeSystemClock));
+
+            var httpClient = web.CreateClient();
+
+            var sut = new AgentClient(httpClient);
+
+            var brandId = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
+            var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+            var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+            var agentEvent = new AgentEventSource
+            {
+                Id = eventId,
+                AgentId = agentId,
+                BrandId = brandId,
+                ChangeSets = "{}",
+                Action = EventAction.Create.ToString(),
+                CreatedOn = DateTime.UtcNow.AddDays(-1),
+            };
+
+            _ = await dbContext.AgentEventSources.AddAsync(agentEvent);
+
+            _ = await dbContext.SaveChangesAsync();            
+
+            var actual = await sut.GetAgentHistoryAsync(eventId);
+
+            Assert.NotNull(actual);
+            Assert.AreEqual(Client.Models.Enums.EventAction.Create, actual!.Action);
+        }
     }
 }

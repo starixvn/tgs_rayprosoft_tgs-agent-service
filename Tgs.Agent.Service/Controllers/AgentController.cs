@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.ApplicationServices;
@@ -186,5 +187,62 @@ public class AgentController : ControllerBase
         var command = new SetAgentStatusCommand(agentId, status, modifyUserId);
 
         return setService.ExecuteAsync(command, HttpContext.RequestAborted);
+    }
+
+    [HttpGet("histories/{agentId}", Name = "GetAgentHistories")]
+    [Description("查詢代理操作紀錄")]
+    public IAsyncEnumerable<AgentHistoryInfoViewModel> GetAgentHistoriesAsync(
+        [FromServices] IQueryService<GetAgentHistoriesQuery, AgentHistoryInfo> queryService,
+        Guid agentId,
+        [FromQuery] AgentHistoryQueryViewModel request,
+        [FromQuery(Name = "skip")] int skip = 0)
+    {
+        var query = new GetAgentHistoriesQuery(agentId, request.From, request.To, skip);
+
+        return queryService.QueryAsync(query, HttpContext.RequestAborted)
+            .Select(item => new AgentHistoryInfoViewModel(
+                item.EventId,
+                item.Action,
+                item.Modifier,
+                item.CreatedOn));
+    }
+
+    [HttpHead("histories/{agentId}", Name = "CountAgentHistories")]
+    [Description("查詢玩家操作紀錄總筆數")]
+    public async Task<NoContentResult> CountAgentHistoriesAsync(
+        [FromServices] IGetService<GetAgentHistoriesQuery, int> countService,
+        Guid agentId,
+        [FromQuery] AgentHistoryQueryViewModel request,
+        [FromQuery(Name = "skip")] int skip = 0)
+    {
+        var query = new GetAgentHistoriesQuery(agentId, request.From, request.To, skip);
+
+        var count = await countService
+            .GetAsync(query, HttpContext.RequestAborted)
+            .ConfigureAwait(false);
+
+        HttpContext.Response.Headers.Add("Tgs-Return", count.ToString());
+
+        return NoContent();
+    }
+
+    [HttpGet("history/{eventId}", Name = "GetPlayerHistory")]
+    [SuccessStatusCode(200, "Player event info found")]
+    [FailStatusCode(404, "Player event info not found")]
+    public async ValueTask<AgentEventInfoViewModel?> GetAgentHistoryAsync(
+        [FromServices] IGetService<GetAgentEventQuery, EventInfo> getService,
+        Guid eventId)
+    {
+        var result = await getService.GetAsync(new GetAgentEventQuery(eventId)).ConfigureAwait(false);
+
+        return result is null
+            ? await this.FailAsync<AgentEventInfoViewModel, object?>(404, default)
+            : new AgentEventInfoViewModel
+            {
+                Action = result.Action,
+                ChangeSets = result.ChangeSets,
+                Modifier = result.Modifier,
+                CreatedOn = result.CreatedOn,
+            };
     }
 }
