@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Net;
 using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Runtime.CompilerServices;
@@ -233,5 +234,77 @@ public class AgentClient : IAgentClient
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();
+    }
+
+    public IAsyncEnumerable<AgentHistoryInfo> GetAgentHistoriesAsync(
+        GetAgentHistoriesQueryConditions conditions,
+        int totalCount,
+        int skip = 0,
+        CancellationToken cancellationToken = default)
+    {
+        var queryStrings = HttpUtility.ParseQueryString(string.Empty);
+
+        queryStrings.Add("from", conditions.From.ToString("o"));
+        queryStrings.Add("to", conditions.To.ToString("o"));
+
+        var remainingCount = totalCount - skip;
+        var pages = (int)Math.Ceiling(remainingCount / 1000D);
+
+        return AsyncEnumerableEx.Return(totalCount)
+            .SelectMany(count => AsyncEnumerable.Range(0, pages)
+                .SelectMany(idx => _client.GetAsync($"/api/agent/histories/{conditions.AgentId}?{queryStrings}&skip={skip + idx * 1000}")
+                    .ToAsyncEnumerable()
+                    .Do(response => response.EnsureSuccessStatusCode())
+                    .SelectMany(response => response.Content
+                        .ReadFromJsonAsync<IAsyncEnumerable<AgentHistoryInfo>>(_jsonSerializerOptions, cancellationToken)
+                        .ToAsyncEnumerable()
+                        .Where(arr => arr is not null)
+                        .SelectMany(arr => arr!))))
+            .Select(record => record);
+    }
+
+    public ValueTask<int> CountAgentHistoriesAsync(GetAgentHistoriesQueryConditions conditions, CancellationToken cancellationToken = default)
+    {
+        var queryStrings = HttpUtility.ParseQueryString(string.Empty);
+
+        queryStrings.Add("from", conditions.From.ToString("o"));
+        queryStrings.Add("to", conditions.To.ToString("o"));
+
+        var requestPath = $"/api/agent/histories/{conditions.AgentId}?{queryStrings}";
+        var countRequest = new HttpRequestMessage(HttpMethod.Head, $"{requestPath}");
+
+        return _client.SendAsync(countRequest, cancellationToken)
+            .ToAsyncEnumerable()
+            .Do(response => response.EnsureSuccessStatusCode())
+            .SelectMany(response => response.Headers
+                .GetValues("Tgs-Return")
+                .ToAsyncEnumerable()
+                .Take(1))
+            .Select(int.Parse)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async ValueTask<AgentEventInfo?> GetAgentHistoryAsync(Guid eventId, CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+           .GetAsync($"/api/agent/history/{eventId}", cancellationToken)
+           .ConfigureAwait(false);
+
+        switch (response.StatusCode)
+        {
+            case HttpStatusCode.OK:
+                {
+                    var content = await response.Content
+                        .ReadAsStringAsync(cancellationToken)
+                        .ConfigureAwait(false);
+
+                    return JsonSerializer.Deserialize<AgentEventInfo>(content, _jsonSerializerOptions);
+                }
+            case HttpStatusCode.NotFound:
+                return null;
+
+            default:
+                throw new AgentServiceApiException("Unknown error");
+        }
     }
 }

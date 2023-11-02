@@ -39,4 +39,16 @@ public interface IAgentClient
         AgentStatus agentStatus,
         string? modifyUserId = null,
         CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<AgentHistoryInfo> GetAgentHistoriesAsync(
+        GetAgentHistoriesQueryConditions conditions,
+        int totalCount,
+        int skip = 0,
+        CancellationToken cancellationToken = default);
+
+    ValueTask<int> CountAgentHistoriesAsync(
+        GetAgentHistoriesQueryConditions conditions,
+        CancellationToken cancellationToken = default);
+
+    ValueTask<AgentEventInfo?> GetAgentHistoryAsync(Guid eventId, CancellationToken cancellationToken = default);
 }
