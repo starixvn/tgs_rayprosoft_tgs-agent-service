@@ -208,7 +208,7 @@ public class AgentController : ControllerBase
     }
 
     [HttpHead("histories/{agentId}", Name = "CountAgentHistories")]
-    [Description("查詢玩家操作紀錄總筆數")]
+    [Description("查詢代理操作紀錄總筆數")]
     public async Task<NoContentResult> CountAgentHistoriesAsync(
         [FromServices] IGetService<GetAgentHistoriesQuery, int> countService,
         Guid agentId,
