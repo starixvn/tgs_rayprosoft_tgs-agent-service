@@ -35,7 +35,9 @@ public class GetAgentInfoTests
 
         var sut = new GetAgentInfoByUsernameQueryService(fakeAgentRepository);
 
-        fakeAgentRepository.GetAgentByUsernameAsync(Arg.Any<Guid>(), Arg.Any<string>()).Returns(agentInfo);
+        _ = fakeAgentRepository
+            .GetAgentByUsernameAsync(Arg.Any<Guid>(), Arg.Any<string>())
+            .Returns(agentInfo);
 
         var response = await sut.GetAsync(query);
 

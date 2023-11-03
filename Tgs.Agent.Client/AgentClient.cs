@@ -16,7 +16,7 @@ public class AgentClient : IAgentClient
 {
     private readonly HttpClient _client;
 
-    private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    private static readonly JsonSerializerOptions _JsonSerializerOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = true,
@@ -33,7 +33,7 @@ public class AgentClient : IAgentClient
     public async ValueTask AddAgentAuditLogAsync(AddAgentAuditLogRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _client
-           .PostAsJsonAsync("/api/auditlog", request, _jsonSerializerOptions, cancellationToken)
+           .PostAsJsonAsync("/api/auditlog", request, _JsonSerializerOptions, cancellationToken)
            .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();
@@ -52,7 +52,7 @@ public class AgentClient : IAgentClient
         if (string.IsNullOrEmpty(contentJson))
             return null;
 
-        return JsonSerializer.Deserialize<AgentInfoModel>(contentJson, _jsonSerializerOptions);
+        return JsonSerializer.Deserialize<AgentInfoModel>(contentJson, _JsonSerializerOptions);
     }
 
     public async ValueTask<AgentInfoModel?> GetAgentInfoByUsernameAsync(GetAgentInfoByUsernameRequest request,
@@ -66,7 +66,7 @@ public class AgentClient : IAgentClient
 
         var contentJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
-        return string.IsNullOrEmpty(contentJson) ? null : JsonSerializer.Deserialize<AgentInfoModel>(contentJson, _jsonSerializerOptions);
+        return string.IsNullOrEmpty(contentJson) ? null : JsonSerializer.Deserialize<AgentInfoModel>(contentJson, _JsonSerializerOptions);
     }
 
     public async IAsyncEnumerable<ChildAgentInfoModel> GetChildAgentInfosAsync(
@@ -81,7 +81,7 @@ public class AgentClient : IAgentClient
 
         var contentJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
-        var playerCountInfos = JsonSerializer.Deserialize<ChildAgentInfoModel[]>(contentJson, _jsonSerializerOptions);
+        var playerCountInfos = JsonSerializer.Deserialize<ChildAgentInfoModel[]>(contentJson, _JsonSerializerOptions);
 
         foreach (var playerCountInfo in playerCountInfos!)
             yield return playerCountInfo;
@@ -90,7 +90,7 @@ public class AgentClient : IAgentClient
     public async ValueTask SetAgentPasswordAsync(SetAgentPasswordRequest request, CancellationToken cancellationToken = default)
     {
         var requestContent = new StringContent(
-            JsonSerializer.Serialize(new { request.Password }, _jsonSerializerOptions),
+            JsonSerializer.Serialize(new { request.Password }, _JsonSerializerOptions),
             Encoding.UTF8,
             MediaTypeNames.Application.Json);
 
@@ -107,7 +107,7 @@ public class AgentClient : IAgentClient
     public async ValueTask SetAgentDividendPercentageAsync(SetAgentDividendPercentageRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _client
-            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:dividend", request, _jsonSerializerOptions, cancellationToken)
+            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:dividend", request, _JsonSerializerOptions, cancellationToken)
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();
@@ -126,7 +126,7 @@ public class AgentClient : IAgentClient
     public async ValueTask SetAgentInfoAsync(SetAgentInfoRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _client
-            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:info", request, _jsonSerializerOptions, cancellationToken: cancellationToken)
+            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:info", request, _JsonSerializerOptions, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();
@@ -135,7 +135,7 @@ public class AgentClient : IAgentClient
     public async ValueTask SetAgentContactAsync(SetAgentContactRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _client
-            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:contact", request, _jsonSerializerOptions, cancellationToken: cancellationToken)
+            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:contact", request, _JsonSerializerOptions, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();
@@ -144,7 +144,7 @@ public class AgentClient : IAgentClient
     public async ValueTask SetAgentPayPasswordAsync(SetAgentPayPasswordRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _client
-            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:pay-password", request, _jsonSerializerOptions, cancellationToken)
+            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:pay-password", request, _JsonSerializerOptions, cancellationToken)
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();
@@ -191,7 +191,7 @@ public class AgentClient : IAgentClient
             .ReadAsStringAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        return JsonSerializer.Deserialize<PagingResponse<AgentAuditLogInfo>>(contentJson, _jsonSerializerOptions)!;
+        return JsonSerializer.Deserialize<PagingResponse<AgentAuditLogInfo>>(contentJson, _JsonSerializerOptions)!;
     }
 
     public async ValueTask SetAgentPropertiesAsync(
@@ -201,7 +201,7 @@ public class AgentClient : IAgentClient
         CancellationToken cancellationToken = default)
     {
         var requestContent = new StringContent(
-            JsonSerializer.Serialize(properties, _jsonSerializerOptions),
+            JsonSerializer.Serialize(properties, _JsonSerializerOptions),
             Encoding.UTF8,
             MediaTypeNames.Application.Json);
 
@@ -222,7 +222,7 @@ public class AgentClient : IAgentClient
         CancellationToken cancellationToken = default)
     {
         var requestContent = new StringContent(
-            JsonSerializer.Serialize(agentStatus, _jsonSerializerOptions),
+            JsonSerializer.Serialize(agentStatus, _JsonSerializerOptions),
             Encoding.UTF8,
             MediaTypeNames.Application.Json);
 
@@ -256,7 +256,7 @@ public class AgentClient : IAgentClient
                     .ToAsyncEnumerable()
                     .Do(response => response.EnsureSuccessStatusCode())
                     .SelectMany(response => response.Content
-                        .ReadFromJsonAsync<IAsyncEnumerable<AgentHistoryInfo>>(_jsonSerializerOptions, cancellationToken)
+                        .ReadFromJsonAsync<IAsyncEnumerable<AgentHistoryInfo>>(_JsonSerializerOptions, cancellationToken)
                         .ToAsyncEnumerable()
                         .Where(arr => arr is not null)
                         .SelectMany(arr => arr!))))
@@ -298,7 +298,7 @@ public class AgentClient : IAgentClient
                         .ReadAsStringAsync(cancellationToken)
                         .ConfigureAwait(false);
 
-                    return JsonSerializer.Deserialize<AgentEventInfo>(content, _jsonSerializerOptions);
+                    return JsonSerializer.Deserialize<AgentEventInfo>(content, _JsonSerializerOptions);
                 }
             case HttpStatusCode.NotFound:
                 return null;

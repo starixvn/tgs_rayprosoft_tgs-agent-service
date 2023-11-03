@@ -18,4 +18,5 @@ public record AgentInfoViewModel(
     AgentLevelType AgentLevelType,
     decimal DividendPercentage,
     int PlayerNumber,
-    decimal AccumulatedProfitSharing);
+    decimal AccumulatedProfitSharing,
+    Guid BrandId);
