@@ -126,7 +126,7 @@ public class SetAgentPropertiesTests
 
         var agentProperties = new Dictionary<string, string?>
         {
-            ["Remark"] = remark
+            ["Remarks"] = remark
         };
 
         var sut = new SetAgentPropertiesCommandService(fakeAgentRepository, fakeDataCommandBuilder, fakeSerialNumberGenerator);
@@ -146,7 +146,7 @@ public class SetAgentPropertiesTests
 
         _ = fakeDataCommandBuilder
             .Received(1)
-            .CreatePutCommand(Arg.Is(nameof(AgentPropertyName.Remark)), Arg.Is(remark));
+            .CreatePutCommand(Arg.Is(nameof(AgentPropertyName.Remarks)), Arg.Is(remark));
 
         _ = fakeAgentRepository
             .Received(1)
@@ -622,7 +622,7 @@ public class SetAgentPropertiesTests
 
         var agentProperties = new Dictionary<string, string?>
         {
-            ["Remark"] = null
+            ["Remarks"] = null
         };
 
         var sut = new SetAgentPropertiesCommandService(fakeAgentRepository, fakeDataCommandBuilder, fakeSerialNumberGenerator);
@@ -642,7 +642,7 @@ public class SetAgentPropertiesTests
 
         _ = fakeDataCommandBuilder
             .Received(1)
-            .CreateDeleteCommand(Arg.Is(nameof(AgentPropertyName.Remark)));
+            .CreateDeleteCommand(Arg.Is(nameof(AgentPropertyName.Remarks)));
 
         _ = fakeAgentRepository
             .Received(1)

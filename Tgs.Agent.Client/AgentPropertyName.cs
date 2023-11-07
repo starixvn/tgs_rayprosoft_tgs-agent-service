@@ -3,7 +3,7 @@
 public enum AgentPropertyName
 {
     RealName = 0,
-    Remark = 1,
+    Remarks = 1,
     Phone = 2,
     Email = 3,
     Qq = 4,
