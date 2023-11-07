@@ -21,7 +21,7 @@ internal class AgentDeleteDataCommand : DeleteDataCommand
                 modifyContext.Agent.RealName = null;
                 break;
 
-            case nameof(AgentPropertyName.Remark):
+            case nameof(AgentPropertyName.Remarks):
                 modifyContext.Agent.Remarks = null;
                 break;
 

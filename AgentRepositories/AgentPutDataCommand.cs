@@ -21,7 +21,7 @@ internal class AgentPutDataCommand : PutDataCommand
                 modifyContext.Agent.RealName = Value;
                 break;
 
-            case nameof(AgentPropertyName.Remark):
+            case nameof(AgentPropertyName.Remarks):
                 modifyContext.Agent.Remarks = Value;
                 break;
 
