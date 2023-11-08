@@ -51,4 +51,6 @@ public interface IAgentClient
         CancellationToken cancellationToken = default);
 
     ValueTask<AgentEventInfo?> GetAgentHistoryAsync(Guid eventId, CancellationToken cancellationToken = default);
+
+    ValueTask ClearAgentDividendConditionsAsync(Guid agentId, CancellationToken cancellationToken = default);
 }

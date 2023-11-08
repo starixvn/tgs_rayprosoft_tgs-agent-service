@@ -65,4 +65,8 @@ public interface IAgentRepository
         Guid agentId,
         AgentStatus status,
         CancellationToken cancellationToken = default);
+
+    ValueTask ClearAgentDividendConditionsAsync(
+        Guid agentId,
+        CancellationToken cancellationToken = default);
 }

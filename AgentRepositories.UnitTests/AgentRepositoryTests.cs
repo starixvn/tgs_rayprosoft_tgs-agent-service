@@ -640,4 +640,57 @@ public class AgentRepositoryTests
 
         Assert.AreEqual((short)AgentStatus.InBlacklist, actual.Status);
     }
+
+    [Test]
+    public async Task 清除代理階梯式分紅設置()
+    {
+        var dbContextOptionsBuilder = new DbContextOptionsBuilder<TgsContext>();
+        _ = dbContextOptionsBuilder
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(x => x.Ignore(
+                InMemoryEventId.TransactionIgnoredWarning));
+
+        var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
+
+        var agentId = Guid.NewGuid();
+
+        await dbContext.AgentDividendConditions.AddRangeAsync(new AgentDividendCondition[] {
+            new AgentDividendCondition()
+            {
+                AgentId = agentId,
+                ActiveNumber = 10,
+                DividendPercentage = 15m,
+                NetProfit = 10m,
+                Rank = 1,
+            },
+            new AgentDividendCondition()
+            {
+                AgentId = agentId,
+                ActiveNumber = 20,
+                DividendPercentage = 18m,
+                NetProfit = 20m,
+                Rank = 2,
+            },
+            new AgentDividendCondition()
+            {
+                AgentId = agentId,
+                ActiveNumber = 100,
+                DividendPercentage = 20m,
+                NetProfit = 100m,
+                Rank = 3,
+            }
+        });
+
+        _ = await dbContext.SaveChangesAsync();
+
+        var sut = new AgentRepository(dbContext);
+
+        await sut.ClearAgentDividendConditionsAsync(agentId);
+
+        var actual = await dbContext.AgentDividendConditions
+            .Where(x => x.AgentId == agentId)
+            .ToArrayAsync();
+
+        Assert.AreEqual(0, actual.Length);
+    }
 }

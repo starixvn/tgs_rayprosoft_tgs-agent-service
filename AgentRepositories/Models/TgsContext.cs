@@ -22,6 +22,8 @@ public partial class TgsContext : DbContext
 
     public virtual DbSet<AgentDividend> AgentDividends { get; set; }
 
+    public virtual DbSet<AgentDividendCondition> AgentDividendConditions { get; set; }
+
     public virtual DbSet<AgentEventSource> AgentEventSources { get; set; }
 
     public virtual DbSet<Player> Players { get; set; }

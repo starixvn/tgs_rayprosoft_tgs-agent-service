@@ -428,4 +428,17 @@ internal class AgentRepository : IAgentRepository
             .SaveChangesAsync(cancellationToken)
             .ConfigureAwait(false);
     }
+
+    public async ValueTask ClearAgentDividendConditionsAsync(Guid agentId, CancellationToken cancellationToken = default)
+    {
+        var agentDividendConditions = _tgsContext.AgentDividendConditions
+            .Where(x => x.AgentId == agentId)
+            .ToAsyncEnumerable();
+
+        _tgsContext.AgentDividendConditions.RemoveRange(agentDividendConditions.ToEnumerable());
+
+        _ = await _tgsContext
+            .SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
 }
