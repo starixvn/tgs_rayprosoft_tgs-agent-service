@@ -464,7 +464,7 @@ internal class AgentRepository : IAgentRepository
         return new AgentPathInfo(agent.Id, agent.NLevel, agent.Path.ToString());
     }
 
-    public void UpdateSubAgentsPath(
+    public async ValueTask UpdateSubAgentsPathAsync(
         Guid agentId,
         int agentNLevel,
         string agentPath,
@@ -472,7 +472,6 @@ internal class AgentRepository : IAgentRepository
         CancellationToken cancellationToken = default)
     {
         var sql = "SELECT * from dbo.agent_update_path(@agentId,@agentNlevel,@agentPah,@newAgentPath)";
-        //var spName = "dbo.agent_update_path";
 
         var dbConnection = _tgsContext.Database.GetDbConnection();
         var transaction = _tgsContext.Database.CurrentTransaction?.GetDbTransaction();
@@ -485,26 +484,11 @@ internal class AgentRepository : IAgentRepository
             { "@newAgentPath", newParentAgentPath }
         };
 
-        _ = dbConnection.Execute(
+        await dbConnection.ExecuteAsync(
             sql,
             parameters,
             transaction,
             null,
-            CommandType.Text);
-
-        //_ = dbConnection.ExecuteAsync(
-        //    spName,
-        //    new Dictionary<string, object>
-        //    {
-        //        { "_agent_id", agentId },
-        //        { "_agent_nlevel", agentNLevel },
-        //        { "_agent_path", agentPath },
-        //        { "_new_agent_path", newParentAgentPath }
-        //    },
-        //    transaction,
-        //    null,
-        //    System.Data.CommandType.StoredProcedure);
-
-        //return ValueTask.CompletedTask;
+            CommandType.Text).ConfigureAwait(false);
     }
 }
