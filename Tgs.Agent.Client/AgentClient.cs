@@ -316,4 +316,13 @@ public class AgentClient : IAgentClient
 
         _ = response.EnsureSuccessStatusCode();
     }
+
+    public async ValueTask UpdateSubAgentsPathAsync(Guid agentId, Guid newParentAgentId, CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+           .PatchAsync($"/api/agent/{agentId}:sub-agents/path/{newParentAgentId}", null, cancellationToken)
+           .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
 }

@@ -69,4 +69,15 @@ public interface IAgentRepository
     ValueTask ClearAgentDividendConditionsAsync(
         Guid agentId,
         CancellationToken cancellationToken = default);
+
+    ValueTask<AgentPathInfo?> GetAgentPathInfoAsync(
+        Guid agentId,
+        CancellationToken cancellationToken = default);
+
+    ValueTask UpdateSubAgentsPathAsnyc(
+        Guid agentId,
+        int agentNLevel,
+        string agentPath,
+        string newParentAgentPath,
+        CancellationToken cancellationToken = default);
 }

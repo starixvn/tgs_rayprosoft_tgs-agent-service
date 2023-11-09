@@ -476,4 +476,36 @@ public class AgentTests
         Assert.NotNull(actual);
         Assert.AreEqual(Client.Models.Enums.EventAction.Create, actual!.Action);
     }
+
+    [Test]
+    public async Task 更新子代理們path()
+    {
+        var fakeAgentRepository = Substitute.For<IAgentRepository>();
+
+        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
+            => services
+                .AddSingleton(fakeAgentRepository));
+
+        var httpClient = web.CreateClient();
+
+        var agentId = Guid.Parse("09d7371b-556e-4d86-bac4-bba727e8dedd");
+        var agentNLevel = 2;
+        var agentPath = "c3d9bf119ea24d1c84dc2ed9b8a55fdd.09d7371b556e4d86bac4bba727e8dedd";
+        var newParentAgentId = Guid.Parse("c3d9bf11-9ea2-4d1c-84dc-2ed9b8a55fdd");
+        var newParentPath = "c3d9bf119ea24d1c84dc2ed9b8a55fdd";
+
+        _ = fakeAgentRepository.GetAgentPathInfoAsync(Arg.Is(agentId), Arg.Any<CancellationToken>())
+            .Returns(new AgentPathInfo(agentId, agentNLevel, agentPath));
+
+        _ = fakeAgentRepository.GetAgentPathInfoAsync(Arg.Is(newParentAgentId), Arg.Any<CancellationToken>())
+            .Returns(new AgentPathInfo(newParentAgentId, 1, newParentPath));
+
+        var sut = new AgentClient(httpClient);
+
+        await sut.UpdateSubAgentsPathAsync(agentId, newParentAgentId);
+
+        _ = fakeAgentRepository
+            .Received(1)
+            .UpdateSubAgentsPathAsnyc(Arg.Is(agentId), Arg.Is(agentNLevel), Arg.Is(agentPath), Arg.Is(newParentPath), Arg.Any<CancellationToken>());
+    }
 }

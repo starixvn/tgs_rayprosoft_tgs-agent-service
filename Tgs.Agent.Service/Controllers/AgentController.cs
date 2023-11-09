@@ -247,4 +247,15 @@ public class AgentController : ControllerBase
                 CreatedOn = result.CreatedOn,
             };
     }
+
+    [HttpPatch("{agentId}:sub-agents/path/{newParentAgentId}", Name = "SetSubAgentsPath")]
+    public ValueTask SetSubAgentsPathAsync(
+        [FromServices] ICommandService<SetSubAgentsPathCommand> commandService,
+        Guid agentId,
+        Guid newParentAgentId)
+    {
+        var command = new SetSubAgentsPathCommand(agentId, newParentAgentId);
+
+        return commandService.ExecuteAsync(command);
+    }
 }
