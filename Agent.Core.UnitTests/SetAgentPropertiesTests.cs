@@ -39,7 +39,9 @@ public class SetAgentPropertiesTests
             0m,
             0,
             0m,
-            brandId);
+            brandId,
+            Guid.NewGuid(),
+            null);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -122,7 +124,9 @@ public class SetAgentPropertiesTests
             0m,
             0,
             0m,
-            brandId);
+            brandId,
+            Guid.NewGuid(),
+            null);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -205,7 +209,9 @@ public class SetAgentPropertiesTests
             0m,
             0,
             0m,
-            brandId);
+            brandId,
+            Guid.NewGuid(),
+            null);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -288,7 +294,9 @@ public class SetAgentPropertiesTests
             0m,
             0,
             0m,
-            brandId);
+            brandId,
+            Guid.NewGuid(),
+            null);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -371,7 +379,9 @@ public class SetAgentPropertiesTests
             0m,
             0,
             0m,
-            brandId);
+            brandId,
+            Guid.NewGuid(),
+            null);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -454,7 +464,9 @@ public class SetAgentPropertiesTests
             0m,
             0,
             0m,
-            brandId);
+            brandId,
+            Guid.NewGuid(),
+            null);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -536,7 +548,9 @@ public class SetAgentPropertiesTests
             0m,
             0,
             0m,
-            brandId);
+            brandId,
+            Guid.NewGuid(),
+            null);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -618,7 +632,9 @@ public class SetAgentPropertiesTests
             0m,
             0,
             0m,
-            brandId);
+            brandId,
+            Guid.NewGuid(),
+            null);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -680,7 +696,7 @@ public class SetAgentPropertiesTests
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
         var brandId = Guid.NewGuid();
-        var agentId = Guid.NewGuid();        
+        var agentId = Guid.NewGuid();
         var modifyUserId = "50ce61eb-8c9d-4f84-3cf6-08d9262ce1a5";
 
         var agentInfo = new AgentInfo(
@@ -700,7 +716,9 @@ public class SetAgentPropertiesTests
             0m,
             0,
             0m,
-            brandId);
+            brandId,
+            Guid.NewGuid(),
+            null);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -782,7 +800,9 @@ public class SetAgentPropertiesTests
             0m,
             0,
             0m,
-            brandId);
+            brandId,
+            Guid.NewGuid(),
+            null);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -864,7 +884,9 @@ public class SetAgentPropertiesTests
             0m,
             0,
             0m,
-            brandId);
+            brandId,
+            Guid.NewGuid(),
+            null);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -946,7 +968,9 @@ public class SetAgentPropertiesTests
             0m,
             0,
             0m,
-            brandId);
+            brandId,
+            Guid.NewGuid(),
+            null);
 
         var agentProperties = new Dictionary<string, string?>
         {

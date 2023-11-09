@@ -49,7 +49,9 @@ public class SetAgentStatusTests
             0m,
             0,
             0m,
-            brandId);
+            brandId,
+            Guid.NewGuid(),
+            null);
 
         _ = fakeAgentRepository
             .GetAgentByIdAsync(Arg.Is(agentId))
