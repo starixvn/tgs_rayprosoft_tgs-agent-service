@@ -74,7 +74,7 @@ public interface IAgentRepository
         Guid agentId,
         CancellationToken cancellationToken = default);
 
-    ValueTask UpdateSubAgentsPathAsnyc(
+    void UpdateSubAgentsPath(
         Guid agentId,
         int agentNLevel,
         string agentPath,

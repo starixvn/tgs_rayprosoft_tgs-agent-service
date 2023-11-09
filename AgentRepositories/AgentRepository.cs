@@ -1,6 +1,8 @@
-﻿using System.Text.Json;
+﻿using System.Data;
+using System.Text.Json;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Core.Models.Enums;
@@ -458,16 +460,18 @@ internal class AgentRepository : IAgentRepository
         return new AgentPathInfo(agent.Id, agent.NLevel, agent.Path.ToString());
     }
 
-    public async ValueTask UpdateSubAgentsPathAsnyc(
+    public void UpdateSubAgentsPath(
         Guid agentId,
         int agentNLevel,
         string agentPath,
         string newParentAgentPath,
         CancellationToken cancellationToken = default)
     {
-        var sql = "select * from dbo.agent_update_path(@agentId,@agentNlevel,@agentPah,@newAgentPath)";
+        var sql = "SELECT * from dbo.agent_update_path(@agentId,@agentNlevel,@agentPah,@newAgentPath)";
+        //var spName = "dbo.agent_update_path";
 
         var dbConnection = _tgsContext.Database.GetDbConnection();
+        var transaction = _tgsContext.Database.CurrentTransaction?.GetDbTransaction();
 
         var parameters = new Dictionary<string, object>
         {
@@ -477,8 +481,26 @@ internal class AgentRepository : IAgentRepository
             { "@newAgentPath", newParentAgentPath }
         };
 
-        _ = await dbConnection
-            .ExecuteAsync(sql, parameters, commandType: System.Data.CommandType.Text)
-            .ConfigureAwait(false);
+        _ = dbConnection.Execute(
+            sql,
+            parameters,
+            transaction,
+            null,
+            CommandType.Text);
+
+        //_ = dbConnection.ExecuteAsync(
+        //    spName,
+        //    new Dictionary<string, object>
+        //    {
+        //        { "_agent_id", agentId },
+        //        { "_agent_nlevel", agentNLevel },
+        //        { "_agent_path", agentPath },
+        //        { "_new_agent_path", newParentAgentPath }
+        //    },
+        //    transaction,
+        //    null,
+        //    System.Data.CommandType.StoredProcedure);
+
+        //return ValueTask.CompletedTask;
     }
 }

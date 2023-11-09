@@ -8,7 +8,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAgentClient(this IServiceCollection services,
         Action<AgentOptions, IServiceProvider> configure)
     {
-        services.AddOptions<AgentOptions>().Configure(configure);
+        
+        
 
         services.AddHttpClient<IAgentClient, AgentClient>()
             .ConfigureHttpClient((sp, httpClient) =>

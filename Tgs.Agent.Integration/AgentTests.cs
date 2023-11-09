@@ -506,6 +506,6 @@ public class AgentTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateSubAgentsPathAsnyc(Arg.Is(agentId), Arg.Is(agentNLevel), Arg.Is(agentPath), Arg.Is(newParentPath), Arg.Any<CancellationToken>());
+            .UpdateSubAgentsPathAsync(Arg.Is(agentId), Arg.Is(agentNLevel), Arg.Is(agentPath), Arg.Is(newParentPath), Arg.Any<CancellationToken>());
     }
 }

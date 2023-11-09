@@ -38,9 +38,7 @@ internal class SetSubAgentsPathCommandService : ICommandService<SetSubAgentsPath
             return;
         }
 
-        await _repository
-            .UpdateSubAgentsPathAsnyc(agentPathInfo.AgentId, agentPathInfo.NLevel, agentPathInfo.Path, parentPathInfo.Path, cancellationToken)
-            .ConfigureAwait(false);
+        _repository.UpdateSubAgentsPath(agentPathInfo.AgentId, agentPathInfo.NLevel, agentPathInfo.Path, parentPathInfo.Path, cancellationToken);
 
         _logger.LogInformation(
             "function dbo.agent_update_path(agentId:{agentId}, agentNLevel:{agentNLevel}, agentPath:{agentPath}, parentAgentPath:{parentAgentPath}) executed",

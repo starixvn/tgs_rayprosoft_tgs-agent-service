@@ -30,6 +30,6 @@ public class SetSubAgentsPathTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateSubAgentsPathAsnyc(Arg.Is(agentId), Arg.Is(agentNLevel), Arg.Is(agentPath), Arg.Is(newParentPath));
+            .UpdateSubAgentsPathAsync(Arg.Is(agentId), Arg.Is(agentNLevel), Arg.Is(agentPath), Arg.Is(newParentPath));
     }
 }
