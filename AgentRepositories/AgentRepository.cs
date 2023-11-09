@@ -1,6 +1,8 @@
-﻿using System.Text.Json;
+﻿using System.Data;
+using System.Text.Json;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Core.Models.Enums;
@@ -462,16 +464,17 @@ internal class AgentRepository : IAgentRepository
         return new AgentPathInfo(agent.Id, agent.NLevel, agent.Path.ToString());
     }
 
-    public async ValueTask UpdateSubAgentsPathAsnyc(
+    public async ValueTask UpdateSubAgentsPathAsync(
         Guid agentId,
         int agentNLevel,
         string agentPath,
         string newParentAgentPath,
         CancellationToken cancellationToken = default)
     {
-        var sql = "select * from dbo.agent_update_path(@agentId,@agentNlevel,@agentPah,@newAgentPath)";
+        var sql = "SELECT * from dbo.agent_update_path(@agentId,@agentNlevel,@agentPah,@newAgentPath)";
 
         var dbConnection = _tgsContext.Database.GetDbConnection();
+        var transaction = _tgsContext.Database.CurrentTransaction?.GetDbTransaction();
 
         var parameters = new Dictionary<string, object>
         {
@@ -481,8 +484,11 @@ internal class AgentRepository : IAgentRepository
             { "@newAgentPath", newParentAgentPath }
         };
 
-        _ = await dbConnection
-            .ExecuteAsync(sql, parameters, commandType: System.Data.CommandType.Text)
-            .ConfigureAwait(false);
+        await dbConnection.ExecuteAsync(
+            sql,
+            parameters,
+            transaction,
+            null,
+            CommandType.Text).ConfigureAwait(false);
     }
 }
