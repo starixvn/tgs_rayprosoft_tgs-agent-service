@@ -50,7 +50,9 @@ public class AgentTests
                 DividendPercentage: 80M,
                 PlayerNumber: 0,
                 AccumulatedProfitSharing: 0M,
-                BrandId: Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af")));
+                BrandId: Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af"),
+                DefaultWalletId: Guid.NewGuid(),
+                WalletId: null));
 
         var actual = await sut.GetAgentInfoAsync(new(agentId));
 
@@ -217,7 +219,9 @@ public class AgentTests
             0m,
             0,
             0m,
-            brandId));
+            brandId,
+            Guid.NewGuid(),
+            null));
 
         await sut.SetAgentPasswordAsync(new(agentId, password, modifyUserId));
 

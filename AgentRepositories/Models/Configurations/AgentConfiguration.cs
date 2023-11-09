@@ -85,6 +85,7 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
             entity.Property(e => e.VirtualSportsRebatePercentage)
             .HasPrecision(18, 6)
             .HasColumnName("virtual_sports_rebate_percentage");
+            entity.Property(e => e.WalletId).HasColumnName("wallet_id");
             entity.Property(e => e.Wechat)
             .HasMaxLength(64)
             .HasColumnName("wechat");

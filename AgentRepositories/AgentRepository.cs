@@ -76,7 +76,9 @@ internal class AgentRepository : IAgentRepository
             agent.DividendPercentage,
             playerNumber,
             dividend,
-            agent.BrandId);
+            agent.BrandId,
+            agent.DefaultWalletId,
+            agent.WalletId);
     }
 
     public async ValueTask<AgentInfo?> GetAgentByUsernameAsync(Guid brandId, string username,
@@ -115,7 +117,9 @@ internal class AgentRepository : IAgentRepository
             agent.DividendPercentage,
             playerNumber,
             dividend,
-            agent.BrandId);
+            agent.BrandId,
+            agent.DefaultWalletId,
+            agent.WalletId);
     }
 
     public IAsyncEnumerable<ChildAgentInfoModel> GetChildAgentInfosAsync(Guid agentId, CancellationToken cancellationToken = default)
