@@ -78,6 +78,8 @@ public partial class Agent
 
     public Guid? SnapshotEventId { get; set; }
 
+    public Guid? WalletId { get; set; }
+
     public virtual ICollection<AgentAuditLog> AgentAuditLogs { get; set; } = new List<AgentAuditLog>();
 
     public virtual ICollection<AgentDividendCondition> AgentDividendConditions { get; set; } = new List<AgentDividendCondition>();

@@ -43,7 +43,9 @@ public class AgentController : ControllerBase
             info.DividendPercentage,
             info.PlayerNumber,
             info.AccumulatedProfitSharing,
-            info.BrandId);
+            info.BrandId,
+            info.DefaultWalletId,
+            info.WalletId);
     }
 
     [HttpGet("info/{brandId}/{username}", Name = "GetAgentInfoByUsername")]
@@ -75,7 +77,9 @@ public class AgentController : ControllerBase
             info.DividendPercentage,
             info.PlayerNumber,
             info.AccumulatedProfitSharing,
-            info.BrandId);
+            info.BrandId,
+            info.DefaultWalletId,
+            info.WalletId);
     }
 
     [HttpGet("allChildAgents/{agentId:Guid}", Name = "GetChildAgentInfos")]

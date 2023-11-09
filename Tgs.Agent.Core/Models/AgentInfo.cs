@@ -16,4 +16,6 @@ public record AgentInfo(
     decimal DividendPercentage,
     int PlayerNumber,
     decimal AccumulatedProfitSharing,
-    Guid BrandId);
+    Guid BrandId,
+    Guid DefaultWalletId,
+    Guid? WalletId);
