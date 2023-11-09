@@ -307,4 +307,22 @@ public class AgentClient : IAgentClient
                 throw new AgentServiceApiException("Unknown error");
         }
     }
+
+    public async ValueTask ClearAgentDividendConditionsAsync(Guid agentId, CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .DeleteAsync($"/api/agentdividendcondition/{agentId}", cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
+
+    public async ValueTask UpdateSubAgentsPathAsync(Guid agentId, Guid newParentAgentId, CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+           .PatchAsync($"/api/agent/{agentId}:sub-agents/path/{newParentAgentId}", null, cancellationToken)
+           .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
 }

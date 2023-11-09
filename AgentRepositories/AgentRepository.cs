@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
@@ -426,6 +427,58 @@ internal class AgentRepository : IAgentRepository
 
         _ = await _tgsContext
             .SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async ValueTask ClearAgentDividendConditionsAsync(Guid agentId, CancellationToken cancellationToken = default)
+    {
+        var agentDividendConditions = _tgsContext.AgentDividendConditions
+            .Where(x => x.AgentId == agentId)
+            .ToAsyncEnumerable();
+
+        _tgsContext.AgentDividendConditions.RemoveRange(agentDividendConditions.ToEnumerable());
+
+        _ = await _tgsContext
+            .SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async ValueTask<AgentPathInfo?> GetAgentPathInfoAsync(Guid agentId, CancellationToken cancellationToken = default)
+    {
+        var query = from a in _tgsContext.Agents.AsQueryable()
+                    where a.Id == agentId
+                    select new { a.Id, a.Path, a.Path.NLevel };
+        var agent = await query
+            .SingleOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        if (agent == null)
+            return null;
+
+        return new AgentPathInfo(agent.Id, agent.NLevel, agent.Path.ToString());
+    }
+
+    public async ValueTask UpdateSubAgentsPathAsnyc(
+        Guid agentId,
+        int agentNLevel,
+        string agentPath,
+        string newParentAgentPath,
+        CancellationToken cancellationToken = default)
+    {
+        var sql = "select * from dbo.agent_update_path(@agentId,@agentNlevel,@agentPah,@newAgentPath)";
+
+        var dbConnection = _tgsContext.Database.GetDbConnection();
+
+        var parameters = new Dictionary<string, object>
+        {
+            { "@agentId", agentId },
+            { "@agentNlevel", agentNLevel },
+            { "@agentPah", agentPath },
+            { "@newAgentPath", newParentAgentPath }
+        };
+
+        _ = await dbConnection
+            .ExecuteAsync(sql, parameters, commandType: System.Data.CommandType.Text)
             .ConfigureAwait(false);
     }
 }

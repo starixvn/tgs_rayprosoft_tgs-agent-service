@@ -80,6 +80,8 @@ public partial class Agent
 
     public virtual ICollection<AgentAuditLog> AgentAuditLogs { get; set; } = new List<AgentAuditLog>();
 
+    public virtual ICollection<AgentDividendCondition> AgentDividendConditions { get; set; } = new List<AgentDividendCondition>();
+
     public virtual ICollection<Agent> InverseParentAgent { get; set; } = new List<Agent>();
 
     public virtual Agent? ParentAgent { get; set; }
