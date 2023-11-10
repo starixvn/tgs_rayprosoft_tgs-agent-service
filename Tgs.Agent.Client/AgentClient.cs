@@ -49,10 +49,7 @@ public class AgentClient : IAgentClient
 
         var contentJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
-        if (string.IsNullOrEmpty(contentJson))
-            return null;
-
-        return JsonSerializer.Deserialize<AgentInfoModel>(contentJson, _JsonSerializerOptions);
+        return string.IsNullOrEmpty(contentJson) ? null : JsonSerializer.Deserialize<AgentInfoModel>(contentJson, _JsonSerializerOptions);
     }
 
     public async ValueTask<AgentInfoModel?> GetAgentInfoByUsernameAsync(GetAgentInfoByUsernameRequest request,

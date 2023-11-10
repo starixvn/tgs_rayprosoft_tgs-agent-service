@@ -458,10 +458,7 @@ internal class AgentRepository : IAgentRepository
             .SingleOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        if (agent == null)
-            return null;
-
-        return new AgentPathInfo(agent.Id, agent.NLevel, agent.Path.ToString());
+        return agent == null ? null : new AgentPathInfo(agent.Id, agent.NLevel, agent.Path.ToString());
     }
 
     public async ValueTask UpdateSubAgentsPathAsync(
@@ -484,7 +481,7 @@ internal class AgentRepository : IAgentRepository
             { "@newAgentPath", newParentAgentPath }
         };
 
-        await dbConnection.ExecuteAsync(
+        _ = await dbConnection.ExecuteAsync(
             sql,
             parameters,
             transaction,

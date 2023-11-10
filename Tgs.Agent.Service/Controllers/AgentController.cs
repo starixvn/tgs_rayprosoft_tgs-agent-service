@@ -23,10 +23,9 @@ public class AgentController : ControllerBase
             .GetAsync(new GetAgentInfoQuery(agentId), HttpContext.RequestAborted)
             .ConfigureAwait(false);
 
-        if (info is null)
-            return null;
-
-        return new AgentInfoViewModel(
+        return info is null
+            ? null
+            : new AgentInfoViewModel(
             info.Id,
             info.Username,
             info.RealName,
@@ -57,10 +56,9 @@ public class AgentController : ControllerBase
             .GetAsync(new GetAgentInfoByUsernameQuery(brandId, username), HttpContext.RequestAborted)
             .ConfigureAwait(false);
 
-        if (info is null)
-            return null;
-
-        return new AgentInfoViewModel(
+        return info is null
+            ? null
+            : new AgentInfoViewModel(
             info.Id,
             info.Username,
             info.RealName,
@@ -89,7 +87,7 @@ public class AgentController : ControllerBase
     {
         var infos = await queryService
             .QueryAsync(new(agentId), HttpContext.RequestAborted)
-            .ToArrayAsync();
+            .ToArrayAsync(HttpContext.RequestAborted).ConfigureAwait(false);
 
         foreach (var info in infos)
         {
@@ -242,7 +240,7 @@ public class AgentController : ControllerBase
         var result = await getService.GetAsync(new GetAgentEventQuery(eventId)).ConfigureAwait(false);
 
         return result is null
-            ? await this.FailAsync<AgentEventInfoViewModel, object?>(404, default)
+            ? await this.FailAsync<AgentEventInfoViewModel, object?>(404, default).ConfigureAwait(false)
             : new AgentEventInfoViewModel
             {
                 Action = result.Action,

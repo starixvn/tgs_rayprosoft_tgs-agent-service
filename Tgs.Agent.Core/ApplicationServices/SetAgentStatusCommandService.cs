@@ -27,7 +27,7 @@ internal class SetAgentStatusCommandService : ICommandService<SetAgentStatusComm
         await _agentRepository.SetAgentStatusAsync(
             command.AgentId,
             command.Status,
-            cancellationToken);
+            cancellationToken).ConfigureAwait(false);
 
         var patchOperations = Array.Empty<PatchOperation>();
 

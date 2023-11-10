@@ -35,4 +35,12 @@
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Projects\tgs-agent-service\Agent.Core.UnitTests\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Projects\tgs-agent-service\Agent.Core.UnitTests\.editorconfig" />
+  </ItemGroup>
+
 </Project>

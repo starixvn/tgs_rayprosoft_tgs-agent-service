@@ -506,7 +506,7 @@ public class AgentTests
 
         var sut = new AgentClient(httpClient);
 
-        await sut.UpdateSubAgentsPathAsync(agentId, newParentAgentId);
+        await sut.UpdateSubAgentsPathAsync(agentId, newParentAgentId).ConfigureAwait(false);
 
         _ = fakeAgentRepository
             .Received(1)
