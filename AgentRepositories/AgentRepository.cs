@@ -2,7 +2,6 @@
 using System.Text.Json;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Core.Models.Enums;
@@ -461,31 +460,28 @@ internal class AgentRepository : IAgentRepository
         return agent == null ? null : new AgentPathInfo(agent.Id, agent.NLevel, agent.Path.ToString());
     }
 
-    public async ValueTask UpdateSubAgentsPathAsync(
+    public async Task UpdateSubAgentsPathAsync(
         Guid agentId,
         int agentNLevel,
         string agentPath,
-        string newParentAgentPath,
-        CancellationToken cancellationToken = default)
+        string newParentAgentPath)
     {
-        var sql = "SELECT * from dbo.agent_update_path(@agentId,@agentNlevel,@agentPah,@newAgentPath)";
+        //return _tgsContext.AgentUpdatePathAsync(agentId, agentNLevel, agentPath, newParentAgentPath);//會沒執行
+        //var sql = "dbo.agent_update_path"; //會沒執行
 
-        var dbConnection = _tgsContext.Database.GetDbConnection();
-        var transaction = _tgsContext.Database.CurrentTransaction?.GetDbTransaction();
+        var sql = "SELECT 1 FROM dbo.agent_update_path(@agentId,@agentNLevel,@agentPath,@newParentAgentPath)"; //可以但有錯誤 呼叫方法前面不能await
 
-        var parameters = new Dictionary<string, object>
-        {
-            { "@agentId", agentId },
-            { "@agentNlevel", agentNLevel },
-            { "@agentPah", agentPath },
-            { "@newAgentPath", newParentAgentPath }
-        };
+        using var connection = _tgsContext.Database.GetDbConnection();
 
-        _ = await dbConnection.ExecuteAsync(
+        _ = await connection.ExecuteAsync(
             sql,
-            parameters,
-            transaction,
-            null,
-            CommandType.Text).ConfigureAwait(false);
+            new
+            {
+                agentId,
+                agentNLevel,
+                agentPath,
+                newParentAgentPath
+            },
+            commandType: CommandType.Text).ConfigureAwait(false);
     }
 }

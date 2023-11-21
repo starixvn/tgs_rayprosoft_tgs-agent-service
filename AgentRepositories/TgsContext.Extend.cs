@@ -19,10 +19,10 @@ public partial class TgsContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder)
     {
-        ////var methodInfo = typeof(TgsContext).GetMethod(nameof(AgentUpdatePathAsync));
-        //_ = modelBuilder
-        //    .HasDbFunction(() => TgsDbFunctions.AgentUpdatePath(default, default, default!, default!))
-        //    .HasSchema("dbo")
-        //    .HasName("agent_update_path");
+        //var methodInfo = typeof(TgsContext).GetMethod(nameof(AgentUpdatePathAsync));
+        _ = modelBuilder
+            .HasDbFunction(() => TgsDbFunctions.AgentUpdatePath(default, default, default!, default!))
+            .HasSchema("dbo")
+            .HasName("agent_update_path");
     }
 }

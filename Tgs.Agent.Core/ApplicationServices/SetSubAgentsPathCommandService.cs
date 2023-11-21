@@ -39,7 +39,7 @@ internal class SetSubAgentsPathCommandService : ICommandService<SetSubAgentsPath
         }
 
         await _repository
-            .UpdateSubAgentsPathAsync(agentPathInfo.AgentId, agentPathInfo.NLevel, agentPathInfo.Path, parentPathInfo.Path, cancellationToken)
+            .UpdateSubAgentsPathAsync(agentPathInfo.AgentId, agentPathInfo.NLevel, agentPathInfo.Path, parentPathInfo.Path)
             .ConfigureAwait(false);
 
         _logger.LogInformation(
