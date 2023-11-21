@@ -81,7 +81,7 @@ push-docker-image:
     untracked: true
     policy: pull
   script:
-    - dotnet build "Tgs.Agent.Service/Tgs.Agent.Service.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:$Tag" --no-restore
+    - docker build -t "$ImageName:$Tag" --build-arg [BUILD_CONFIGURATION]=$BUILD_CONFIGURATION -f "Tgs.Agent.Service/Dockerfile" . --no-cache
     - docker push $ImageName:$Tag
 
 push-k8s-template:
