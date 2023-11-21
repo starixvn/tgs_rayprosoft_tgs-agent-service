@@ -14,7 +14,8 @@ builder.Services
     .AddRepository((sp, optionsBuilder) =>
     {
         var connectionString = sp.GetRequiredService<IConfiguration>().GetConnectionString("Tgs");
-        _ = optionsBuilder.UseNpgsql(connectionString);
+        _ = optionsBuilder.UseNpgsql("name=Tgs")
+            .EnableSensitiveDataLogging();
     });
 
 builder.Logging
@@ -94,11 +95,11 @@ builder.Services
 
 builder.Services.AddHealthChecks();
 
-builder.Services    
+builder.Services
     .AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());        
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
