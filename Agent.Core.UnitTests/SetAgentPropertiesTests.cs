@@ -65,15 +65,7 @@ public class SetAgentPropertiesTests
 
         _ = fakeDataCommandBuilder
             .Received(1)
-            .CreatePutCommand(Arg.Is(nameof(AgentPropertyName.RealName)), Arg.Is(realName));
-
-        _ = fakeAgentRepository
-            .Received(1)
-            .SetAgentPropertiesAsync(
-                agentInfo.BrandId,
-                agentInfo.Id,
-                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
-                Arg.Any<CancellationToken>());
+            .CreatePutCommand(Arg.Is(nameof(AgentPropertyName.RealName)), Arg.Is(realName));        
 
         _ = fakeAgentRepository
             .Received(1)
@@ -88,9 +80,11 @@ public class SetAgentPropertiesTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateAgentSnapshotAsync(
+            .UpdateAgentSnapshotAndPropertiesAsync(
                 Arg.Is(agentId),
+                Arg.Is(brandId),
                 Arg.Is(eventId),
+                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
                 Arg.Any<DateTime>(),
                 Arg.Any<CancellationToken>());
     }
@@ -150,15 +144,7 @@ public class SetAgentPropertiesTests
 
         _ = fakeDataCommandBuilder
             .Received(1)
-            .CreatePutCommand(Arg.Is(nameof(AgentPropertyName.Remarks)), Arg.Is(remark));
-
-        _ = fakeAgentRepository
-            .Received(1)
-            .SetAgentPropertiesAsync(
-                agentInfo.BrandId,
-                agentInfo.Id,
-                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
-                Arg.Any<CancellationToken>());
+            .CreatePutCommand(Arg.Is(nameof(AgentPropertyName.Remarks)), Arg.Is(remark));        
 
         _ = fakeAgentRepository
             .Received(1)
@@ -173,9 +159,11 @@ public class SetAgentPropertiesTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateAgentSnapshotAsync(
+            .UpdateAgentSnapshotAndPropertiesAsync(
                 Arg.Is(agentId),
+                Arg.Is(brandId),
                 Arg.Is(eventId),
+                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
                 Arg.Any<DateTime>(),
                 Arg.Any<CancellationToken>());
     }
@@ -236,15 +224,7 @@ public class SetAgentPropertiesTests
         _ = fakeDataCommandBuilder
             .Received(1)
             .CreatePutCommand(Arg.Is(nameof(AgentPropertyName.Phone)), Arg.Is(phone));
-
-        _ = fakeAgentRepository
-            .Received(1)
-            .SetAgentPropertiesAsync(
-                agentInfo.BrandId,
-                agentInfo.Id,
-                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
-                Arg.Any<CancellationToken>());
-
+        
         _ = fakeAgentRepository
             .Received(1)
             .CreateAgentEventAsync(
@@ -258,9 +238,11 @@ public class SetAgentPropertiesTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateAgentSnapshotAsync(
+            .UpdateAgentSnapshotAndPropertiesAsync(
                 Arg.Is(agentId),
+                Arg.Is(brandId),
                 Arg.Is(eventId),
+                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
                 Arg.Any<DateTime>(),
                 Arg.Any<CancellationToken>());
     }
@@ -320,15 +302,7 @@ public class SetAgentPropertiesTests
 
         _ = fakeDataCommandBuilder
             .Received(1)
-            .CreatePutCommand(Arg.Is(nameof(AgentPropertyName.Email)), Arg.Is(email));
-
-        _ = fakeAgentRepository
-            .Received(1)
-            .SetAgentPropertiesAsync(
-                agentInfo.BrandId,
-                agentInfo.Id,
-                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
-                Arg.Any<CancellationToken>());
+            .CreatePutCommand(Arg.Is(nameof(AgentPropertyName.Email)), Arg.Is(email));        
 
         _ = fakeAgentRepository
             .Received(1)
@@ -343,9 +317,11 @@ public class SetAgentPropertiesTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateAgentSnapshotAsync(
+            .UpdateAgentSnapshotAndPropertiesAsync(
                 Arg.Is(agentId),
+                Arg.Is(brandId),
                 Arg.Is(eventId),
+                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
                 Arg.Any<DateTime>(),
                 Arg.Any<CancellationToken>());
     }
@@ -405,15 +381,7 @@ public class SetAgentPropertiesTests
 
         _ = fakeDataCommandBuilder
             .Received(1)
-            .CreatePutCommand(Arg.Is(nameof(AgentPropertyName.Qq)), Arg.Is(qq));
-
-        _ = fakeAgentRepository
-            .Received(1)
-            .SetAgentPropertiesAsync(
-                agentInfo.BrandId,
-                agentInfo.Id,
-                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
-                Arg.Any<CancellationToken>());
+            .CreatePutCommand(Arg.Is(nameof(AgentPropertyName.Qq)), Arg.Is(qq));        
 
         _ = fakeAgentRepository
             .Received(1)
@@ -428,9 +396,11 @@ public class SetAgentPropertiesTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateAgentSnapshotAsync(
+            .UpdateAgentSnapshotAndPropertiesAsync(
                 Arg.Is(agentId),
+                Arg.Is(brandId),
                 Arg.Is(eventId),
+                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
                 Arg.Any<DateTime>(),
                 Arg.Any<CancellationToken>());
     }
@@ -490,15 +460,7 @@ public class SetAgentPropertiesTests
 
         _ = fakeDataCommandBuilder
             .Received(1)
-            .CreatePutCommand(Arg.Is(nameof(AgentPropertyName.Wechat)), Arg.Is(wechat));
-
-        _ = fakeAgentRepository
-            .Received(1)
-            .SetAgentPropertiesAsync(
-                agentInfo.BrandId,
-                agentInfo.Id,
-                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
-                Arg.Any<CancellationToken>());
+            .CreatePutCommand(Arg.Is(nameof(AgentPropertyName.Wechat)), Arg.Is(wechat));        
 
         _ = fakeAgentRepository
             .Received(1)
@@ -513,9 +475,11 @@ public class SetAgentPropertiesTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateAgentSnapshotAsync(
+            .UpdateAgentSnapshotAndPropertiesAsync(
                 Arg.Is(agentId),
+                Arg.Is(brandId),
                 Arg.Is(eventId),
+                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
                 Arg.Any<DateTime>(),
                 Arg.Any<CancellationToken>());
     }
@@ -574,15 +538,7 @@ public class SetAgentPropertiesTests
 
         _ = fakeDataCommandBuilder
             .Received(1)
-            .CreateDeleteCommand(Arg.Is(nameof(AgentPropertyName.RealName)));
-
-        _ = fakeAgentRepository
-            .Received(1)
-            .SetAgentPropertiesAsync(
-                agentInfo.BrandId,
-                agentInfo.Id,
-                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
-                Arg.Any<CancellationToken>());
+            .CreateDeleteCommand(Arg.Is(nameof(AgentPropertyName.RealName)));        
 
         _ = fakeAgentRepository
             .Received(1)
@@ -597,9 +553,11 @@ public class SetAgentPropertiesTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateAgentSnapshotAsync(
+            .UpdateAgentSnapshotAndPropertiesAsync(
                 Arg.Is(agentId),
+                Arg.Is(brandId),
                 Arg.Is(eventId),
+                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
                 Arg.Any<DateTime>(),
                 Arg.Any<CancellationToken>());
     }
@@ -658,15 +616,7 @@ public class SetAgentPropertiesTests
 
         _ = fakeDataCommandBuilder
             .Received(1)
-            .CreateDeleteCommand(Arg.Is(nameof(AgentPropertyName.Remarks)));
-
-        _ = fakeAgentRepository
-            .Received(1)
-            .SetAgentPropertiesAsync(
-                agentInfo.BrandId,
-                agentInfo.Id,
-                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
-                Arg.Any<CancellationToken>());
+            .CreateDeleteCommand(Arg.Is(nameof(AgentPropertyName.Remarks)));        
 
         _ = fakeAgentRepository
             .Received(1)
@@ -681,9 +631,11 @@ public class SetAgentPropertiesTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateAgentSnapshotAsync(
+            .UpdateAgentSnapshotAndPropertiesAsync(
                 Arg.Is(agentId),
+                Arg.Is(brandId),
                 Arg.Is(eventId),
+                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
                 Arg.Any<DateTime>(),
                 Arg.Any<CancellationToken>());
     }
@@ -742,15 +694,7 @@ public class SetAgentPropertiesTests
 
         _ = fakeDataCommandBuilder
             .Received(1)
-            .CreateDeleteCommand(Arg.Is(nameof(AgentPropertyName.Phone)));
-
-        _ = fakeAgentRepository
-            .Received(1)
-            .SetAgentPropertiesAsync(
-                agentInfo.BrandId,
-                agentInfo.Id,
-                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
-                Arg.Any<CancellationToken>());
+            .CreateDeleteCommand(Arg.Is(nameof(AgentPropertyName.Phone)));        
 
         _ = fakeAgentRepository
             .Received(1)
@@ -765,9 +709,11 @@ public class SetAgentPropertiesTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateAgentSnapshotAsync(
+            .UpdateAgentSnapshotAndPropertiesAsync(
                 Arg.Is(agentId),
+                Arg.Is(brandId),
                 Arg.Is(eventId),
+                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
                 Arg.Any<DateTime>(),
                 Arg.Any<CancellationToken>());
     }
@@ -826,15 +772,7 @@ public class SetAgentPropertiesTests
 
         _ = fakeDataCommandBuilder
             .Received(1)
-            .CreateDeleteCommand(Arg.Is(nameof(AgentPropertyName.Email)));
-
-        _ = fakeAgentRepository
-            .Received(1)
-            .SetAgentPropertiesAsync(
-                agentInfo.BrandId,
-                agentInfo.Id,
-                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
-                Arg.Any<CancellationToken>());
+            .CreateDeleteCommand(Arg.Is(nameof(AgentPropertyName.Email)));        
 
         _ = fakeAgentRepository
             .Received(1)
@@ -849,9 +787,11 @@ public class SetAgentPropertiesTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateAgentSnapshotAsync(
+            .UpdateAgentSnapshotAndPropertiesAsync(
                 Arg.Is(agentId),
+                Arg.Is(brandId),
                 Arg.Is(eventId),
+                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
                 Arg.Any<DateTime>(),
                 Arg.Any<CancellationToken>());
     }
@@ -914,14 +854,6 @@ public class SetAgentPropertiesTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .SetAgentPropertiesAsync(
-                agentInfo.BrandId,
-                agentInfo.Id,
-                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
-                Arg.Any<CancellationToken>());
-
-        _ = fakeAgentRepository
-            .Received(1)
             .CreateAgentEventAsync(
                 Arg.Is(eventId),
                 Arg.Is(brandId),
@@ -933,9 +865,11 @@ public class SetAgentPropertiesTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateAgentSnapshotAsync(
+            .UpdateAgentSnapshotAndPropertiesAsync(
                 Arg.Is(agentId),
+                Arg.Is(brandId),
                 Arg.Is(eventId),
+                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
                 Arg.Any<DateTime>(),
                 Arg.Any<CancellationToken>());
     }
@@ -994,15 +928,7 @@ public class SetAgentPropertiesTests
 
         _ = fakeDataCommandBuilder
             .Received(1)
-            .CreateDeleteCommand(Arg.Is(nameof(AgentPropertyName.Wechat)));
-
-        _ = fakeAgentRepository
-            .Received(1)
-            .SetAgentPropertiesAsync(
-                agentInfo.BrandId,
-                agentInfo.Id,
-                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
-                Arg.Any<CancellationToken>());
+            .CreateDeleteCommand(Arg.Is(nameof(AgentPropertyName.Wechat)));        
 
         _ = fakeAgentRepository
             .Received(1)
@@ -1017,9 +943,11 @@ public class SetAgentPropertiesTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateAgentSnapshotAsync(
+            .UpdateAgentSnapshotAndPropertiesAsync(
                 Arg.Is(agentId),
+                Arg.Is(brandId),
                 Arg.Is(eventId),
+                Arg.Is<IEnumerable<IDataCommand>>(commands => commands.Count() == 1),
                 Arg.Any<DateTime>(),
                 Arg.Any<CancellationToken>());
     }
