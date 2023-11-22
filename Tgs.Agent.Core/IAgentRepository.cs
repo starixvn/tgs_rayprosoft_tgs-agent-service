@@ -55,12 +55,6 @@ public interface IAgentRepository
         string? modifyUserId,
         CancellationToken cancellationToken = default);
 
-    ValueTask SetAgentPropertiesAsync(
-        Guid brandId,
-        Guid agentId,
-        IEnumerable<IDataCommand> modifyCommands,
-        CancellationToken cancellationToken = default);
-
     ValueTask SetAgentStatusAsync(
         Guid agentId,
         AgentStatus status,
@@ -79,5 +73,13 @@ public interface IAgentRepository
         int agentNLevel,
         string agentPath,
         string newParentAgentPath,
+        CancellationToken cancellationToken = default);
+
+    ValueTask UpdateAgentSnapshotAndPropertiesAsync(
+        Guid agentId,
+        Guid brandId,
+        Guid snapshotId,
+        IEnumerable<IDataCommand> modifyCommands,
+        DateTime updatedOn,
         CancellationToken cancellationToken = default);
 }
