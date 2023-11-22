@@ -18,7 +18,8 @@ internal class AgentRepository : IAgentRepository
     private readonly TgsContext _tgsContext;
     private readonly ILogger<AgentRepository> _logger;
 
-    public AgentRepository(TgsContext tgsContext,
+    public AgentRepository(
+        TgsContext tgsContext,
         ILogger<AgentRepository> logger)
     {
         _tgsContext = tgsContext ?? throw new ArgumentNullException(nameof(tgsContext));
