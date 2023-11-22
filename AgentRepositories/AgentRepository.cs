@@ -3,6 +3,7 @@ using System.Text.Json;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Core.Models.Enums;
@@ -15,10 +16,13 @@ namespace Tgs.Agent.Repositories;
 internal class AgentRepository : IAgentRepository
 {
     private readonly TgsContext _tgsContext;
+    private readonly ILogger<AgentRepository> _logger;
 
-    public AgentRepository(TgsContext tgsContext)
+    public AgentRepository(TgsContext tgsContext,
+        ILogger<AgentRepository> logger)
     {
         _tgsContext = tgsContext ?? throw new ArgumentNullException(nameof(tgsContext));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async ValueTask AddAgentAuditLogAsync(Guid agentId, AgentOperation operation, string editUsername, CancellationToken cancellationToken = default)
@@ -334,6 +338,8 @@ internal class AgentRepository : IAgentRepository
             {
                 Id = agentId
             }, cancellationToken).ConfigureAwait(false)).Entity;
+
+        _logger.LogInformation("UpdateAgentSnapshotAsync agent remarks:{remarks}", dbSnapshot.Remarks);
 
         if (dbSnapshot.SnapshotEventId is null || dbSnapshot.SnapshotEventId.Value.CompareTo(snapshotId) == -1)
         {

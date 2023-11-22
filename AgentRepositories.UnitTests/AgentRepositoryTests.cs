@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Logging.Abstractions;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models.Enums;
 using Tgs.Agent.Repositories;
@@ -39,7 +40,7 @@ public class AgentRepositoryTests
         _ = await dbContext.AgentAuditLogs.AddAsync(agentAuditLog);
         _ = await dbContext.SaveChangesAsync();
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         await sut.AddAgentAuditLogAsync(agentId, operation, editUsername);
 
@@ -82,7 +83,7 @@ public class AgentRepositoryTests
         _ = await dbContext.Agents.AddAsync(agent);
         _ = await dbContext.SaveChangesAsync();
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         var actual = await sut.GetAgentByIdAsync(agentId);
 
@@ -124,7 +125,7 @@ public class AgentRepositoryTests
         _ = await dbContext.Agents.AddAsync(agent);
         _ = await dbContext.SaveChangesAsync();
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         var actual = await sut.GetAgentByUsernameAsync(brandId, username);
 
@@ -160,7 +161,7 @@ public class AgentRepositoryTests
         _ = await dbContext.Agents.AddAsync(agent);
         _ = await dbContext.SaveChangesAsync();
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         await sut.SetAgentDividendPercentageAsync(agentId, 68M);
 
@@ -201,7 +202,7 @@ public class AgentRepositoryTests
         _ = await dbContext.Agents.AddAsync(agent);
         _ = await dbContext.SaveChangesAsync();
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         await sut.SetAgentInfoAsync(agentId, realName);
 
@@ -243,7 +244,7 @@ public class AgentRepositoryTests
         _ = await dbContext.Agents.AddAsync(agent);
         _ = await dbContext.SaveChangesAsync();
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         await sut.SetAgentContactAsync(agentId, email, phone);
 
@@ -280,7 +281,7 @@ public class AgentRepositoryTests
         _ = await dbContext.Agents.AddAsync(agent);
         _ = await dbContext.SaveChangesAsync();
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         var newPassword = Encoding.UTF8.GetBytes("123456");
         var newSalt = Encoding.UTF8.GetBytes("456789");
@@ -320,7 +321,7 @@ public class AgentRepositoryTests
         _ = await dbContext.Agents.AddAsync(agent);
         _ = await dbContext.SaveChangesAsync();
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         var newPassword = Encoding.UTF8.GetBytes("123456");
         var newSalt = Encoding.UTF8.GetBytes("456789");
@@ -373,7 +374,7 @@ public class AgentRepositoryTests
         _ = await dbContext.AgentAuditLogs.AddAsync(log);
         _ = await dbContext.SaveChangesAsync();
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         var newPassword = Encoding.UTF8.GetBytes("123456");
         var newSalt = Encoding.UTF8.GetBytes("456789");
@@ -436,7 +437,7 @@ public class AgentRepositoryTests
         _ = await dbContext.AgentAuditLogs.AddAsync(log);
         _ = await dbContext.SaveChangesAsync();
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         var newPassword = Encoding.UTF8.GetBytes("123456");
         var newSalt = Encoding.UTF8.GetBytes("456789");
@@ -484,7 +485,7 @@ public class AgentRepositoryTests
         _ = await dbContext.AgentEventSources.AddAsync(agentEvent);
         _ = await dbContext.SaveChangesAsync();
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         var newPassword = Encoding.UTF8.GetBytes("123456");
         var newSalt = Encoding.UTF8.GetBytes("456789");
@@ -523,7 +524,7 @@ public class AgentRepositoryTests
         });
         _ = await dbContext.SaveChangesAsync();
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         var actual = await sut.GetAgentEventAsync(eventId);
 
@@ -564,7 +565,7 @@ public class AgentRepositoryTests
 
         _ = await dbContext.SaveChangesAsync();
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         await sut.UpdateAgentSnapshotAsync(
             agentId,
@@ -591,7 +592,7 @@ public class AgentRepositoryTests
         var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
         var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         await sut.CreateAgentEventAsync(
             eventId,
@@ -630,7 +631,7 @@ public class AgentRepositoryTests
             WithdrawSalt = Array.Empty<byte>()
         });
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         await sut.SetAgentStatusAsync(
             agentId,
@@ -683,7 +684,7 @@ public class AgentRepositoryTests
 
         _ = await dbContext.SaveChangesAsync();
 
-        var sut = new AgentRepository(dbContext);
+        var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
         await sut.ClearAgentDividendConditionsAsync(agentId);
 
