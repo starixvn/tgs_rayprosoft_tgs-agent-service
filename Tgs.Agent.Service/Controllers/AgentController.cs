@@ -184,7 +184,7 @@ public class AgentController : ControllerBase
 
     [HttpPut("status/{agentId}", Name = "SetAgentStatus")]
     [SuccessStatusCode(200, "Status set")]
-    public ValueTask SetPlayerStatusAsync(
+    public ValueTask SetAgentStatusAsync(
         [FromServices] ICommandService<SetAgentStatusCommand> setService,
         [FromHeader(Name = "ModifyUserId")] string? modifyUserId,
         Guid agentId,
