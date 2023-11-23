@@ -338,7 +338,7 @@ internal class AgentRepository : IAgentRepository
             ?? (await _tgsContext.Agents.AddAsync(new Entities.Agent
             {
                 Id = agentId
-            }, cancellationToken).ConfigureAwait(false)).Entity;        
+            }, cancellationToken).ConfigureAwait(false)).Entity;
 
         if (dbSnapshot.SnapshotEventId is null || dbSnapshot.SnapshotEventId.Value.CompareTo(snapshotId) == -1)
         {
@@ -391,7 +391,7 @@ internal class AgentRepository : IAgentRepository
     public async ValueTask<int> CountAgentEventAsync(AgentEventQueryConditions conditions, CancellationToken cancellationToken = default)
         => await MakeAgentHistoriesQuery(conditions)
             .CountAsync(cancellationToken)
-            .ConfigureAwait(false);    
+            .ConfigureAwait(false);
 
     public async ValueTask SetAgentStatusAsync(Guid agentId, AgentStatus status, CancellationToken cancellationToken = default)
     {
@@ -498,6 +498,31 @@ internal class AgentRepository : IAgentRepository
                 .ExecuteAsync(context, cancellationToken)
                 .ConfigureAwait(false);
 
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async ValueTask UpdateAgentSnapshotAndStatusAsync(
+        Guid agentId,
+        AgentStatus status,
+        Guid snapshotId,
+        DateTime updatedOn,
+        CancellationToken cancellationToken = default)
+    {
+        var dbSnapshot = await _tgsContext.Agents
+            .FindAsync(new object?[] { agentId }, cancellationToken: cancellationToken)
+            .ConfigureAwait(false)
+            ?? (await _tgsContext.Agents.AddAsync(new Entities.Agent
+            {
+                Id = agentId
+            }, cancellationToken).ConfigureAwait(false)).Entity;
+
+        if (dbSnapshot.SnapshotEventId is null || dbSnapshot.SnapshotEventId.Value.CompareTo(snapshotId) == -1)
+        {
+            dbSnapshot.SnapshotEventId = snapshotId;
+            dbSnapshot.UpdatedOn = updatedOn;
+        }
+
+        dbSnapshot.Status = (short)status;
         _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

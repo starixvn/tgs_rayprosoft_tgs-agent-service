@@ -82,4 +82,11 @@ public interface IAgentRepository
         IEnumerable<IDataCommand> modifyCommands,
         DateTime updatedOn,
         CancellationToken cancellationToken = default);
+
+    ValueTask UpdateAgentSnapshotAndStatusAsync(
+        Guid agentId,
+        AgentStatus status,
+        Guid snapshotId,
+        DateTime updatedOn,
+        CancellationToken cancellationToken = default);
 }

@@ -57,11 +57,7 @@ public class SetAgentStatusTests
             .GetAgentByIdAsync(Arg.Is(agentId))
             .Returns(agentInfo);
 
-        await sut.ExecuteAsync(new SetAgentStatusCommand(agentId, status, modifyUserId));
-
-        _ = fakeAgentRepository
-            .Received(1)
-            .SetAgentStatusAsync(Arg.Is(agentId), Arg.Is(status));
+        await sut.ExecuteAsync(new SetAgentStatusCommand(agentId, status, modifyUserId));        
 
         _ = fakeAgentRepository
             .Received(1)
@@ -75,8 +71,9 @@ public class SetAgentStatusTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateAgentSnapshotAsync(
+            .UpdateAgentSnapshotAndStatusAsync(
                 Arg.Is(agentId),
+                Arg.Is(status),
                 Arg.Is(eventId),
                 Arg.Is(now.DateTime));
     }
