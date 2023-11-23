@@ -338,9 +338,7 @@ internal class AgentRepository : IAgentRepository
             ?? (await _tgsContext.Agents.AddAsync(new Entities.Agent
             {
                 Id = agentId
-            }, cancellationToken).ConfigureAwait(false)).Entity;
-
-        _logger.LogInformation("UpdateAgentSnapshotAsync agent remarks:{remarks}", dbSnapshot.Remarks);
+            }, cancellationToken).ConfigureAwait(false)).Entity;        
 
         if (dbSnapshot.SnapshotEventId is null || dbSnapshot.SnapshotEventId.Value.CompareTo(snapshotId) == -1)
         {
