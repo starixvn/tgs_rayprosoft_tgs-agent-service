@@ -153,12 +153,14 @@ public class AgentController : ControllerBase
     [HttpPatch("{agentId}:pay-password", Name = "SetPayPassword")]
     public ValueTask SetPayPasswordAsync(
         [FromServices] ICommandService<SetAgentPayPasswordCommand> commandService,
+        [FromHeader(Name = "ModifyUserId")] string? modifyUserId,
         [FromBody] SetAgentPayPasswordViewModel request,
         Guid agentId)
         => commandService.ExecuteAsync(
             new SetAgentPayPasswordCommand(
                 agentId,
-                request.PayPassword),
+                request.PayPassword,
+                modifyUserId),
             HttpContext.RequestAborted);
 
     [HttpPost("prop/{agentId}", Name = "SetAgentProperties")]
