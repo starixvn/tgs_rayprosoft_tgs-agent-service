@@ -40,16 +40,21 @@
          "ObjectType": 0
       },
       {
+         "Name": "dbo.brand_agent_dividend_conditions",
+         "ObjectType": 0
+      },
+      {
          "Name": "dbo.players",
          "ObjectType": 0
       }
    ],
-   "UiHint": "LocalDB",
+   "UiHint": "tgs",
    "UncountableWords": null,
    "UseBoolPropertiesWithoutDefaultSql": true,
    "UseDatabaseNames": false,
    "UseDateOnlyTimeOnly": false,
    "UseDbContextSplitting": true,
+   "UseDecimalDataAnnotationForSprocResult": true,
    "UseFluentApiOnly": true,
    "UseHandleBars": false,
    "UseHierarchyId": false,

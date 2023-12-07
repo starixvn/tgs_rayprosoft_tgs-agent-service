@@ -258,4 +258,31 @@ public class AgentController : ControllerBase
 
         return commandService.ExecuteAsync(command);
     }
+
+    [HttpPost("", Name = "CreateAgent")]
+    [Description("Create an agent")]
+    public ValueTask<Guid> CreateAgentAsync([FromServices] IGetService<GetAndAddAgentQuery,Guid> getService, 
+        CreateAgentViewRequest request)
+    {
+        return getService.GetAsync(new GetAndAddAgentQuery
+        {
+            Username = request.Username,
+            BrandId = request.BrandId,
+            LevelType = request.LevelType,
+            CardGameRebatePercentage = request.CardGameRebatePercentage,
+            CommissionPercentage = request.CommissionPercentage,
+            DividendPercentage = request.DividendPercentage,
+            LiveDealerRebatePercentage = request.LiveDealerRebatePercentage,
+            LotteryRebatePercentage = request.LotteryRebatePercentage,
+            SlotRebatePercentage = request.SlotRebatePercentage,
+            SportsRebatePercentage = request.SportsRebatePercentage,
+            VirtualSportsRebatePercentage = request.VirtualSportsRebatePercentage,
+            ParentAgentId = request.ParentAgentId,
+            Password = request.Password,
+            RealName = request.RealName,
+            Type = request.Type,
+            Remarks = request.Remarks,
+            EditorUsername = request.EditorUsername
+        });
+    }
 }

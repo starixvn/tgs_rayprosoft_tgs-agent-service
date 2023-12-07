@@ -325,4 +325,17 @@ public class AgentClient : IAgentClient
 
         _ = response.EnsureSuccessStatusCode();
     }
+
+    public async ValueTask<Guid> CreateAgentAsync(CreateAgentRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .PostAsJsonAsync("/api/agent", request, _JsonSerializerOptions, cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+
+        var contentJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+        return JsonSerializer.Deserialize<Guid>(contentJson, _JsonSerializerOptions);
+    }
 }

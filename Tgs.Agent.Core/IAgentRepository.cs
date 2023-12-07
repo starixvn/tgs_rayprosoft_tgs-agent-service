@@ -74,10 +74,12 @@ public interface IAgentRepository
         Guid agentId,
         CancellationToken cancellationToken = default);
 
-    ValueTask UpdateSubAgentsPathAsnyc(
+    ValueTask UpdateSubAgentsPathAsync(
         Guid agentId,
         int agentNLevel,
         string agentPath,
         string newParentAgentPath,
         CancellationToken cancellationToken = default);
+
+    Task<Guid> CreateAgentAsync(AgentModel agentModel, CancellationToken cancellationToken = default);
 }
