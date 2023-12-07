@@ -1,6 +1,9 @@
-﻿using System.Text.Json;
+﻿using System.Data;
+using System.Text.Json;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.ApplicationServices;
 using Tgs.Agent.Core.Models;
@@ -15,10 +18,14 @@ namespace Tgs.Agent.Repositories;
 internal class AgentRepository : IAgentRepository
 {
     private readonly TgsContext _tgsContext;
+    private readonly ILogger<AgentRepository> _logger;
 
-    public AgentRepository(TgsContext tgsContext)
+    public AgentRepository(
+        TgsContext tgsContext,
+        ILogger<AgentRepository> logger)
     {
         _tgsContext = tgsContext ?? throw new ArgumentNullException(nameof(tgsContext));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async ValueTask AddAgentAuditLogAsync(Guid agentId, AgentOperation operation, string editUsername, CancellationToken cancellationToken = default)
@@ -76,7 +83,9 @@ internal class AgentRepository : IAgentRepository
             agent.DividendPercentage,
             playerNumber,
             dividend,
-            agent.BrandId);
+            agent.BrandId,
+            agent.DefaultWalletId,
+            agent.WalletId);
     }
 
     public async ValueTask<AgentInfo?> GetAgentByUsernameAsync(Guid brandId, string username,
@@ -115,7 +124,9 @@ internal class AgentRepository : IAgentRepository
             agent.DividendPercentage,
             playerNumber,
             dividend,
-            agent.BrandId);
+            agent.BrandId,
+            agent.DefaultWalletId,
+            agent.WalletId);
     }
 
     public IAsyncEnumerable<ChildAgentInfoModel> GetChildAgentInfosAsync(Guid agentId, CancellationToken cancellationToken = default)
@@ -384,34 +395,6 @@ internal class AgentRepository : IAgentRepository
             .CountAsync(cancellationToken)
             .ConfigureAwait(false);
 
-    public async ValueTask SetAgentPropertiesAsync(Guid brandId, Guid agentId, IEnumerable<IDataCommand> modifyCommands, CancellationToken cancellationToken = default)
-    {
-        var agent = await _tgsContext.Agents
-            .FindAsync(new object?[]
-            {
-                agentId
-            }, cancellationToken)
-            .ConfigureAwait(false);
-
-        if (agent == null)
-            return;
-
-        var context = new AgentModifyCommandContext(
-            agent,
-            _tgsContext);
-
-        foreach (var command in modifyCommands)
-            await command
-                .ExecuteAsync(context, cancellationToken)
-                .ConfigureAwait(false);
-
-        agent.UpdatedOn = DateTime.UtcNow;
-
-        _ = await _tgsContext
-            .SaveChangesAsync(cancellationToken)
-            .ConfigureAwait(false);
-    }
-
     public async ValueTask SetAgentStatusAsync(Guid agentId, AgentStatus status, CancellationToken cancellationToken = default)
     {
         var agent = await _tgsContext.Agents
@@ -467,9 +450,10 @@ internal class AgentRepository : IAgentRepository
         string newParentAgentPath,
         CancellationToken cancellationToken = default)
     {
-        var sql = "select * from dbo.agent_update_path(@agentId,@agentNlevel,@agentPah,@newAgentPath)";
+        var sql = "SELECT * from dbo.agent_update_path(@agentId,@agentNlevel,@agentPah,@newAgentPath)";
 
         var dbConnection = _tgsContext.Database.GetDbConnection();
+        var transaction = _tgsContext.Database.CurrentTransaction?.GetDbTransaction();
 
         var parameters = new Dictionary<string, object>
         {
@@ -479,9 +463,69 @@ internal class AgentRepository : IAgentRepository
             { "@newAgentPath", newParentAgentPath }
         };
 
-        _ = await dbConnection
-            .ExecuteAsync(sql, parameters, commandType: System.Data.CommandType.Text)
-            .ConfigureAwait(false);
+        await dbConnection.ExecuteAsync(
+            sql,
+            parameters,
+            transaction,
+            null,
+            CommandType.Text).ConfigureAwait(false);
+    }
+
+    public async ValueTask UpdateAgentSnapshotAndPropertiesAsync(
+        Guid agentId,
+        Guid brandId,
+        Guid snapshotId,
+        IEnumerable<IDataCommand> modifyCommands,
+        DateTime updatedOn,
+        CancellationToken cancellationToken = default)
+    {
+        var dbSnapshot = await _tgsContext.Agents
+            .FindAsync(new object?[] { agentId }, cancellationToken: cancellationToken)
+            .ConfigureAwait(false)
+            ?? (await _tgsContext.Agents.AddAsync(new Entities.Agent
+            {
+                Id = agentId
+            }, cancellationToken).ConfigureAwait(false)).Entity;
+
+        if (dbSnapshot.SnapshotEventId is null || dbSnapshot.SnapshotEventId.Value.CompareTo(snapshotId) == -1)
+        {
+            dbSnapshot.SnapshotEventId = snapshotId;
+            dbSnapshot.UpdatedOn = updatedOn;
+        }
+
+        var context = new AgentModifyCommandContext(dbSnapshot, _tgsContext);
+
+        foreach (var command in modifyCommands)
+            await command
+                .ExecuteAsync(context, cancellationToken)
+                .ConfigureAwait(false);
+
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async ValueTask UpdateAgentSnapshotAndStatusAsync(
+        Guid agentId,
+        AgentStatus status,
+        Guid snapshotId,
+        DateTime updatedOn,
+        CancellationToken cancellationToken = default)
+    {
+        var dbSnapshot = await _tgsContext.Agents
+            .FindAsync(new object?[] { agentId }, cancellationToken: cancellationToken)
+            .ConfigureAwait(false)
+            ?? (await _tgsContext.Agents.AddAsync(new Entities.Agent
+            {
+                Id = agentId
+            }, cancellationToken).ConfigureAwait(false)).Entity;
+
+        if (dbSnapshot.SnapshotEventId is null || dbSnapshot.SnapshotEventId.Value.CompareTo(snapshotId) == -1)
+        {
+            dbSnapshot.SnapshotEventId = snapshotId;
+            dbSnapshot.UpdatedOn = updatedOn;
+        }
+
+        dbSnapshot.Status = (short)status;
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<Guid> CreateAgentAsync(AgentModel agentModel, CancellationToken cancellationToken = default)

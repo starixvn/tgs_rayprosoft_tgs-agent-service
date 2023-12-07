@@ -14,7 +14,8 @@ builder.Services
     .AddRepository((sp, optionsBuilder) =>
     {
         var connectionString = sp.GetRequiredService<IConfiguration>().GetConnectionString("Tgs");
-        _ = optionsBuilder.UseNpgsql(connectionString);
+        _ = optionsBuilder.UseNpgsql("name=Tgs")
+            .EnableSensitiveDataLogging();
     });
 
 builder.Logging

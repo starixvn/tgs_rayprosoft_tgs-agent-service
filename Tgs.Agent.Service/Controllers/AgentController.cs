@@ -43,7 +43,9 @@ public class AgentController : ControllerBase
             info.DividendPercentage,
             info.PlayerNumber,
             info.AccumulatedProfitSharing,
-            info.BrandId);
+            info.BrandId,
+            info.DefaultWalletId,
+            info.WalletId);
     }
 
     [HttpGet("info/{brandId}/{username}", Name = "GetAgentInfoByUsername")]
@@ -75,7 +77,9 @@ public class AgentController : ControllerBase
             info.DividendPercentage,
             info.PlayerNumber,
             info.AccumulatedProfitSharing,
-            info.BrandId);
+            info.BrandId,
+            info.DefaultWalletId,
+            info.WalletId);
     }
 
     [HttpGet("allChildAgents/{agentId:Guid}", Name = "GetChildAgentInfos")]
@@ -149,12 +153,14 @@ public class AgentController : ControllerBase
     [HttpPatch("{agentId}:pay-password", Name = "SetPayPassword")]
     public ValueTask SetPayPasswordAsync(
         [FromServices] ICommandService<SetAgentPayPasswordCommand> commandService,
+        [FromHeader(Name = "ModifyUserId")] string? modifyUserId,
         [FromBody] SetAgentPayPasswordViewModel request,
         Guid agentId)
         => commandService.ExecuteAsync(
             new SetAgentPayPasswordCommand(
                 agentId,
-                request.PayPassword),
+                request.PayPassword,
+                modifyUserId),
             HttpContext.RequestAborted);
 
     [HttpPost("prop/{agentId}", Name = "SetAgentProperties")]
@@ -180,7 +186,7 @@ public class AgentController : ControllerBase
 
     [HttpPut("status/{agentId}", Name = "SetAgentStatus")]
     [SuccessStatusCode(200, "Status set")]
-    public ValueTask SetPlayerStatusAsync(
+    public ValueTask SetAgentStatusAsync(
         [FromServices] ICommandService<SetAgentStatusCommand> setService,
         [FromHeader(Name = "ModifyUserId")] string? modifyUserId,
         Guid agentId,

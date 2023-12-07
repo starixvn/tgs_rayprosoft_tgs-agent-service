@@ -61,10 +61,6 @@ internal class SetAgentPropertiesCommandService : ICommandService<SetAgentProper
             }
         }
 
-        await _agentRepository
-            .SetAgentPropertiesAsync(agent.BrandId, agent.Id, dataCommands, cancellationToken)
-            .ConfigureAwait(false);
-
         var changeSets = new JsonPatch(patchOperations);
         var eventId = await _serialNumberGenerator
             .GenerateAsync(cancellationToken)
@@ -81,9 +77,12 @@ internal class SetAgentPropertiesCommandService : ICommandService<SetAgentProper
             command.ModifyUserId,
             cancellationToken).ConfigureAwait(false);
 
-        await _agentRepository.UpdateAgentSnapshotAsync(
+        await _agentRepository.UpdateAgentSnapshotAndPropertiesAsync(
             agent.Id,
+            agent.BrandId,
             eventId,
-            currentTime, cancellationToken).ConfigureAwait(false);
+            dataCommands,
+            currentTime,
+            cancellationToken).ConfigureAwait(false);
     }
 }

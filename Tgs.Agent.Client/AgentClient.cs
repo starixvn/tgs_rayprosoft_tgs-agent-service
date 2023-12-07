@@ -143,8 +143,16 @@ public class AgentClient : IAgentClient
 
     public async ValueTask SetAgentPayPasswordAsync(SetAgentPayPasswordRequest request, CancellationToken cancellationToken = default)
     {
+        var requestContent = new StringContent(
+            JsonSerializer.Serialize(new { request.PayPassword }, _JsonSerializerOptions),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
+
+        if (!string.IsNullOrWhiteSpace(request.ModifyUserId))
+            requestContent.Headers.Add("ModifyUserId", request.ModifyUserId);
+
         var response = await _client
-            .PatchAsJsonAsync($"/api/agent/{request.AgentId}:pay-password", request, _JsonSerializerOptions, cancellationToken)
+            .PatchAsync($"/api/agent/{request.AgentId}:pay-password", requestContent, cancellationToken)
             .ConfigureAwait(false);
 
         _ = response.EnsureSuccessStatusCode();

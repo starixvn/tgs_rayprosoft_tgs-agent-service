@@ -23,12 +23,7 @@ internal class SetAgentStatusCommandService : ICommandService<SetAgentStatusComm
     }
 
     public async ValueTask ExecuteAsync(SetAgentStatusCommand command, CancellationToken cancellationToken = default)
-    {
-        await _agentRepository.SetAgentStatusAsync(
-            command.AgentId,
-            command.Status,
-            cancellationToken);
-
+    {        
         var patchOperations = Array.Empty<PatchOperation>();
 
         patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/status"), command.Status.ToString())).ToArray();
@@ -54,8 +49,9 @@ internal class SetAgentStatusCommandService : ICommandService<SetAgentStatusComm
             command.ModifyUserId,
             cancellationToken).ConfigureAwait(false);
 
-        await _agentRepository.UpdateAgentSnapshotAsync(
+        await _agentRepository.UpdateAgentSnapshotAndStatusAsync(
             command.AgentId,
+            command.Status,
             eventId,
             currentTime,
             cancellationToken).ConfigureAwait(false);

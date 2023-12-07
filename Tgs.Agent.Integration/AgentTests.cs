@@ -53,7 +53,9 @@ public class AgentTests
                 DividendPercentage: 80M,
                 PlayerNumber: 0,
                 AccumulatedProfitSharing: 0M,
-                BrandId: Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af")));
+                BrandId: Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af"),
+                DefaultWalletId: Guid.NewGuid(),
+                WalletId: null));
 
         var actual = await sut.GetAgentInfoAsync(new(agentId));
 
@@ -220,7 +222,9 @@ public class AgentTests
             0m,
             0,
             0m,
-            brandId));
+            brandId,
+            Guid.NewGuid(),
+            null));
 
         await sut.SetAgentPasswordAsync(new(agentId, password, modifyUserId));
 
@@ -240,16 +244,67 @@ public class AgentTests
     public async Task 設置代理提款密碼()
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
+        var fakePasswordHandler = Substitute.For<IPasswordHandler>();        
+        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
         await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services.AddSingleton(fakeAgentRepository));
+            => services.AddSingleton(fakeAgentRepository)
+                .AddSingleton(fakePasswordHandler)
+                .AddSingleton(fakeSerialNumberGenerator)
+            );
 
         var httpClient = web.CreateClient();
 
         var sut = new AgentClient(httpClient);
 
         var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+        var password = "password";
+        var modifyUserId = "50ce61eb-8c9d-4f84-3cf6-08d9262ce1a5";
+        var brandId = Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af");
+        var eventId = Guid.NewGuid();
+        var salt = Encoding.UTF8.GetBytes("salt");
+        var hashedPassword = Encoding.UTF8.GetBytes("password");
 
-        await sut.SetAgentPayPasswordAsync(new(agentId, "password"));
+        _ = fakePasswordHandler.GenerateCredential(password)
+            .Returns((salt, hashedPassword));
+
+        _ = fakeSerialNumberGenerator
+            .GenerateAsync(Arg.Any<CancellationToken>())
+            .Returns(eventId);
+
+        _ = fakeAgentRepository.GetAgentByIdAsync(agentId, Arg.Any<CancellationToken>())
+            .Returns(new AgentInfo(
+            Id: agentId,
+            Username: "agentUsername",
+            null,
+            null,
+            null,
+            null,
+            null,
+            "inviteCode",
+            null,
+            DateTimeOffset.UtcNow.AddMonths(-1),
+            Core.AgentStatus.Enabled,
+            Core.AgentType.Cash,
+            Core.AgentLevelType.Chief,
+            0m,
+            0,
+            0m,
+            brandId,
+            Guid.NewGuid(),
+            null));
+
+        await sut.SetAgentPayPasswordAsync(new(agentId, password, modifyUserId));
+
+        _ = fakeAgentRepository
+            .Received(1)
+            .SetPayPasswordAsync(Arg.Is(agentId), Arg.Is(hashedPassword), Arg.Is(salt), Arg.Any<CancellationToken>());
+
+        _ = fakeAgentRepository
+            .Received(1)
+            .CreateAgentEventAsync(Arg.Is(eventId), Arg.Is(brandId), Arg.Is(agentId), Arg.Is(EventAction.Update), Arg.Any<JsonDocument>(), Arg.Is(modifyUserId), Arg.Any<CancellationToken>());
+
+        _ = fakeAgentRepository.Received(1)
+            .UpdateAgentSnapshotAsync(Arg.Is(agentId), Arg.Is(eventId), Arg.Any<DateTime>(), Arg.Any<CancellationToken>());
     }
 
     [Test]
