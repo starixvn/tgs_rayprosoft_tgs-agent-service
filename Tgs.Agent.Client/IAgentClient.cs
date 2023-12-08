@@ -58,4 +58,8 @@ public interface IAgentClient
         Guid agentId,
         Guid newParentAgentId,
         CancellationToken cancellationToken = default);
+
+    ValueTask<Guid> CreateAgentAsync(
+        CreateAgentRequest request,
+        CancellationToken cancellationToken = default);
 }

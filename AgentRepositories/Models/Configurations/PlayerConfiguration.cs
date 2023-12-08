@@ -76,6 +76,7 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
             entity.Property(e => e.RegisteredOn).HasColumnName("registered_on");
             entity.Property(e => e.Remark).HasColumnName("remark");
             entity.Property(e => e.Salt).HasColumnName("salt");
+            entity.Property(e => e.SnapshotEventId).HasColumnName("snapshot_event_id");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.Type).HasColumnName("type");
             entity.Property(e => e.UpdatedByUsername).HasColumnName("updated_by_username");
@@ -94,6 +95,10 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
             .HasForeignKey(d => d.AgentId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("fk_players_agents_agent_id");
+
+            entity.HasOne(d => d.Brand).WithMany(p => p.Players)
+            .HasForeignKey(d => d.BrandId)
+            .HasConstraintName("fk_players_brands_brand_id");
 
             OnConfigurePartial(entity);
         }

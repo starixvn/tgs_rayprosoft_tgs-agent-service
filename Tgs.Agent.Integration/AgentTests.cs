@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using AutoFixture.NUnit3;
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -11,8 +12,12 @@ using Tgs.Agent.Client.Models;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Repositories.Entities;
+using Tgs.CashService;
+using Tgs.CashService.Client;
 using Tgs.Core.Infrastructures.Security;
 using Tgs.SerialNumberGenerator;
+using AgentLevelType = Tgs.Agent.Client.Models.Enums.AgentLevelType;
+using AgentType = Tgs.Agent.Client.Models.Enums.AgentType;
 
 namespace Tgs.Agent.IntegrationTest;
 
@@ -562,5 +567,53 @@ public class AgentTests
         _ = fakeAgentRepository
             .Received(1)
             .UpdateSubAgentsPathAsync(Arg.Is(agentId), Arg.Is(agentNLevel), Arg.Is(agentPath), Arg.Is(newParentPath), Arg.Any<CancellationToken>());
+    }
+
+    [Test]
+    public async Task Create_An_Agent()
+    {
+        var fakeAgentRepository = Substitute.For<IAgentRepository>();
+        var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
+
+        await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
+            services.AddSingleton(fakeAgentRepository)
+                .AddSingleton(fakeCashServiceClient));
+
+        fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(),Arg.Any<string>(),
+            Arg.Any<string>(),
+            Arg.Is(CashType.Agent),
+            Arg.Any<CancellationToken>()).Returns(Guid.NewGuid());
+
+        var httpClient = web.CreateClient();
+
+        var sut = new AgentClient(httpClient);
+
+        var agentId = await sut.CreateAgentAsync(new CreateAgentRequest
+        {
+            Username = "username",
+            BrandId = Guid.NewGuid(),
+            CurrencyCode = "CNY",
+            LevelType = AgentLevelType.Agent,
+            CardGameRebatePercentage = 0,
+            CommissionPercentage = 0,
+            DividendPercentage = 0,
+            LiveDealerRebatePercentage = 0,
+            LotteryRebatePercentage = 0,
+            SlotRebatePercentage = 0,
+            SportsRebatePercentage = 0,
+            VirtualSportsRebatePercentage = 0,
+            ParentAgentId = Guid.NewGuid(),
+            Password = "password",
+            RealName = "RealName",
+            Type = AgentType.Cash,
+            Remarks = "remarks",
+            EditorUsername = "EditorUsername"
+        });
+
+        _ = await fakeAgentRepository.GetAgentByIdAsync(agentId);
+
+        Assert.NotNull(agentId);
+
+        _ = fakeAgentRepository.ReceivedWithAnyArgs(1).CreateAgentAsync(null, default);
     }
 }

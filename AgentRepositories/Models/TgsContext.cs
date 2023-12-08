@@ -26,6 +26,10 @@ public partial class TgsContext : DbContext
 
     public virtual DbSet<AgentEventSource> AgentEventSources { get; set; }
 
+    public virtual DbSet<Brand> Brands { get; set; }
+
+    public virtual DbSet<BrandAgentDividendCondition> BrandAgentDividendConditions { get; set; }
+
     public virtual DbSet<Player> Players { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -35,7 +39,15 @@ public partial class TgsContext : DbContext
             .HasPostgresExtension("pg_trgm")
             .HasPostgresExtension("uuid-ossp");
 
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(TgsContext).Assembly);
+        modelBuilder.ApplyConfiguration(new Configurations.AgentConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.AgentAuditLogConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.AgentClearCommissionRecordConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.AgentDividendConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.AgentDividendConditionConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.AgentEventSourceConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.BrandConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.BrandAgentDividendConditionConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.PlayerConfiguration());
         OnModelCreatingPartial(modelBuilder);
     }
 

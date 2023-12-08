@@ -89,4 +89,6 @@ public interface IAgentRepository
         Guid snapshotId,
         DateTime updatedOn,
         CancellationToken cancellationToken = default);
+
+    Task CreateAgentAsync(AgentModel agentModel, CancellationToken cancellationToken = default);
 }

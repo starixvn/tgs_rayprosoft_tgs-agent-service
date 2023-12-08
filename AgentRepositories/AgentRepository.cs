@@ -5,11 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Tgs.Agent.Core;
+using Tgs.Agent.Core.ApplicationServices;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Core.Models.Enums;
 using Tgs.Agent.Repositories.Entities;
 using Tgs.Paging;
 using TGS.Core.Infrastructures.Extensions;
+using Tgs.Core.Infrastructures.Utility;
 
 namespace Tgs.Agent.Repositories;
 
@@ -524,5 +526,73 @@ internal class AgentRepository : IAgentRepository
 
         dbSnapshot.Status = (short)status;
         _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task CreateAgentAsync(AgentModel agentModel, CancellationToken cancellationToken = default)
+    {
+        var invitationCode = InvitationCodeGenerator.NewId();
+
+        while (await _tgsContext.Agents.AnyAsync(x => x.InvitationCode == invitationCode, cancellationToken)
+                   .ConfigureAwait(false))
+            invitationCode = InvitationCodeGenerator.NewId();
+
+        var defaultWalletId = GuidExtensions.NewSequentialGuid();
+        var agentId = Guid.NewGuid();
+
+        var parentAgent =
+            await _tgsContext.Agents.FirstOrDefaultAsync(x => x.Id == agentModel.ParentAgentId, cancellationToken)
+                .ConfigureAwait(false);
+
+        var brand = await _tgsContext.Brands.Include(x => x.BrandAgentDividendConditions)
+            .FirstAsync(x => x.Id == agentModel.BrandId, cancellationToken);
+
+        var agent = new Entities.Agent
+        {
+            Id = agentId,
+            WalletId = agentModel.WalletId,
+            Username = agentModel.Username,
+            LevelType = (short)agentModel.LevelType,
+            Type = (short)agentModel.Type,
+            BrandId = agentModel.BrandId,
+            Status = (short)AgentStatus.Enabled,
+            ParentAgentId = agentModel.ParentAgentId,
+            DefaultWalletId = defaultWalletId,
+            AgentStatus =
+                brand is { AgentDividendType: (short)AgentDividendType.MultipleLayer, BrandAgentDividendConditions.Count: > 0 } ||
+                brand.AgentDividendType == (short)AgentDividendType.OneLayer && agentModel.DividendPercentage > 0
+                    ? (short)AgentConfigStatus.DoneForConfigurePercentage
+                    : (short)AgentConfigStatus.WaitForConfigurePercentage,
+            CommissionPercentage = agentModel.CommissionPercentage,
+            DividendPercentage = agentModel.DividendPercentage,
+            LiveDealerRebatePercentage = agentModel.LiveDealerRebatePercentage,
+            SlotRebatePercentage = agentModel.SlotRebatePercentage,
+            LotteryRebatePercentage = agentModel.LotteryRebatePercentage,
+            CardGameRebatePercentage = agentModel.CardGameRebatePercentage,
+            SportsRebatePercentage = agentModel.SportsRebatePercentage,
+            VirtualSportsRebatePercentage = agentModel.VirtualSportsRebatePercentage,
+            InvitationCode = invitationCode,
+            Remarks = agentModel.Remarks,
+            CreatedByUsername = agentModel.EditorUsername,
+            UpdatedByUsername = agentModel.EditorUsername,
+            CreatedOn = DateTime.UtcNow,
+            UpdatedOn = DateTime.UtcNow,
+            RegisteredOn = DateTime.UtcNow,
+            Path = agentModel.ParentAgentId == null ? new LTree($"{agentId:N}") : new LTree($"{parentAgent!.Path}.{agentId:N}"),
+            Password = agentModel.Password,
+            Salt = agentModel.Salt,
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>(),
+            AgentDividendConditions = brand.BrandAgentDividendConditions.Select(x => new AgentDividendCondition
+            {
+                Rank = x.Rank,
+                NetProfit = x.NetProfit,
+                ActiveNumber = x.ActiveNumber,
+                DividendPercentage = x.DividendPercentage
+            }).ToHashSet()
+        };
+
+        _ = await _tgsContext.Agents.AddAsync(agent, cancellationToken);
+
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken);
     }
 }

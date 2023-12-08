@@ -13,7 +13,8 @@ data:
         }
       },
       "AgentService": {
-        "PlayerServiceBaseUrl": "http://player-api"
+        "PlayerServiceBaseUrl": "http://player-api",
+        "CashBaseUrl": "http://cashservice-api"
       }
     }
   otel-collector-config.yaml: |
