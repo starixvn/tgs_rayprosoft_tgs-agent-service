@@ -275,6 +275,7 @@ public class AgentController : ControllerBase
             Username = request.Username,
             BrandId = request.BrandId,
             LevelType = request.LevelType,
+            CurrencyCode = request.CurrencyCode,
             CardGameRebatePercentage = request.CardGameRebatePercentage,
             CommissionPercentage = request.CommissionPercentage,
             DividendPercentage = request.DividendPercentage,
