@@ -1,4 +1,5 @@
-﻿using Tgs.Agent.Core.Models;
+﻿using Microsoft.Extensions.Logging;
+using Tgs.Agent.Core.Models;
 using Tgs.CashService;
 using Tgs.CashService.Client;
 using Tgs.Core.Infrastructures.Security;
@@ -11,12 +12,14 @@ internal class AddAgentQueryService : IGetService<AddAgentQuery, Guid>
     private readonly IAgentRepository _repository;
     private readonly IPasswordHandler _passwordHandler;
     private readonly ICashServiceClient _cashServiceClient;
+    private readonly ILogger<AddAgentQueryService> _logger;
 
-    public AddAgentQueryService(IAgentRepository repository, IPasswordHandler passwordHandler, ICashServiceClient cashServiceClient)
+    public AddAgentQueryService(IAgentRepository repository, IPasswordHandler passwordHandler, ICashServiceClient cashServiceClient, ILogger<AddAgentQueryService> logger)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _passwordHandler = passwordHandler;
         _cashServiceClient = cashServiceClient;
+        _logger = logger;
     }
 
     public async ValueTask<Guid> GetAsync(AddAgentQuery command, CancellationToken cancellationToken = default)
@@ -24,6 +27,8 @@ internal class AddAgentQueryService : IGetService<AddAgentQuery, Guid>
         var (salt, pwd) = _passwordHandler.GenerateCredential(command.Password);
 
         var agentId = Guid.NewGuid();
+
+        _logger.LogInformation("brand {BrandId} agent {Agent} currencyCode {CurrencyCode}", command.BrandId, agentId, command.CurrencyCode);
 
         var walletId = await _cashServiceClient.CreateNewCashAsync(command.BrandId,
             agentId.ToString(),
