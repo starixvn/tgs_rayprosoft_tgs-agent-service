@@ -536,7 +536,6 @@ internal class AgentRepository : IAgentRepository
                    .ConfigureAwait(false))
             invitationCode = InvitationCodeGenerator.NewId();
 
-        var defaultWalletId = GuidExtensions.NewSequentialGuid();
         var agentId = Guid.NewGuid();
 
         var parentAgent =
@@ -549,14 +548,14 @@ internal class AgentRepository : IAgentRepository
         var agent = new Entities.Agent
         {
             Id = agentId,
-            WalletId = agentModel.WalletId,
             Username = agentModel.Username,
             LevelType = (short)agentModel.LevelType,
             Type = (short)agentModel.Type,
             BrandId = agentModel.BrandId,
             Status = (short)AgentStatus.Enabled,
             ParentAgentId = agentModel.ParentAgentId,
-            DefaultWalletId = defaultWalletId,
+            DefaultWalletId = agentModel.WalletId,
+            WalletId = agentModel.WalletId,
             AgentStatus =
                 brand is { AgentDividendType: (short)AgentDividendType.MultipleLayer, BrandAgentDividendConditions.Count: > 0 } ||
                 brand.AgentDividendType == (short)AgentDividendType.OneLayer && agentModel.DividendPercentage > 0
