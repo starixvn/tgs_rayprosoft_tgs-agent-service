@@ -44,6 +44,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "dbo.brands",
+         "ObjectType": 0
+      },
+      {
          "Name": "dbo.players",
          "ObjectType": 0
       }

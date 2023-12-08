@@ -91,6 +91,11 @@ builder.Services
         var config = sp.GetRequiredService<IConfiguration>();
         options.BaseUrl = config.GetValue<Uri>("AgentService:PlayerServiceBaseUrl")!;
     })
+    .AddCashServiceClient((options, sp) =>
+    {
+        var config = sp.GetRequiredService<IConfiguration>();
+        options.BaseUrl = config.GetValue<Uri>("AgentService:CashBaseUrl")!;
+    })
     .AddSecurity();
 
 builder.Services.AddHealthChecks();

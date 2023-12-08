@@ -1,26 +1,40 @@
 ﻿using Tgs.Agent.Core.Models;
+using Tgs.CashService;
+using Tgs.CashService.Client;
 using Tgs.Core.Infrastructures.Security;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Agent.Core.ApplicationServices;
 
-internal class GetAndAddAgentQueryService : IGetService<GetAndAddAgentQuery, Guid>
+internal class AddAgentQueryService : IGetService<AddAgentQuery, Guid>
 {
     private readonly IAgentRepository _repository;
     private readonly IPasswordHandler _passwordHandler;
+    private readonly ICashServiceClient _cashServiceClient;
 
-    public GetAndAddAgentQueryService(IAgentRepository repository, IPasswordHandler passwordHandler)
+    public AddAgentQueryService(IAgentRepository repository, IPasswordHandler passwordHandler, ICashServiceClient cashServiceClient)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _passwordHandler = passwordHandler;
+        _cashServiceClient = cashServiceClient;
     }
 
-    public async ValueTask<Guid> GetAsync(GetAndAddAgentQuery command, CancellationToken cancellationToken = default)
+    public async ValueTask<Guid> GetAsync(AddAgentQuery command, CancellationToken cancellationToken = default)
     {
         var (salt, pwd) = _passwordHandler.GenerateCredential(command.Password);
 
-        return await _repository.CreateAgentAsync(new AgentModel
+        var agentId = Guid.NewGuid();
+
+        var walletId = await _cashServiceClient.CreateNewCashAsync(command.BrandId,
+            agentId.ToString(),
+            command.CurrencyCode,
+            CashType.Agent,
+            cancellationToken);
+
+        await _repository.CreateAgentAsync(new AgentModel
         {
+            AgentId = agentId,
+            WalletId = walletId,
             Username = command.Username,
             BrandId = command.BrandId,
             LevelType = command.LevelType,
@@ -40,5 +54,7 @@ internal class GetAndAddAgentQueryService : IGetService<GetAndAddAgentQuery, Gui
             Remarks = command.Remarks,
             EditorUsername = command.EditorUsername
         }, cancellationToken);
+
+        return agentId;
     }
 }

@@ -528,7 +528,7 @@ internal class AgentRepository : IAgentRepository
         _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<Guid> CreateAgentAsync(AgentModel agentModel, CancellationToken cancellationToken = default)
+    public async Task CreateAgentAsync(AgentModel agentModel, CancellationToken cancellationToken = default)
     {
         var invitationCode = InvitationCodeGenerator.NewId();
 
@@ -543,14 +543,13 @@ internal class AgentRepository : IAgentRepository
             await _tgsContext.Agents.FirstOrDefaultAsync(x => x.Id == agentModel.ParentAgentId, cancellationToken)
                 .ConfigureAwait(false);
 
-        var brandConditions = await _tgsContext.BrandAgentDividendConditions
-            .Where(x => x.BrandId == agentModel.BrandId)
-            .ToArrayAsync(cancellationToken)
-            .ConfigureAwait(false);
+        var brand = await _tgsContext.Brands.Include(x => x.BrandAgentDividendConditions)
+            .FirstAsync(x => x.Id == agentModel.BrandId, cancellationToken);
 
         var agent = new Entities.Agent
         {
             Id = agentId,
+            WalletId = agentModel.WalletId,
             Username = agentModel.Username,
             LevelType = (short)agentModel.LevelType,
             Type = (short)agentModel.Type,
@@ -558,7 +557,11 @@ internal class AgentRepository : IAgentRepository
             Status = (short)AgentStatus.Enabled,
             ParentAgentId = agentModel.ParentAgentId,
             DefaultWalletId = defaultWalletId,
-            AgentStatus = (short)AgentConfigStatus.WaitForConfigurePercentage,
+            AgentStatus =
+                brand is { AgentDividendType: (short)AgentDividendType.MultipleLayer, BrandAgentDividendConditions.Count: > 0 } ||
+                brand.AgentDividendType == (short)AgentDividendType.OneLayer && agentModel.DividendPercentage > 0
+                    ? (short)AgentConfigStatus.DoneForConfigurePercentage
+                    : (short)AgentConfigStatus.WaitForConfigurePercentage,
             CommissionPercentage = agentModel.CommissionPercentage,
             DividendPercentage = agentModel.DividendPercentage,
             LiveDealerRebatePercentage = agentModel.LiveDealerRebatePercentage,
@@ -579,7 +582,7 @@ internal class AgentRepository : IAgentRepository
             Salt = agentModel.Salt,
             WithdrawPassword = Array.Empty<byte>(),
             WithdrawSalt = Array.Empty<byte>(),
-            AgentDividendConditions = brandConditions.Select(x => new AgentDividendCondition
+            AgentDividendConditions = brand.BrandAgentDividendConditions.Select(x => new AgentDividendCondition
             {
                 Rank = x.Rank,
                 NetProfit = x.NetProfit,
@@ -591,7 +594,5 @@ internal class AgentRepository : IAgentRepository
         _ = await _tgsContext.Agents.AddAsync(agent, cancellationToken);
 
         _ = await _tgsContext.SaveChangesAsync(cancellationToken);
-
-        return agentId;
     }
 }

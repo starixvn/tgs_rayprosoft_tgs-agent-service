@@ -76,4 +76,6 @@ public partial class Player
     public Guid? SnapshotEventId { get; set; }
 
     public virtual Agent? Agent { get; set; }
+
+    public virtual Brand Brand { get; set; } = null!;
 }

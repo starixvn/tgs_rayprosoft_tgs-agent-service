@@ -96,6 +96,10 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("fk_players_agents_agent_id");
 
+            entity.HasOne(d => d.Brand).WithMany(p => p.Players)
+            .HasForeignKey(d => d.BrandId)
+            .HasConstraintName("fk_players_brands_brand_id");
+
             OnConfigurePartial(entity);
         }
 

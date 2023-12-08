@@ -267,10 +267,10 @@ public class AgentController : ControllerBase
 
     [HttpPost("", Name = "CreateAgent")]
     [Description("Create an agent")]
-    public ValueTask<Guid> CreateAgentAsync([FromServices] IGetService<GetAndAddAgentQuery,Guid> getService, 
+    public ValueTask<Guid> CreateAgentAsync([FromServices] IGetService<AddAgentQuery,Guid> getService, 
         CreateAgentViewRequest request)
     {
-        return getService.GetAsync(new GetAndAddAgentQuery
+        return getService.GetAsync(new AddAgentQuery
         {
             Username = request.Username,
             BrandId = request.BrandId,

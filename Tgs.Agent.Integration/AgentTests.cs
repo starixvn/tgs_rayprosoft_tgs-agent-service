@@ -12,6 +12,8 @@ using Tgs.Agent.Client.Models;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Repositories.Entities;
+using Tgs.CashService;
+using Tgs.CashService.Client;
 using Tgs.Core.Infrastructures.Security;
 using Tgs.SerialNumberGenerator;
 using AgentLevelType = Tgs.Agent.Client.Models.Enums.AgentLevelType;
@@ -571,8 +573,16 @@ public class AgentTests
     public async Task Create_An_Agent()
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
+        var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
+
         await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
-            services.AddSingleton(fakeAgentRepository));
+            services.AddSingleton(fakeAgentRepository)
+                .AddSingleton(fakeCashServiceClient));
+
+        fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(),Arg.Any<string>(),
+            Arg.Any<string>(),
+            Arg.Is(CashType.Agent),
+            Arg.Any<CancellationToken>()).Returns(Guid.NewGuid());
 
         var httpClient = web.CreateClient();
 
@@ -582,6 +592,7 @@ public class AgentTests
         {
             Username = "username",
             BrandId = Guid.NewGuid(),
+            CurrencyCode = "CNY",
             LevelType = AgentLevelType.Agent,
             CardGameRebatePercentage = 0,
             CommissionPercentage = 0,

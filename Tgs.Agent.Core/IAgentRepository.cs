@@ -90,5 +90,5 @@ public interface IAgentRepository
         DateTime updatedOn,
         CancellationToken cancellationToken = default);
 
-    Task<Guid> CreateAgentAsync(AgentModel agentModel, CancellationToken cancellationToken = default);
+    Task CreateAgentAsync(AgentModel agentModel, CancellationToken cancellationToken = default);
 }

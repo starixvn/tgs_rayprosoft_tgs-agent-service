@@ -29,6 +29,10 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
             .HasPrecision(18, 6)
             .HasColumnName("net_profit");
 
+            entity.HasOne(d => d.Brand).WithMany(p => p.BrandAgentDividendConditions)
+            .HasForeignKey(d => d.BrandId)
+            .HasConstraintName("fk_brand_agent_dividend_conditions_brands_brand_id");
+
             OnConfigurePartial(entity);
         }
 

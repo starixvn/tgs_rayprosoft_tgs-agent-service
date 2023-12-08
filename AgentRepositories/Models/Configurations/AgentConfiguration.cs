@@ -94,6 +94,10 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
             entity.Property(e => e.WithdrawPassword).HasColumnName("withdraw_password");
             entity.Property(e => e.WithdrawSalt).HasColumnName("withdraw_salt");
 
+            entity.HasOne(d => d.Brand).WithMany(p => p.Agents)
+            .HasForeignKey(d => d.BrandId)
+            .HasConstraintName("fk_agents_brands_brand_id");
+
             entity.HasOne(d => d.ParentAgent).WithMany(p => p.InverseParentAgent)
             .HasForeignKey(d => d.ParentAgentId)
             .OnDelete(DeleteBehavior.Restrict)
