@@ -2,7 +2,6 @@
 using System.Text;
 using System.Text.Json;
 using AutoFixture.NUnit3;
-using DocumentFormat.OpenXml.InkML;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -246,7 +245,7 @@ public class AgentTests
     public async Task 設置代理提款密碼()
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
-        var fakePasswordHandler = Substitute.For<IPasswordHandler>();        
+        var fakePasswordHandler = Substitute.For<IPasswordHandler>();
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
         await using var web = TestSiteHelper.GetAgentServiceTestHost(services
             => services.AddSingleton(fakeAgentRepository)
@@ -579,7 +578,7 @@ public class AgentTests
             services.AddSingleton(fakeAgentRepository)
                 .AddSingleton(fakeCashServiceClient));
 
-        fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(),Arg.Any<string>(),
+        fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(), Arg.Any<string>(),
             Arg.Any<string>(),
             Arg.Is(CashType.Agent),
             Arg.Any<CancellationToken>()).Returns(Guid.NewGuid());
@@ -605,6 +604,8 @@ public class AgentTests
             ParentAgentId = Guid.NewGuid(),
             Password = "password",
             RealName = "RealName",
+            Email = "email",
+            Phone = "phone",
             Type = AgentType.Cash,
             Remarks = "remarks",
             EditorUsername = "EditorUsername"
