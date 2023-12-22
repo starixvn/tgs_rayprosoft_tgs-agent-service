@@ -12,6 +12,8 @@ public class CreateAgentViewRequest
     public AgentType Type { get; init; }
     public string Password { get; init; } = null!;
     public string RealName { get; init; } = null!;
+    public string Email { get; init; } = null!;
+    public string Phone { get; init; } = null!;
     public string Remarks { get; init; } = null!;
     public decimal CardGameRebatePercentage { get; init; }
     public decimal CommissionPercentage { get; init; }
