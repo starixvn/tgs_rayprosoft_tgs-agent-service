@@ -52,7 +52,8 @@ public class SetAgentPasswordTests
                 0m,
                 brandId,
                 Guid.NewGuid(),
-                null));
+                null,
+                false));
 
         var sut = new SetAgentPasswordCommandService(
             fakeAgentRepository,

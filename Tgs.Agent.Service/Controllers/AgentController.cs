@@ -45,7 +45,8 @@ public class AgentController : ControllerBase
             info.AccumulatedProfitSharing,
             info.BrandId,
             info.DefaultWalletId,
-            info.WalletId);
+            info.WalletId,
+            info.IsSetPayPassword);
     }
 
     [HttpGet("info/{brandId}/{username}", Name = "GetAgentInfoByUsername")]
@@ -79,7 +80,8 @@ public class AgentController : ControllerBase
             info.AccumulatedProfitSharing,
             info.BrandId,
             info.DefaultWalletId,
-            info.WalletId);
+            info.WalletId,
+            info.IsSetPayPassword);
     }
 
     [HttpGet("allChildAgents/{agentId:Guid}", Name = "GetChildAgentInfos")]

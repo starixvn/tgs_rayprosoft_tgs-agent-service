@@ -84,7 +84,8 @@ internal class AgentRepository : IAgentRepository
             dividend,
             agent.BrandId,
             agent.DefaultWalletId,
-            agent.WalletId);
+            agent.WalletId,
+            agent.WithdrawPassword.Length > 0);
     }
 
     public async ValueTask<AgentInfo?> GetAgentByUsernameAsync(Guid brandId, string username,
@@ -125,7 +126,8 @@ internal class AgentRepository : IAgentRepository
             dividend,
             agent.BrandId,
             agent.DefaultWalletId,
-            agent.WalletId);
+            agent.WalletId,
+            agent.WithdrawPassword.Length > 0);
     }
 
     public IAsyncEnumerable<ChildAgentInfoModel> GetChildAgentInfosAsync(Guid agentId, CancellationToken cancellationToken = default)

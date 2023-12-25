@@ -41,7 +41,8 @@ public class SetAgentPropertiesTests
             0m,
             brandId,
             Guid.NewGuid(),
-            null);
+            null,
+            false);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -120,7 +121,8 @@ public class SetAgentPropertiesTests
             0m,
             brandId,
             Guid.NewGuid(),
-            null);
+            null, 
+            false);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -199,7 +201,8 @@ public class SetAgentPropertiesTests
             0m,
             brandId,
             Guid.NewGuid(),
-            null);
+            null, 
+            false);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -278,7 +281,8 @@ public class SetAgentPropertiesTests
             0m,
             brandId,
             Guid.NewGuid(),
-            null);
+            null, 
+            false);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -357,7 +361,8 @@ public class SetAgentPropertiesTests
             0m,
             brandId,
             Guid.NewGuid(),
-            null);
+            null, 
+            false);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -436,7 +441,8 @@ public class SetAgentPropertiesTests
             0m,
             brandId,
             Guid.NewGuid(),
-            null);
+            null, 
+            false);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -514,7 +520,8 @@ public class SetAgentPropertiesTests
             0m,
             brandId,
             Guid.NewGuid(),
-            null);
+            null, 
+            false);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -592,7 +599,8 @@ public class SetAgentPropertiesTests
             0m,
             brandId,
             Guid.NewGuid(),
-            null);
+            null, 
+            false);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -670,7 +678,8 @@ public class SetAgentPropertiesTests
             0m,
             brandId,
             Guid.NewGuid(),
-            null);
+            null, 
+            false);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -748,7 +757,8 @@ public class SetAgentPropertiesTests
             0m,
             brandId,
             Guid.NewGuid(),
-            null);
+            null, 
+            false);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -826,7 +836,8 @@ public class SetAgentPropertiesTests
             0m,
             brandId,
             Guid.NewGuid(),
-            null);
+            null, 
+            false);
 
         var agentProperties = new Dictionary<string, string?>
         {
@@ -904,7 +915,8 @@ public class SetAgentPropertiesTests
             0m,
             brandId,
             Guid.NewGuid(),
-            null);
+            null, 
+            false);
 
         var agentProperties = new Dictionary<string, string?>
         {

@@ -21,4 +21,5 @@ public record AgentInfoModel(
     decimal AccumulatedProfitSharing,
     Guid BrandId,
     Guid DefaultWalletId,
-    Guid? WalletId);
+    Guid? WalletId,
+    bool IsSetPayPassword);

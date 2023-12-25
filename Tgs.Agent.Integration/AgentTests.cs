@@ -56,7 +56,8 @@ public class AgentTests
                 AccumulatedProfitSharing: 0M,
                 BrandId: Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af"),
                 DefaultWalletId: Guid.NewGuid(),
-                WalletId: null));
+                WalletId: null,
+                false));
 
         var actual = await sut.GetAgentInfoAsync(new(agentId));
 
@@ -225,7 +226,8 @@ public class AgentTests
             0m,
             brandId,
             Guid.NewGuid(),
-            null));
+            null,
+            false));
 
         await sut.SetAgentPasswordAsync(new(agentId, password, modifyUserId));
 
@@ -292,7 +294,8 @@ public class AgentTests
             0m,
             brandId,
             Guid.NewGuid(),
-            null));
+            null, 
+            false));
 
         await sut.SetAgentPayPasswordAsync(new(agentId, password, modifyUserId));
 
