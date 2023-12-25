@@ -594,4 +594,25 @@ internal class AgentRepository : IAgentRepository
 
         _ = await _tgsContext.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task CreateContractAsync(Guid brandId,
+        Guid agentId,
+        decimal gradeIntervalLimit,
+        CancellationToken cancellationToken = default)
+    {
+        var brand = await _tgsContext.Brands
+            .FirstAsync(x => x.Id == brandId, cancellationToken);
+
+        var contract = new AgentDividendContract
+        {
+            BrandId = brand.Id,
+            AgentId = agentId,
+            BetDays = 0,
+            ContractDividendType = brand.AgentDividendType,
+            Name = "Contract",
+            GradeIntervalLimit = gradeIntervalLimit
+        };
+
+        _ = await _tgsContext.AgentDividendContracts.AddAsync(contract, cancellationToken);
+    }
 }

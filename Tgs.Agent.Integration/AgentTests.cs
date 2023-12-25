@@ -588,7 +588,7 @@ public class AgentTests
 
         var sut = new AgentClient(httpClient);
 
-        var agentId = await sut.CreateAgentAsync(new CreateAgentRequest
+        var request = new CreateAgentRequest
         {
             Username = "username",
             BrandId = Guid.NewGuid(),
@@ -608,12 +608,15 @@ public class AgentTests
             Type = AgentType.Cash,
             Remarks = "remarks",
             EditorUsername = "EditorUsername"
-        });
+        };
+
+        var agentId = await sut.CreateAgentAsync(request);
 
         _ = await fakeAgentRepository.GetAgentByIdAsync(agentId);
 
         Assert.NotNull(agentId);
 
+        _ = fakeAgentRepository.Received(1).CreateAgentAsync(Arg.Is<AgentModel>(x => x.ParentAgentId == request.ParentAgentId), default);
         _ = fakeAgentRepository.ReceivedWithAnyArgs(1).CreateAgentAsync(null, default);
     }
 }

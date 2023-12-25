@@ -47,7 +47,8 @@ builder.Services
     });
 
 builder.Services
-    .AddOpenTelemetryTracing(builder => builder
+    .AddOpenTelemetry()
+    .WithTracing(builder => builder
         .SetResourceBuilder(ResourceBuilder.CreateDefault()
             .AddEnvironmentVariableDetector())
         .AddSource("Tgs.*")
@@ -60,7 +61,8 @@ builder.Services
         })
         .AddProfileViewExporter()
         .AddOtlpExporter())
-    .Configure<AspNetCoreInstrumentationOptions>(options =>
+    .Services
+    .Configure<AspNetCoreTraceInstrumentationOptions>(options =>
     {
         options.Filter = httpContext =>
         {

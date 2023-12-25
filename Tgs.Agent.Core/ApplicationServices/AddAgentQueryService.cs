@@ -36,6 +36,8 @@ internal class AddAgentQueryService : IGetService<AddAgentQuery, Guid>
             CashType.Agent,
             cancellationToken);
 
+        await _repository.CreateContractAsync(command.BrandId, agentId, command.GradeIntervalLimit, cancellationToken);
+
         await _repository.CreateAgentAsync(new AgentModel
         {
             AgentId = agentId,

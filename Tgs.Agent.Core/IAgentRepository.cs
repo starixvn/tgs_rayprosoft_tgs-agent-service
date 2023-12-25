@@ -91,4 +91,7 @@ public interface IAgentRepository
         CancellationToken cancellationToken = default);
 
     Task CreateAgentAsync(AgentModel agentModel, CancellationToken cancellationToken = default);
+
+    Task CreateContractAsync(Guid brandId,Guid agentId, decimal gradeIntervalLimit, CancellationToken cancellationToken = default);
+
 }
