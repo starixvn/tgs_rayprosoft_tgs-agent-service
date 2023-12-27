@@ -14,7 +14,11 @@ internal class AddAgentQueryService : IGetService<AddAgentQuery, Guid>
     private readonly ICashServiceClient _cashServiceClient;
     private readonly ILogger<AddAgentQueryService> _logger;
 
-    public AddAgentQueryService(IAgentRepository repository, IPasswordHandler passwordHandler, ICashServiceClient cashServiceClient, ILogger<AddAgentQueryService> logger)
+    public AddAgentQueryService(
+        IAgentRepository repository,
+        IPasswordHandler passwordHandler,
+        ICashServiceClient cashServiceClient,
+        ILogger<AddAgentQueryService> logger)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _passwordHandler = passwordHandler;
@@ -28,13 +32,17 @@ internal class AddAgentQueryService : IGetService<AddAgentQuery, Guid>
 
         var agentId = Guid.NewGuid();
 
-        _logger.LogInformation("brand {BrandId} agent {Agent} currencyCode {CurrencyCode}", command.BrandId, agentId, command.CurrencyCode);
+        _logger.LogInformation("brand:{BrandId}, agent:{Agent}, currencyCode:{CurrencyCode}",
+            command.BrandId,
+            agentId,
+            command.CurrencyCode);
 
-        var walletId = await _cashServiceClient.CreateNewCashAsync(command.BrandId,
+        var walletId = await _cashServiceClient.CreateNewCashAsync(
+            command.BrandId,
             agentId.ToString(),
             command.CurrencyCode,
             CashType.Agent,
-            cancellationToken);
+            cancellationToken).ConfigureAwait(false);
 
         await _repository.CreateContractAsync(command.BrandId, agentId, command.GradeIntervalLimit, cancellationToken);
 
@@ -59,8 +67,10 @@ internal class AddAgentQueryService : IGetService<AddAgentQuery, Guid>
             RealName = command.RealName,
             Type = command.Type,
             Remarks = command.Remarks,
+            Email = command.Email,
+            Phone = command.Phone,
             EditorUsername = command.EditorUsername
-        }, cancellationToken);
+        }, cancellationToken).ConfigureAwait(false);
 
         return agentId;
     }

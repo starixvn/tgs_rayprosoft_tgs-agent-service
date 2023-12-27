@@ -15,6 +15,9 @@ public record AddAgentQuery
     public decimal LotteryRebatePercentage { get; init; }
     public string Password { get; init; } = default!;
     public string RealName { get; init; } = default!;
+    public string Email { get; init; } = default!;
+
+    public string Phone { get; init; } = default!;
     public string Remarks { get; init; } = default!;
     public decimal SlotRebatePercentage { get; init; }
     public decimal SportsRebatePercentage { get; init; }

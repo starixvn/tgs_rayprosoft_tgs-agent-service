@@ -5,13 +5,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Tgs.Agent.Core;
-using Tgs.Agent.Core.ApplicationServices;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Core.Models.Enums;
 using Tgs.Agent.Repositories.Entities;
+using Tgs.Core.Infrastructures.Utility;
 using Tgs.Paging;
 using TGS.Core.Infrastructures.Extensions;
-using Tgs.Core.Infrastructures.Utility;
 
 namespace Tgs.Agent.Repositories;
 
@@ -85,7 +84,8 @@ internal class AgentRepository : IAgentRepository
             dividend,
             agent.BrandId,
             agent.DefaultWalletId,
-            agent.WalletId);
+            agent.WalletId,
+            agent.WithdrawPassword.Length > 0);
     }
 
     public async ValueTask<AgentInfo?> GetAgentByUsernameAsync(Guid brandId, string username,
@@ -126,7 +126,8 @@ internal class AgentRepository : IAgentRepository
             dividend,
             agent.BrandId,
             agent.DefaultWalletId,
-            agent.WalletId);
+            agent.WalletId,
+            agent.WithdrawPassword.Length > 0);
     }
 
     public IAsyncEnumerable<ChildAgentInfoModel> GetChildAgentInfosAsync(Guid agentId, CancellationToken cancellationToken = default)
@@ -536,18 +537,17 @@ internal class AgentRepository : IAgentRepository
                    .ConfigureAwait(false))
             invitationCode = InvitationCodeGenerator.NewId();
 
-        var agentId = Guid.NewGuid();
-
         var parentAgent =
             await _tgsContext.Agents.FirstOrDefaultAsync(x => x.Id == agentModel.ParentAgentId, cancellationToken)
                 .ConfigureAwait(false);
 
         var brand = await _tgsContext.Brands.Include(x => x.BrandAgentDividendConditions)
-            .FirstAsync(x => x.Id == agentModel.BrandId, cancellationToken);
+            .FirstAsync(x => x.Id == agentModel.BrandId, cancellationToken)
+            .ConfigureAwait(false);
 
         var agent = new Entities.Agent
         {
-            Id = agentId,
+            Id = agentModel.AgentId,
             Username = agentModel.Username,
             LevelType = (short)agentModel.LevelType,
             Type = (short)agentModel.Type,
@@ -576,11 +576,14 @@ internal class AgentRepository : IAgentRepository
             CreatedOn = DateTime.UtcNow,
             UpdatedOn = DateTime.UtcNow,
             RegisteredOn = DateTime.UtcNow,
-            Path = agentModel.ParentAgentId == null ? new LTree($"{agentId:N}") : new LTree($"{parentAgent!.Path}.{agentId:N}"),
+            Path = agentModel.ParentAgentId == null ? new LTree($"{agentModel.AgentId:N}") : new LTree($"{parentAgent!.Path}.{agentModel.AgentId:N}"),
             Password = agentModel.Password,
             Salt = agentModel.Salt,
             WithdrawPassword = Array.Empty<byte>(),
             WithdrawSalt = Array.Empty<byte>(),
+            RealName = agentModel.RealName,
+            Email = agentModel.Email,
+            Phone = agentModel.Phone,
             AgentDividendConditions = brand.BrandAgentDividendConditions.Select(x => new AgentDividendCondition
             {
                 Rank = x.Rank,
@@ -590,9 +593,13 @@ internal class AgentRepository : IAgentRepository
             }).ToHashSet()
         };
 
-        _ = await _tgsContext.Agents.AddAsync(agent, cancellationToken);
+        _ = await _tgsContext.Agents
+            .AddAsync(agent, cancellationToken)
+            .ConfigureAwait(false);
 
-        _ = await _tgsContext.SaveChangesAsync(cancellationToken);
+        _ = await _tgsContext
+            .SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 
     public async Task CreateContractAsync(Guid brandId,

@@ -45,7 +45,8 @@ public class AgentController : ControllerBase
             info.AccumulatedProfitSharing,
             info.BrandId,
             info.DefaultWalletId,
-            info.WalletId);
+            info.WalletId,
+            info.IsSetPayPassword);
     }
 
     [HttpGet("info/{brandId}/{username}", Name = "GetAgentInfoByUsername")]
@@ -79,7 +80,8 @@ public class AgentController : ControllerBase
             info.AccumulatedProfitSharing,
             info.BrandId,
             info.DefaultWalletId,
-            info.WalletId);
+            info.WalletId,
+            info.IsSetPayPassword);
     }
 
     [HttpGet("allChildAgents/{agentId:Guid}", Name = "GetChildAgentInfos")]
@@ -265,9 +267,10 @@ public class AgentController : ControllerBase
         return commandService.ExecuteAsync(command);
     }
 
-    [HttpPost("", Name = "CreateAgent")]
+    [HttpPost(Name = "CreateAgent")]
     [Description("Create an agent")]
-    public ValueTask<Guid> CreateAgentAsync([FromServices] IGetService<AddAgentQuery,Guid> getService, 
+    public ValueTask<Guid> CreateAgentAsync(
+        [FromServices] IGetService<AddAgentQuery, Guid> getService,
         CreateAgentViewRequest request)
     {
         return getService.GetAsync(new AddAgentQuery
@@ -287,6 +290,8 @@ public class AgentController : ControllerBase
             ParentAgentId = request.ParentAgentId,
             Password = request.Password,
             RealName = request.RealName,
+            Email = request.Email,
+            Phone = request.Phone,
             Type = request.Type,
             Remarks = request.Remarks,
             EditorUsername = request.EditorUsername
