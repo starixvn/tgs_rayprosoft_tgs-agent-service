@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
+using Tgs.Agent.Core.Models.BrandContract;
 using Tgs.Agent.Core.Models.Enums;
 using Tgs.Agent.Repositories.Entities;
 using Tgs.Core.Infrastructures.Utility;
@@ -529,6 +530,16 @@ internal class AgentRepository : IAgentRepository
         _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    public async ValueTask<Guid?> CheckAgentPlayerRelationExistsAsync(string playerCode,
+        CancellationToken cancellationToken = default)
+    {
+        var playerAgentRelation = await _tgsContext.PlayerAgentRelations
+            .FirstOrDefaultAsync(x => x.PlayerCode == playerCode, cancellationToken)
+            .ConfigureAwait(false);
+
+        return playerAgentRelation?.AgentId;
+    }
+
     public async Task CreateAgentAsync(AgentModel agentModel, CancellationToken cancellationToken = default)
     {
         var invitationCode = InvitationCodeGenerator.NewId();
@@ -583,14 +594,7 @@ internal class AgentRepository : IAgentRepository
             WithdrawSalt = Array.Empty<byte>(),
             RealName = agentModel.RealName,
             Email = agentModel.Email,
-            Phone = agentModel.Phone,
-            AgentDividendConditions = brand.BrandAgentDividendConditions.Select(x => new AgentDividendCondition
-            {
-                Rank = x.Rank,
-                NetProfit = x.NetProfit,
-                ActiveNumber = x.ActiveNumber,
-                DividendPercentage = x.DividendPercentage
-            }).ToHashSet()
+            Phone = agentModel.Phone
         };
 
         _ = await _tgsContext.Agents
@@ -602,24 +606,21 @@ internal class AgentRepository : IAgentRepository
             .ConfigureAwait(false);
     }
 
-    public async Task CreateContractAsync(Guid brandId,
+    public async Task CreateAgentPlayerRelationAsync(Guid brandId,
         Guid agentId,
-        decimal gradeIntervalLimit,
+        string playerCode,
         CancellationToken cancellationToken = default)
     {
-        var brand = await _tgsContext.Brands
-            .FirstAsync(x => x.Id == brandId, cancellationToken);
-
-        var contract = new AgentDividendContract
+        _ = await _tgsContext.PlayerAgentRelations.AddAsync(new PlayerAgentRelation
         {
-            BrandId = brand.Id,
+            BrandId = brandId,
             AgentId = agentId,
-            BetDays = 0,
-            ContractDividendType = brand.AgentDividendType,
-            Name = "Contract",
-            GradeIntervalLimit = gradeIntervalLimit
-        };
+            PlayerCode = playerCode
+        },
+        cancellationToken);
 
-        _ = await _tgsContext.AgentDividendContracts.AddAsync(contract, cancellationToken);
+        _ = await _tgsContext
+            .SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 }

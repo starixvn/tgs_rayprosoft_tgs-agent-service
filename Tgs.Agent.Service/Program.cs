@@ -100,6 +100,13 @@ builder.Services
     })
     .AddSecurity();
 
+builder.Services
+    .AddAgentDividendClient((options, sp) =>
+    {
+        var config = sp.GetRequiredService<IConfiguration>();
+        options.BaseUrl = config.GetValue<Uri>("AgentService:AgentDividendServiceBaseUrl")!;
+    });
+
 builder.Services.AddHealthChecks();
 
 builder.Services

@@ -346,4 +346,18 @@ public class AgentClient : IAgentClient
 
         return JsonSerializer.Deserialize<Guid>(contentJson, _JsonSerializerOptions);
     }
+
+    public async ValueTask<Guid> CreateAgentByPlayerUpgradeAsync(CreateAgentByPlayerUpgradeRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .PostAsJsonAsync("/api/agent/create-by-player-upgrade", request, _JsonSerializerOptions, cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+
+        var contentJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+        return JsonSerializer.Deserialize<Guid>(contentJson, _JsonSerializerOptions);
+    }
 }

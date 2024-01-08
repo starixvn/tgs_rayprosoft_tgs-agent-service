@@ -21,7 +21,7 @@ public class AgentModel
     public string Email { get; init; } = default!;
 
     public string Phone { get; init; } = default!;
-    public string Remarks { get; init; } = default!;
+    public string? Remarks { get; init; }
     public decimal SlotRebatePercentage { get; init; }
     public decimal SportsRebatePercentage { get; init; }
     public decimal VirtualSportsRebatePercentage { get; init; }
