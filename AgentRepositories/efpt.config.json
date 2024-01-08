@@ -1,5 +1,5 @@
 ﻿{
-   "CodeGenerationMode": 3,
+   "CodeGenerationMode": 4,
    "ContextClassName": "TgsContext",
    "ContextNamespace": "Entities",
    "DefaultDacpacSchema": null,
@@ -45,6 +45,10 @@
       },
       {
          "Name": "dbo.brands",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dbo.player_agent_relations",
          "ObjectType": 0
       },
       {

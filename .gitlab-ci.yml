@@ -51,59 +51,22 @@ unit-test:
       junit: ./TestReports/*-TestReport.xml
 
 push-nuget:
-  stage: publish
-  needs:
-    - job: build-code
-      artifacts: true
-    - unit-test
-  only:
-    - main
+  extends: .push-nuget-template
   script:
-    - dotnet restore
-    - dotnet pack -c $BuildConfiguration "Tgs.Agent.Client/Tgs.Agent.Client.csproj" --no-restore
-    - dotnet nuget push "Tgs.Agent.Client/bin/$BuildConfiguration/*.nupkg" -s "raypro-baget" -k $NugetApiKey --skip-duplicate
+    - push_package "Tgs.Agent.Client"
   artifacts:
-    name: Nuget
-    untracked: false
-    expire_in: "30 days"
     paths:
       - Tgs.Agent.Client/bin/$BuildConfiguration/*.nupkg
 
 push-docker-image:
-  stage: publish
-  needs:
-    - build-code
-    - unit-test
-  only:
-    - main
-  cache:
-    key: $BuildCacheKey
-    untracked: true
-    policy: pull
+  extends: .push-docker-image-template
   script:
-    - docker build -t "$ImageName:$Tag" --build-arg [BUILD_CONFIGURATION]=$BUILD_CONFIGURATION -f "Tgs.Agent.Service/Dockerfile" . --no-cache
-    - docker push $ImageName:$Tag
+    - push_docker "Tgs.Agent.Service" $ImageName $Tag
 
 push-k8s-template:
-  stage: publish
-  needs:
-    - unit-test
-  only:
-    - main
+  extends: .push-k8s-template
   script:
-    - mkdir -p artifacts/k8s
-    - cp -R deployment/k8s/$HelmTemplateFolderName artifacts/k8s/
-    - |
-      yq -i e '
-        .image.repository = strenv(ImageName) |
-        .image.tag = strenv(Tag)
-      ' artifacts/k8s/$HelmTemplateFolderName/values.yaml
-  artifacts:
-    name: HelmTemplate
-    untracked: false
-    expire_in: "180 days"
-    paths:
-      - artifacts/**/*
+    - push_k8s_template $HelmTemplateFolderName $ImageName $Tag
 
 deploy-dev:
   extends: .deploy-template

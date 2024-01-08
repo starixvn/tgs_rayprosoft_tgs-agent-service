@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Tgs.Agent.Core.Models;
+using Tgs.Agent.Core.Models.BrandContract;
 using Tgs.Agent.Core.Models.Enums;
 using Tgs.Paging;
 
@@ -90,5 +91,11 @@ public interface IAgentRepository
         DateTime updatedOn,
         CancellationToken cancellationToken = default);
 
+    ValueTask<Guid?> CheckAgentPlayerRelationExistsAsync(
+        string playerCode,
+        CancellationToken cancellationToken = default);
+
     Task CreateAgentAsync(AgentModel agentModel, CancellationToken cancellationToken = default);
+
+    Task CreateAgentPlayerRelationAsync(Guid brandId, Guid agentId, string playerCode, CancellationToken cancellationToken = default);
 }

@@ -22,5 +22,6 @@ public record AddAgentQuery
     public decimal SlotRebatePercentage { get; init; }
     public decimal SportsRebatePercentage { get; init; }
     public decimal VirtualSportsRebatePercentage { get; init; }
+    public decimal GradeIntervalLimit { get; init; }
     public string EditorUsername { get; set; } = default!;
 }

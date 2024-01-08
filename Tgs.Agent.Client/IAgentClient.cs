@@ -62,4 +62,8 @@ public interface IAgentClient
     ValueTask<Guid> CreateAgentAsync(
         CreateAgentRequest request,
         CancellationToken cancellationToken = default);
+
+    ValueTask<Guid> CreateAgentByPlayerUpgradeAsync(
+        CreateAgentByPlayerUpgradeRequest request,
+        CancellationToken cancellationToken = default);
 }

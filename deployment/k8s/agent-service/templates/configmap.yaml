@@ -14,7 +14,8 @@ data:
       },
       "AgentService": {
         "PlayerServiceBaseUrl": "http://player-api",
-        "CashBaseUrl": "http://cashservice-api"
+        "CashBaseUrl": "http://cashservice-api",
+        "AgentDividendServiceBaseUrl": "http://agent-dividend-service"
       }
     }
   otel-collector-config.yaml: |

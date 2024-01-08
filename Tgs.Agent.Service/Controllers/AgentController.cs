@@ -297,4 +297,27 @@ public class AgentController : ControllerBase
             EditorUsername = request.EditorUsername
         });
     }
+
+    [HttpPost("create-by-player-upgrade")]
+    [Description("Create an agent by player upgrade")]
+    public ValueTask<Guid> CreateAgentByPlayerUpgradeAsync(
+        [FromServices] IGetService<AddAgentByPlayerUpgradeQuery, Guid> getService,
+        CreateAgentByPlayerUpgradeViewRequest request)
+    {
+        return getService.GetAsync(new AddAgentByPlayerUpgradeQuery
+        {
+            Username = request.Username,
+            BrandId = request.BrandId,
+            PlayerCode = request.PlayerCode,
+            LevelType = request.LevelType,
+            CurrencyCode = request.CurrencyCode,
+            ParentAgentId = request.ParentAgentId,
+            RealName = request.RealName,
+            Email = request.Email,
+            Phone = request.Phone,
+            Type = request.Type,
+            Remarks = request.Remarks,
+            EditorUsername = request.EditorUsername
+        });
+    }
 }

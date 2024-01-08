@@ -10,6 +10,9 @@ using Tgs.Agent.Client;
 using Tgs.Agent.Client.Models;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
+using Tgs.Agent.Dividend.Client;
+using Tgs.Agent.Dividend.Client.Enums;
+using Tgs.Agent.Dividend.Client.Models;
 using Tgs.Agent.Repositories.Entities;
 using Tgs.CashService;
 using Tgs.CashService.Client;
@@ -576,12 +579,31 @@ public class AgentTests
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
         var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
+        var fakeBrandContractClient = Substitute.For<IBrandContractClient>();
+        var fakeAgentContractClient = Substitute.For<IAgentContractClient>();
 
         await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
             services.AddSingleton(fakeAgentRepository)
-                .AddSingleton(fakeCashServiceClient));
+                .AddSingleton(fakeCashServiceClient)
+                .AddSingleton(fakeBrandContractClient)
+                .AddSingleton(fakeAgentContractClient));
 
-        fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(), Arg.Any<string>(),
+        _ = fakeBrandContractClient.GetBrandContractAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(new BrandContract[]
+            {
+                new(Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    "name",
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    [ContractGameType.CardGame, ContractGameType.LiveDealer],
+                    Enumerable.Empty<BrandContractCondition>())
+            }.ToAsyncEnumerable());
+
+        _ = fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(), Arg.Any<string>(),
             Arg.Any<string>(),
             Arg.Is(CashType.Agent),
             Arg.Any<CancellationToken>()).Returns(Guid.NewGuid());
@@ -590,7 +612,7 @@ public class AgentTests
 
         var sut = new AgentClient(httpClient);
 
-        var agentId = await sut.CreateAgentAsync(new CreateAgentRequest
+        var request = new CreateAgentRequest
         {
             Username = "username",
             BrandId = Guid.NewGuid(),
@@ -612,12 +634,15 @@ public class AgentTests
             Type = AgentType.Cash,
             Remarks = "remarks",
             EditorUsername = "EditorUsername"
-        });
+        };
+
+        var agentId = await sut.CreateAgentAsync(request);
 
         _ = await fakeAgentRepository.GetAgentByIdAsync(agentId);
 
         Assert.NotNull(agentId);
 
-        _ = fakeAgentRepository.ReceivedWithAnyArgs(1).CreateAgentAsync(null, default);
+        _ = fakeAgentRepository.Received(1).CreateAgentAsync(Arg.Is<AgentModel>(x => x.ParentAgentId == request.ParentAgentId), default);
+        _ = fakeAgentRepository.ReceivedWithAnyArgs(1).CreateAgentAsync(null!, default);
     }
 }

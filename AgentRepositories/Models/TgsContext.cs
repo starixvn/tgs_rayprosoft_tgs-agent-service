@@ -32,6 +32,8 @@ public partial class TgsContext : DbContext
 
     public virtual DbSet<Player> Players { get; set; }
 
+    public virtual DbSet<PlayerAgentRelation> PlayerAgentRelations { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -48,6 +50,7 @@ public partial class TgsContext : DbContext
         modelBuilder.ApplyConfiguration(new Configurations.BrandConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.BrandAgentDividendConditionConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.PlayerConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.PlayerAgentRelationConfiguration());
         OnModelCreatingPartial(modelBuilder);
     }
 

@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Tgs.Agent.Core.Models;
+using Tgs.Agent.Dividend.Client;
+using Tgs.Agent.Dividend.Client.Models;
 using Tgs.CashService;
 using Tgs.CashService.Client;
 using Tgs.Core.Infrastructures.Security;
@@ -7,44 +9,44 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Agent.Core.ApplicationServices;
 
-internal class AddAgentQueryService : IGetService<AddAgentQuery, Guid>
+internal class AddAgentQueryService(
+    IAgentRepository repository,
+    IPasswordHandler passwordHandler,
+    ICashServiceClient cashServiceClient,
+    IAgentContractClient agentContractClient,
+    IBrandContractClient brandContractClient,
+    ILogger<AddAgentQueryService> logger)
+    : IGetService<AddAgentQuery, Guid>
 {
-    private readonly IAgentRepository _repository;
-    private readonly IPasswordHandler _passwordHandler;
-    private readonly ICashServiceClient _cashServiceClient;
-    private readonly ILogger<AddAgentQueryService> _logger;
-
-    public AddAgentQueryService(
-        IAgentRepository repository,
-        IPasswordHandler passwordHandler,
-        ICashServiceClient cashServiceClient,
-        ILogger<AddAgentQueryService> logger)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _passwordHandler = passwordHandler;
-        _cashServiceClient = cashServiceClient;
-        _logger = logger;
-    }
-
     public async ValueTask<Guid> GetAsync(AddAgentQuery command, CancellationToken cancellationToken = default)
     {
-        var (salt, pwd) = _passwordHandler.GenerateCredential(command.Password);
+        var (salt, pwd) = passwordHandler.GenerateCredential(command.Password);
 
         var agentId = Guid.NewGuid();
 
-        _logger.LogInformation("brand:{BrandId}, agent:{Agent}, currencyCode:{CurrencyCode}",
+        logger.LogInformation("brand:{BrandId}, agent:{Agent}, currencyCode:{CurrencyCode}",
             command.BrandId,
             agentId,
             command.CurrencyCode);
 
-        var walletId = await _cashServiceClient.CreateNewCashAsync(
+        var brandContract = await brandContractClient.GetBrandContractAsync(command.BrandId, cancellationToken)
+                                .FirstOrDefaultAsync(cancellationToken) ??
+                            throw new Exception("Can't found brand contract");
+
+        var walletId = await cashServiceClient.CreateNewCashAsync(
             command.BrandId,
             agentId.ToString(),
             command.CurrencyCode,
             CashType.Agent,
             cancellationToken).ConfigureAwait(false);
 
-        await _repository.CreateAgentAsync(new AgentModel
+        await agentContractClient.CreateAgentContractAsync(new CreateAgentContractRequest(command.BrandId,
+                agentId,
+                brandContract.Id,
+                command.EditorUsername),
+            cancellationToken);
+
+        await repository.CreateAgentAsync(new AgentModel
         {
             AgentId = agentId,
             WalletId = walletId,
