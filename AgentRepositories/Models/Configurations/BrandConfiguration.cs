@@ -77,6 +77,9 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
             entity.Property(e => e.EnableEmailRegisterFlow)
             .HasDefaultValue(false)
             .HasColumnName("enable_email_register_flow");
+            entity.Property(e => e.EnablePlayerAgent)
+            .HasDefaultValue(false)
+            .HasColumnName("enable_player_agent");
             entity.Property(e => e.EnablePlayerIdentity)
             .HasDefaultValue(false)
             .HasColumnName("enable_player_identity");

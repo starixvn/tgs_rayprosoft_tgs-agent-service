@@ -294,6 +294,7 @@ public class AgentController : ControllerBase
             Phone = request.Phone,
             Type = request.Type,
             Remarks = request.Remarks,
+            NegativeAgentDividendCarryForward = request.NegativeAgentDividendCarryForward,
             EditorUsername = request.EditorUsername
         });
     }
@@ -307,6 +308,7 @@ public class AgentController : ControllerBase
         return getService.GetAsync(new AddAgentByPlayerUpgradeQuery
         {
             Username = request.Username,
+            PlayerWalletId = request.PlayerWalletId,
             BrandId = request.BrandId,
             PlayerCode = request.PlayerCode,
             LevelType = request.LevelType,
@@ -317,6 +319,7 @@ public class AgentController : ControllerBase
             Phone = request.Phone,
             Type = request.Type,
             Remarks = request.Remarks,
+            NegativeAgentDividendCarryForward = request.NegativeAgentDividendCarryForward,
             EditorUsername = request.EditorUsername
         });
     }
