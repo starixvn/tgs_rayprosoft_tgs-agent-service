@@ -17,9 +17,11 @@ using Tgs.Agent.Repositories.Entities;
 using Tgs.CashService;
 using Tgs.CashService.Client;
 using Tgs.Core.Infrastructures.Security;
+using Tgs.PlayerService.Client;
 using Tgs.SerialNumberGenerator;
 using AgentLevelType = Tgs.Agent.Client.Models.Enums.AgentLevelType;
 using AgentType = Tgs.Agent.Client.Models.Enums.AgentType;
+using EventAction = Tgs.Agent.Core.EventAction;
 
 namespace Tgs.Agent.IntegrationTest;
 
@@ -650,6 +652,7 @@ public class AgentTests
     public async Task Create_An_Agent_By_Player_Upgrade()
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
+        var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
         var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
         var fakeBrandContractClient = Substitute.For<IBrandContractClient>();
         var fakeAgentContractClient = Substitute.For<IAgentContractClient>();
@@ -658,7 +661,8 @@ public class AgentTests
             services.AddSingleton(fakeAgentRepository)
                 .AddSingleton(fakeCashServiceClient)
                 .AddSingleton(fakeBrandContractClient)
-                .AddSingleton(fakeAgentContractClient));
+                .AddSingleton(fakeAgentContractClient)
+                .AddSingleton(fakePlayerServiceClient));
 
         _ = fakeBrandContractClient.GetBrandContractAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(new BrandContract[]

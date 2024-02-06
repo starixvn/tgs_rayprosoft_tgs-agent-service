@@ -606,22 +606,4 @@ internal class AgentRepository : IAgentRepository
             .SaveChangesAsync(cancellationToken)
             .ConfigureAwait(false);
     }
-
-    public async Task CreateAgentPlayerRelationAsync(Guid brandId,
-        Guid agentId,
-        string playerCode,
-        CancellationToken cancellationToken = default)
-    {
-        _ = await _tgsContext.PlayerAgentRelations.AddAsync(new PlayerAgentRelation
-        {
-            BrandId = brandId,
-            AgentId = agentId,
-            PlayerCode = playerCode
-        },
-        cancellationToken);
-
-        _ = await _tgsContext
-            .SaveChangesAsync(cancellationToken)
-            .ConfigureAwait(false);
-    }
 }

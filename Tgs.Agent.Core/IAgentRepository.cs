@@ -96,6 +96,4 @@ public interface IAgentRepository
         CancellationToken cancellationToken = default);
 
     Task CreateAgentAsync(AgentModel agentModel, CancellationToken cancellationToken = default);
-
-    Task CreateAgentPlayerRelationAsync(Guid brandId, Guid agentId, string playerCode, CancellationToken cancellationToken = default);
 }
