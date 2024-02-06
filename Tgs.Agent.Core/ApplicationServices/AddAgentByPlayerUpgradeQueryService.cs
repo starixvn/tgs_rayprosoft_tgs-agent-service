@@ -14,8 +14,6 @@ internal class AddAgentByPlayerUpgradeQueryService(
 {
     public async ValueTask<Guid> GetAsync(AddAgentByPlayerUpgradeQuery command, CancellationToken cancellationToken = default)
     {
-        var (salt, pwd) = passwordHandler.GenerateCredential(hashProvider.Hash(command.PlayerCode));
-
         var agentId = Guid.NewGuid();
 
         logger.LogInformation("brand:{BrandId}, agent:{Agent}, currencyCode:{CurrencyCode}",
@@ -40,8 +38,8 @@ internal class AddAgentByPlayerUpgradeQueryService(
             BrandId = command.BrandId,
             LevelType = command.LevelType,
             ParentAgentId = command.ParentAgentId,
-            Password = pwd,
-            Salt = salt,
+            Password = command.Password,
+            Salt = command.Salt,
             RealName = command.RealName,
             Type = command.Type,
             Remarks = command.Remarks,

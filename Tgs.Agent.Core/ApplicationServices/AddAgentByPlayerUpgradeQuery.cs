@@ -4,6 +4,8 @@ public record AddAgentByPlayerUpgradeQuery
 {
     public string Username { get; init; } = default!;
     public string PlayerCode { get; init; } = default!;
+    public byte[] Password { get; init; } = default!;
+    public byte[] Salt { get; init; } = default!;
     public Guid BrandId { get; init; }
     public Guid PlayerWalletId { get; init; }
     public Guid? ParentAgentId { get; init; }

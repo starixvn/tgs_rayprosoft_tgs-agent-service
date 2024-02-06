@@ -308,6 +308,8 @@ public class AgentController : ControllerBase
         return getService.GetAsync(new AddAgentByPlayerUpgradeQuery
         {
             Username = request.Username,
+            Password = request.Password,
+            Salt = request.Salt,
             PlayerWalletId = request.PlayerWalletId,
             BrandId = request.BrandId,
             PlayerCode = request.PlayerCode,

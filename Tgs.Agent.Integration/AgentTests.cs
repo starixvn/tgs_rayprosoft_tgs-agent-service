@@ -645,4 +645,69 @@ public class AgentTests
         _ = fakeAgentRepository.Received(1).CreateAgentAsync(Arg.Is<AgentModel>(x => x.ParentAgentId == request.ParentAgentId), default);
         _ = fakeAgentRepository.ReceivedWithAnyArgs(1).CreateAgentAsync(null!, default);
     }
+
+    [Test]
+    public async Task Create_An_Agent_By_Player_Upgrade()
+    {
+        var fakeAgentRepository = Substitute.For<IAgentRepository>();
+        var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
+        var fakeBrandContractClient = Substitute.For<IBrandContractClient>();
+        var fakeAgentContractClient = Substitute.For<IAgentContractClient>();
+
+        await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
+            services.AddSingleton(fakeAgentRepository)
+                .AddSingleton(fakeCashServiceClient)
+                .AddSingleton(fakeBrandContractClient)
+                .AddSingleton(fakeAgentContractClient));
+
+        _ = fakeBrandContractClient.GetBrandContractAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(new BrandContract[]
+            {
+                new(Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    "name",
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    [ContractGameType.CardGame, ContractGameType.LiveDealer],
+                    Enumerable.Empty<BrandContractCondition>())
+            }.ToAsyncEnumerable());
+
+        _ = fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(), Arg.Any<string>(),
+            Arg.Any<string>(),
+            Arg.Is(CashType.Agent),
+            Arg.Any<CancellationToken>()).Returns(Guid.NewGuid());
+
+        var httpClient = web.CreateClient();
+
+        var sut = new AgentClient(httpClient);
+
+        var request = new CreateAgentByPlayerUpgradeRequest(Guid.NewGuid(),
+            Guid.NewGuid(),
+            [1,2,3],
+            [3,2,1],
+            "Username",
+            null,
+            "playerCode",
+            "CNY",
+            null,
+            null,
+            "test",
+            AgentLevelType.Agent,
+            AgentType.Cash,
+            null,
+            null,
+            true);
+
+        var agentId = await sut.CreateAgentByPlayerUpgradeAsync(request);
+
+        _ = await fakeAgentRepository.GetAgentByIdAsync(agentId);
+
+        Assert.NotNull(agentId);
+
+        _ = fakeAgentRepository.Received(1).CreateAgentAsync(Arg.Is<AgentModel>(x => x.ParentAgentId == request.ParentAgentId), default);
+        _ = fakeAgentRepository.ReceivedWithAnyArgs(1).CreateAgentAsync(null!, default);
+    }
 }
