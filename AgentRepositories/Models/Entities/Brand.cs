@@ -95,6 +95,8 @@ public partial class Brand
 
     public int? TimeSpanMinutes { get; set; }
 
+    public bool EnablePlayerAgent { get; set; }
+
     public virtual ICollection<Agent> Agents { get; set; } = new List<Agent>();
 
     public virtual ICollection<BrandAgentDividendCondition> BrandAgentDividendConditions { get; set; } = new List<BrandAgentDividendCondition>();

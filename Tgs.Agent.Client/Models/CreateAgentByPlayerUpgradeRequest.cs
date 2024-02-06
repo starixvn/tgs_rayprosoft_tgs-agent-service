@@ -4,6 +4,7 @@ namespace Tgs.Agent.Client.Models;
 
 public record CreateAgentByPlayerUpgradeRequest(
     Guid BrandId,
+    Guid PlayerWalletId,
     string Username,
     string? RealName,
     string PlayerCode,
@@ -14,4 +15,5 @@ public record CreateAgentByPlayerUpgradeRequest(
     AgentLevelType LevelType,
     AgentType Type,
     Guid? ParentAgentId,
-    string? Remarks);
+    string? Remarks,
+    bool NegativeAgentDividendCarryForward = true);

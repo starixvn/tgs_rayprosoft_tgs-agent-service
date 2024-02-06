@@ -594,7 +594,8 @@ internal class AgentRepository : IAgentRepository
             WithdrawSalt = Array.Empty<byte>(),
             RealName = agentModel.RealName,
             Email = agentModel.Email,
-            Phone = agentModel.Phone
+            Phone = agentModel.Phone,
+            NegativeAgentDividendCarryForward = agentModel.NegativeAgentDividendCarryForward
         };
 
         _ = await _tgsContext.Agents

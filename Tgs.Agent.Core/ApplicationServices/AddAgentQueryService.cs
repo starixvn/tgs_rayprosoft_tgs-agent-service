@@ -69,6 +69,7 @@ internal class AddAgentQueryService(
             Remarks = command.Remarks,
             Email = command.Email,
             Phone = command.Phone,
+            NegativeAgentDividendCarryForward = command.NegativeAgentDividendCarryForward,
             EditorUsername = command.EditorUsername
         }, cancellationToken).ConfigureAwait(false);
 

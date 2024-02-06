@@ -8,6 +8,7 @@ public class CreateAgentViewRequest
     public Guid? ParentAgentId { get; init; }
     public string Username { get; init; } = null!;
     public string CurrencyCode { get; init; } = null!;
+    public bool NegativeAgentDividendCarryForward { get; init; }
     public AgentLevelType LevelType { get; init; }
     public AgentType Type { get; init; }
     public string Password { get; init; } = null!;

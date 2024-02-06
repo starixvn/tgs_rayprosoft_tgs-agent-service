@@ -4,6 +4,7 @@ namespace Tgs.Agent.Service.ViewModels;
 
 public record CreateAgentByPlayerUpgradeViewRequest(
     Guid BrandId,
+    Guid PlayerWalletId,
     string Username,
     string? RealName,
     string PlayerCode,
@@ -13,5 +14,6 @@ public record CreateAgentByPlayerUpgradeViewRequest(
     string EditorUsername,
     AgentLevelType LevelType,
     AgentType Type,
+    bool NegativeAgentDividendCarryForward,
     Guid? ParentAgentId,
     string? Remarks);

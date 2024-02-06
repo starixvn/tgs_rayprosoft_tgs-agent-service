@@ -1,9 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Tgs.Agent.Core.Models;
-using Tgs.Agent.Dividend.Client;
-using Tgs.Agent.Dividend.Client.Models;
-using Tgs.CashService;
-using Tgs.CashService.Client;
 using Tgs.Core.Infrastructures.Security;
 using Tgs.ServiceUtility;
 
@@ -12,9 +8,6 @@ namespace Tgs.Agent.Core.ApplicationServices;
 internal class AddAgentByPlayerUpgradeQueryService(
     IAgentRepository repository,
     IPasswordHandler passwordHandler,
-    ICashServiceClient cashServiceClient,
-    IAgentContractClient agentContractClient,
-    IBrandContractClient brandContractClient,
     IHashProvider hashProvider,
     ILogger<AddAgentByPlayerUpgradeQueryService> logger)
     : IGetService<AddAgentByPlayerUpgradeQuery, Guid>
@@ -39,25 +32,10 @@ internal class AddAgentByPlayerUpgradeQueryService(
             return relationAgentId.Value;
         }
 
-        var walletId = await cashServiceClient.CreateNewCashAsync(
-            command.BrandId,
-            agentId.ToString(),
-            command.CurrencyCode,
-            CashType.Agent,
-            cancellationToken).ConfigureAwait(false);
-
-        var brandContractId = command.BrandContractId ??
-                              (await brandContractClient.GetBrandContractAsync(command.BrandId, cancellationToken)
-                                  .FirstAsync(cancellationToken))!.Id;
-
-        await agentContractClient.CreateAgentContractAsync (
-            new CreateAgentContractRequest(command.BrandId, agentId, brandContractId, command.EditorUsername),
-            cancellationToken);
-
         await repository.CreateAgentAsync(new AgentModel
         {
             AgentId = agentId,
-            WalletId = walletId,
+            WalletId = command.PlayerWalletId,
             Username = command.Username,
             BrandId = command.BrandId,
             LevelType = command.LevelType,
@@ -69,6 +47,7 @@ internal class AddAgentByPlayerUpgradeQueryService(
             Remarks = command.Remarks,
             Email = command.Email,
             Phone = command.Phone,
+            NegativeAgentDividendCarryForward = command.NegativeAgentDividendCarryForward,
             EditorUsername = command.EditorUsername
         }, cancellationToken).ConfigureAwait(false);
 

@@ -9,6 +9,7 @@ public class AgentModel
     public string Username { get; init; } = default!;
     public AgentLevelType LevelType { get; init; }
     public AgentType Type { get; init; }
+    public bool NegativeAgentDividendCarryForward { get; init; }
     public decimal CardGameRebatePercentage { get; init; }
     public decimal CommissionPercentage { get; init; }
     public decimal DividendPercentage { get; init; }

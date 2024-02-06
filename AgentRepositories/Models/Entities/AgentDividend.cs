@@ -86,4 +86,10 @@ public partial class AgentDividend
     public decimal DepositHandlingFee { get; set; }
 
     public decimal WithdrawHandlingFee { get; set; }
+
+    public int ActiveNumber { get; set; }
+
+    public decimal PlatformChargePercentage { get; set; }
+
+    public bool NegativeAgentDividendCarryForward { get; set; }
 }
