@@ -1,10 +1,13 @@
 ﻿using Tgs.Agent.Core;
+using Tgs.Agent.Core.Models.Enums;
 
 namespace Tgs.Agent.Service.ViewModels;
 
 public record CreateAgentByPlayerUpgradeViewRequest(
     Guid BrandId,
     Guid PlayerWalletId,
+    byte[] Password,
+    byte[] Salt,
     string Username,
     string? RealName,
     string PlayerCode,

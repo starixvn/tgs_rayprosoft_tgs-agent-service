@@ -159,16 +159,24 @@ internal class AgentRepository : IAgentRepository
         _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async ValueTask SetAgentInfoAsync(Guid agentId, string? realName, CancellationToken cancellationToken = default)
+    public async ValueTask SetAgentInfoAsync(UpdateAgentModel updateAgent,
+        CancellationToken cancellationToken = default)
     {
         var agent = await _tgsContext.Agents
-            .FindAsync(new object?[] { agentId }, cancellationToken: cancellationToken)
+            .FindAsync(new object?[] { updateAgent.AgentId }, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
         if (agent is null)
             return;
 
-        agent.RealName = realName;
+        agent.RealName = updateAgent.RealName;
+        agent.ParentAgentId = updateAgent.ParentAgentId;
+        agent.Status = (short)updateAgent.AgentStatus;
+        agent.LevelType = (short)updateAgent.AgentLevelType;
+        agent.AgentStatus = (short)updateAgent.AgentConfigStatus;
+        agent.Remarks = updateAgent.Remarks;
+        agent.NegativeAgentDividendCarryForward = updateAgent.NegativeAgentDividendCarryForward;
+        agent.UpdatedByUsername = updateAgent.EditorUsername;
         agent.UpdatedOn = DateTime.UtcNow;
 
         _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -601,24 +609,6 @@ internal class AgentRepository : IAgentRepository
         _ = await _tgsContext.Agents
             .AddAsync(agent, cancellationToken)
             .ConfigureAwait(false);
-
-        _ = await _tgsContext
-            .SaveChangesAsync(cancellationToken)
-            .ConfigureAwait(false);
-    }
-
-    public async Task CreateAgentPlayerRelationAsync(Guid brandId,
-        Guid agentId,
-        string playerCode,
-        CancellationToken cancellationToken = default)
-    {
-        _ = await _tgsContext.PlayerAgentRelations.AddAsync(new PlayerAgentRelation
-        {
-            BrandId = brandId,
-            AgentId = agentId,
-            PlayerCode = playerCode
-        },
-        cancellationToken);
 
         _ = await _tgsContext
             .SaveChangesAsync(cancellationToken)

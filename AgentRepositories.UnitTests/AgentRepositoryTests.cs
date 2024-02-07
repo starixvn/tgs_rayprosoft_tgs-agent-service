@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging.Abstractions;
 using Tgs.Agent.Core;
+using Tgs.Agent.Core.ApplicationServices;
+using Tgs.Agent.Core.Models;
 using Tgs.Agent.Core.Models.Enums;
 using Tgs.Agent.Repositories;
 using Tgs.Agent.Repositories.Entities;
@@ -183,6 +185,7 @@ public class AgentRepositoryTests
         var dbContext = new TgsContext(dbContextOptionsBuilder.Options);
 
         var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+        var parentAgentId = Guid.NewGuid();
         var realName = "realName";
 
         var agent = new Agent
@@ -204,12 +207,28 @@ public class AgentRepositoryTests
 
         var sut = new AgentRepository(dbContext, NullLogger<AgentRepository>.Instance);
 
-        await sut.SetAgentInfoAsync(agentId, realName);
+        var command = new UpdateAgentModel(
+            agentId,
+            parentAgentId,
+            AgentStatus.Enabled,
+            AgentLevelType.Agent,
+            AgentConfigStatus.WaitForConfigurePercentage,
+            true,
+            realName,
+            null,
+            "editor");
 
-        var actual = await dbContext.Agents.FirstOrDefaultAsync(x => x.Id == agentId);
+        await sut.SetAgentInfoAsync(command);
+
+        var actual = dbContext.Agents.First(x => x.Id == agentId);
 
         Assert.NotNull(actual);
-        Assert.AreEqual(actual!.RealName, realName);
+        Assert.AreEqual(actual.RealName, realName);
+        Assert.That(actual.Status, Is.EqualTo((short)AgentStatus.Enabled));
+        Assert.That(actual.LevelType, Is.EqualTo((short)AgentLevelType.Agent));
+        Assert.That(actual.AgentStatus, Is.EqualTo((short)AgentConfigStatus.WaitForConfigurePercentage));
+        Assert.That(actual.ParentAgentId, Is.EqualTo(parentAgentId));
+        Assert.That(actual.Remarks, Is.EqualTo(null));
     }
 
     [Test]

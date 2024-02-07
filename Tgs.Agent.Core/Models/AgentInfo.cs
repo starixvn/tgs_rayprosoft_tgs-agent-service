@@ -1,4 +1,6 @@
-﻿namespace Tgs.Agent.Core.Models;
+﻿using Tgs.Agent.Core.Models.Enums;
+
+namespace Tgs.Agent.Core.Models;
 public record AgentInfo(
     Guid Id,
     string Username,

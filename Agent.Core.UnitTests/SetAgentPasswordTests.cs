@@ -4,6 +4,8 @@ using NSubstitute;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.ApplicationServices;
 using Tgs.Agent.Core.Models;
+using Tgs.Agent.Core.Models.Enums;
+using Tgs.Agent.Core.Models.Enums;
 using Tgs.Core.Infrastructures.Security;
 using Tgs.SerialNumberGenerator;
 

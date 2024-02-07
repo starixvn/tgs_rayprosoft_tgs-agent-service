@@ -22,7 +22,7 @@ public interface IAgentRepository
 
     public ValueTask SetAgentDividendPercentageAsync(Guid agentId, decimal dividendPercentage, CancellationToken cancellationToken = default);
 
-    public ValueTask SetAgentInfoAsync(Guid agentId, string? realName, CancellationToken cancellationToken = default);
+    public ValueTask SetAgentInfoAsync(UpdateAgentModel updateAgent, CancellationToken cancellationToken = default);
 
     public ValueTask SetAgentContactAsync(Guid agentId, string? email, string? phone, CancellationToken cancellationToken = default);
 
@@ -96,6 +96,4 @@ public interface IAgentRepository
         CancellationToken cancellationToken = default);
 
     Task CreateAgentAsync(AgentModel agentModel, CancellationToken cancellationToken = default);
-
-    Task CreateAgentPlayerRelationAsync(Guid brandId, Guid agentId, string playerCode, CancellationToken cancellationToken = default);
 }
