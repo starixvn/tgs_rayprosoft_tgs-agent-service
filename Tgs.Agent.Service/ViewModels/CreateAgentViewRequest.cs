@@ -1,4 +1,5 @@
 ﻿using Tgs.Agent.Core;
+using Tgs.Agent.Core.Models.Enums;
 
 namespace Tgs.Agent.Service.ViewModels;
 

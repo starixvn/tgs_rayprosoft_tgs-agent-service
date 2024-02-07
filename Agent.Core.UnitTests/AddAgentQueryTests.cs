@@ -4,9 +4,6 @@ using NSubstitute;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.ApplicationServices;
 using Tgs.Agent.Core.Models;
-using Tgs.Agent.Dividend.Client;
-using Tgs.Agent.Dividend.Client.Enums;
-using Tgs.Agent.Dividend.Client.Models;
 using Tgs.CashService;
 using Tgs.CashService.Client;
 using Tgs.Core.Infrastructures.Security;
@@ -21,14 +18,10 @@ public class AddAgentQueryTests
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
         var fakePasswordHandler = Substitute.For<IPasswordHandler>();
         var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
-        var fakeAgentContractClient = Substitute.For<IAgentContractClient>();
-        var fakeBrandContractClient = Substitute.For<IBrandContractClient>();
 
         var sut = new AddAgentQueryService(fakeAgentRepository,
             fakePasswordHandler,
             fakeCashServiceClient,
-            fakeAgentContractClient,
-            fakeBrandContractClient,
             NullLogger<AddAgentQueryService>.Instance);
 
         var password = "password";
@@ -40,21 +33,6 @@ public class AddAgentQueryTests
         _ = fakePasswordHandler
             .GenerateCredential(password)
             .Returns((salt, pwd));
-
-        _ = fakeBrandContractClient.GetBrandContractAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(new BrandContract[]
-            {
-                new(Guid.NewGuid(),
-                    Guid.NewGuid(),
-                    "name",
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    [ContractGameType.CardGame, ContractGameType.LiveDealer],
-                    Enumerable.Empty<BrandContractCondition>())
-            }.ToAsyncEnumerable());
 
         var query = new AddAgentQuery()
         {

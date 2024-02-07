@@ -10,17 +10,13 @@ using Tgs.Agent.Client;
 using Tgs.Agent.Client.Models;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
-using Tgs.Agent.Dividend.Client;
-using Tgs.Agent.Dividend.Client.Enums;
-using Tgs.Agent.Dividend.Client.Models;
+using Tgs.Agent.Core.Models.Enums;
 using Tgs.Agent.Repositories.Entities;
 using Tgs.CashService;
 using Tgs.CashService.Client;
 using Tgs.Core.Infrastructures.Security;
 using Tgs.PlayerService.Client;
 using Tgs.SerialNumberGenerator;
-using AgentLevelType = Tgs.Agent.Client.Models.Enums.AgentLevelType;
-using AgentType = Tgs.Agent.Client.Models.Enums.AgentType;
 using EventAction = Tgs.Agent.Core.EventAction;
 
 namespace Tgs.Agent.IntegrationTest;
@@ -53,9 +49,9 @@ public class AgentTests
                 InvitationCode: "wg5g8h",
                 ParentAgentId: Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31"),
                 RegisteredOn: DateTimeOffset.UtcNow,
-                Status: Core.AgentStatus.Enabled,
-                Type: Core.AgentType.Cash,
-                AgentLevelType: Core.AgentLevelType.Chief,
+                Status: AgentStatus.Enabled,
+                Type: Core.Models.Enums.AgentType.Cash,
+                AgentLevelType: Core.Models.Enums.AgentLevelType.Chief,
                 DividendPercentage: 80M,
                 PlayerNumber: 0,
                 AccumulatedProfitSharing: 0M,
@@ -143,8 +139,18 @@ public class AgentTests
         var sut = new AgentClient(httpClient);
 
         var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+        var parentAgentId = Guid.NewGuid();
 
-        await sut.SetAgentInfoAsync(new(agentId, "realName"));
+        await sut.SetAgentInfoAsync(new(
+            agentId,
+            parentAgentId,
+            Client.Models.Enums.AgentStatus.Enabled,
+            Client.Models.Enums.AgentLevelType.Agent,
+            Client.Models.Enums.AgentConfigStatus.WaitForConfigurePercentage,
+            true,
+            "",
+            null,
+            "editor"));
     }
 
     [Test]
@@ -223,9 +229,9 @@ public class AgentTests
             "inviteCode",
             null,
             DateTimeOffset.UtcNow.AddMonths(-1),
-            Core.AgentStatus.Enabled,
-            Core.AgentType.Cash,
-            Core.AgentLevelType.Chief,
+            AgentStatus.Enabled,
+            Core.Models.Enums.AgentType.Cash,
+            Core.Models.Enums.AgentLevelType.Chief,
             0m,
             0,
             0m,
@@ -291,9 +297,9 @@ public class AgentTests
             "inviteCode",
             null,
             DateTimeOffset.UtcNow.AddMonths(-1),
-            Core.AgentStatus.Enabled,
-            Core.AgentType.Cash,
-            Core.AgentLevelType.Chief,
+            AgentStatus.Enabled,
+            Core.Models.Enums.AgentType.Cash,
+            Core.Models.Enums.AgentLevelType.Chief,
             0m,
             0,
             0m,
@@ -581,29 +587,10 @@ public class AgentTests
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
         var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
-        var fakeBrandContractClient = Substitute.For<IBrandContractClient>();
-        var fakeAgentContractClient = Substitute.For<IAgentContractClient>();
 
         await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
             services.AddSingleton(fakeAgentRepository)
-                .AddSingleton(fakeCashServiceClient)
-                .AddSingleton(fakeBrandContractClient)
-                .AddSingleton(fakeAgentContractClient));
-
-        _ = fakeBrandContractClient.GetBrandContractAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(new BrandContract[]
-            {
-                new(Guid.NewGuid(),
-                    Guid.NewGuid(),
-                    "name",
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    [ContractGameType.CardGame, ContractGameType.LiveDealer],
-                    Enumerable.Empty<BrandContractCondition>())
-            }.ToAsyncEnumerable());
+                .AddSingleton(fakeCashServiceClient));
 
         _ = fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(), Arg.Any<string>(),
             Arg.Any<string>(),
@@ -619,7 +606,7 @@ public class AgentTests
             Username = "username",
             BrandId = Guid.NewGuid(),
             CurrencyCode = "CNY",
-            LevelType = AgentLevelType.Agent,
+            LevelType = Client.Models.Enums.AgentLevelType.Agent,
             CardGameRebatePercentage = 0,
             CommissionPercentage = 0,
             DividendPercentage = 0,
@@ -633,7 +620,7 @@ public class AgentTests
             RealName = "RealName",
             Email = "email",
             Phone = "phone",
-            Type = AgentType.Cash,
+            Type = Client.Models.Enums.AgentType.Cash,
             Remarks = "remarks",
             EditorUsername = "EditorUsername"
         };
@@ -654,30 +641,11 @@ public class AgentTests
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
         var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
         var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
-        var fakeBrandContractClient = Substitute.For<IBrandContractClient>();
-        var fakeAgentContractClient = Substitute.For<IAgentContractClient>();
 
         await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
             services.AddSingleton(fakeAgentRepository)
                 .AddSingleton(fakeCashServiceClient)
-                .AddSingleton(fakeBrandContractClient)
-                .AddSingleton(fakeAgentContractClient)
                 .AddSingleton(fakePlayerServiceClient));
-
-        _ = fakeBrandContractClient.GetBrandContractAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(new BrandContract[]
-            {
-                new(Guid.NewGuid(),
-                    Guid.NewGuid(),
-                    "name",
-                    1,
-                    1,
-                    1,
-                    1,
-                    1,
-                    [ContractGameType.CardGame, ContractGameType.LiveDealer],
-                    Enumerable.Empty<BrandContractCondition>())
-            }.ToAsyncEnumerable());
 
         _ = fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(), Arg.Any<string>(),
             Arg.Any<string>(),
@@ -699,8 +667,8 @@ public class AgentTests
             null,
             null,
             "test",
-            AgentLevelType.Agent,
-            AgentType.Cash,
+            Client.Models.Enums.AgentLevelType.Agent,
+            Client.Models.Enums.AgentType.Cash,
             null,
             null,
             true);

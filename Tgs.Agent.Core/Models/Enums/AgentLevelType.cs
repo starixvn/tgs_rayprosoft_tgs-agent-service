@@ -1,4 +1,4 @@
-﻿namespace Tgs.Agent.Core;
+﻿namespace Tgs.Agent.Core.Models.Enums;
 
 public enum AgentLevelType
 {

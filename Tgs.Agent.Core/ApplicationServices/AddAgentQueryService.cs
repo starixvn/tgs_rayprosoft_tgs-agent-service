@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Tgs.Agent.Core.Models;
-using Tgs.Agent.Dividend.Client;
-using Tgs.Agent.Dividend.Client.Models;
 using Tgs.CashService;
 using Tgs.CashService.Client;
 using Tgs.Core.Infrastructures.Security;
@@ -13,8 +11,6 @@ internal class AddAgentQueryService(
     IAgentRepository repository,
     IPasswordHandler passwordHandler,
     ICashServiceClient cashServiceClient,
-    IAgentContractClient agentContractClient,
-    IBrandContractClient brandContractClient,
     ILogger<AddAgentQueryService> logger)
     : IGetService<AddAgentQuery, Guid>
 {
@@ -29,22 +25,12 @@ internal class AddAgentQueryService(
             agentId,
             command.CurrencyCode);
 
-        var brandContract = await brandContractClient.GetBrandContractAsync(command.BrandId, cancellationToken)
-                                .FirstOrDefaultAsync(cancellationToken) ??
-                            throw new Exception("Can't found brand contract");
-
         var walletId = await cashServiceClient.CreateNewCashAsync(
             command.BrandId,
             agentId.ToString(),
             command.CurrencyCode,
             CashType.Agent,
             cancellationToken).ConfigureAwait(false);
-
-        await agentContractClient.CreateAgentContractAsync(new CreateAgentContractRequest(command.BrandId,
-                agentId,
-                brandContract.Id,
-                command.EditorUsername),
-            cancellationToken);
 
         await repository.CreateAgentAsync(new AgentModel
         {

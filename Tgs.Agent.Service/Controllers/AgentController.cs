@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.ApplicationServices;
 using Tgs.Agent.Core.Models;
+using Tgs.Agent.Core.Models.Enums;
 using Tgs.Agent.Service.ViewModels;
 using Tgs.ServiceUtility;
 using Tgs.WebApi.Toolkits;
@@ -113,7 +114,14 @@ public class AgentController : ControllerBase
         => commandService.ExecuteAsync(
         new SetAgentInfoCommand(
                     agentId,
-                    request.RealName),
+                    request.ParentAgentId,
+                    request.AgentStatus,
+                    request.AgentLevelType,
+                    request.AgentConfigStatus,
+                    request.NegativeAgentDividendCarryForward,
+                    request.RealName,
+                    request.Remarks,
+                    request.EditorUsername),
             HttpContext.RequestAborted);
 
     [HttpPatch("{agentId}:contact", Name = "SetAgentContact")]
