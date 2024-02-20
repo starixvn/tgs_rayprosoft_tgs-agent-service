@@ -682,4 +682,58 @@ public class AgentTests
         _ = fakeAgentRepository.Received(1).CreateAgentAsync(Arg.Is<AgentModel>(x => x.ParentAgentId == request.ParentAgentId), default);
         _ = fakeAgentRepository.ReceivedWithAnyArgs(1).CreateAgentAsync(null!, default);
     }
+
+    [Test]
+    public async Task Set_Agent_NegativeAgentDividendCarryForward()
+    {
+        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+        var fakeSystemClock = Substitute.For<ISystemClock>();
+        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
+            => services
+                .AddSingleton(fakeSerialNumberGenerator)
+                .AddSingleton(fakeSystemClock));
+
+        var httpClient = web.CreateClient();
+
+        var sut = new AgentClient(httpClient);
+
+        var brandId = Guid.NewGuid();
+        var eventId = Guid.NewGuid();
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+        var negativeAgentDividendCarryForward = true;
+        var modifyUserId = "50ce61eb-8c9d-4f84-3cf6-08d9262ce1a5";
+        var now = DateTimeOffset.UtcNow;
+
+        var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+        var agent = new Repositories.Entities.Agent
+        {
+            Id = agentId,
+            Status = (short)AgentStatus.Enabled,
+            BrandId = brandId,
+            Password = Array.Empty<byte>(),
+            Salt = Array.Empty<byte>(),
+            Username = "agentUsername",
+            RealName = "agentRealName",
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>(),
+            InvitationCode = "hgq0m0",
+            RegisteredOn = DateTime.UtcNow.AddMonths(-1),
+            NegativeAgentDividendCarryForward = false
+        };
+
+        _ = await dbContext.Agents.AddAsync(agent);
+
+        _ = await dbContext.SaveChangesAsync();
+
+        _ = fakeSerialNumberGenerator
+            .GenerateAsync(Arg.Any<CancellationToken>())
+            .Returns(eventId);
+
+        _ = fakeSystemClock.UtcNow.Returns(now);
+
+        await sut.SetAgentNegativeAgentDividendCarryForwardAsync(agentId, negativeAgentDividendCarryForward, modifyUserId);
+
+        Assert.AreEqual(true, agent.NegativeAgentDividendCarryForward);
+    }
 }

@@ -333,4 +333,17 @@ public class AgentController : ControllerBase
             EditorUsername = request.EditorUsername
         });
     }
+
+    [HttpPut("negative-agent-dividend-carry-forward/{agentId}", Name = "SetNegativeAgentDividendCarryForward")]
+    [SuccessStatusCode(200, "NegativeAgentDividendCarryForward set")]
+    public ValueTask SetAgentNegativeAgentDividendCarryForwardAsync(
+        [FromServices] ICommandService<SetAgentNegativeAgentDividendCarryForwardCommand> setService,
+        [FromHeader(Name = "ModifyUserId")] string? modifyUserId,
+        Guid agentId,
+        [FromBody] bool negativeAgentDividendCarryForward)
+    {
+        var command = new SetAgentNegativeAgentDividendCarryForwardCommand(agentId, negativeAgentDividendCarryForward, modifyUserId);
+
+        return setService.ExecuteAsync(command, HttpContext.RequestAborted);
+    }
 }

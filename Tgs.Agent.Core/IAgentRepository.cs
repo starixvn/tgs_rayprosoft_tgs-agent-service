@@ -91,6 +91,11 @@ public interface IAgentRepository
         DateTime updatedOn,
         CancellationToken cancellationToken = default);
 
+    ValueTask UpdateAgentNegativeAgentDividendCarryForwardAsync(
+        Guid agentId,
+        bool negativeAgentDividendCarryForward,
+        CancellationToken cancellationToken = default);
+
     ValueTask<Guid?> CheckAgentPlayerRelationExistsAsync(
         string playerCode,
         CancellationToken cancellationToken = default);
