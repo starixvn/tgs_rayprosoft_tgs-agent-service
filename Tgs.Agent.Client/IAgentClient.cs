@@ -66,4 +66,10 @@ public interface IAgentClient
     ValueTask<Guid> CreateAgentByPlayerUpgradeAsync(
         CreateAgentByPlayerUpgradeRequest request,
         CancellationToken cancellationToken = default);
+
+    ValueTask SetAgentNegativeAgentDividendCarryForwardAsync(
+        Guid agentId,
+        bool negativeAgentDividendCarryForward,
+        string? modifyUserId = null,
+        CancellationToken cancellationToken = default);
 }

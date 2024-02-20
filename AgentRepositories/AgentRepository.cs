@@ -538,6 +538,17 @@ internal class AgentRepository : IAgentRepository
         _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    public async ValueTask UpdateAgentNegativeAgentDividendCarryForwardAsync(Guid agentId,
+        bool negativeAgentDividendCarryForward,
+        CancellationToken cancellationToken = default)
+    {
+        var agent = await _tgsContext.Agents.FirstAsync(x => x.Id == agentId, cancellationToken).ConfigureAwait(false);
+
+        agent.NegativeAgentDividendCarryForward = negativeAgentDividendCarryForward;
+
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
     public async ValueTask<Guid?> CheckAgentPlayerRelationExistsAsync(string playerCode,
         CancellationToken cancellationToken = default)
     {

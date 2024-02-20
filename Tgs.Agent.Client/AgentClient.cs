@@ -360,4 +360,24 @@ public class AgentClient : IAgentClient
 
         return JsonSerializer.Deserialize<Guid>(contentJson, _JsonSerializerOptions);
     }
+
+    public async ValueTask SetAgentNegativeAgentDividendCarryForwardAsync(Guid agentId,
+        bool negativeAgentDividendCarryForward,
+        string? modifyUserId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var requestContent = new StringContent(
+            JsonSerializer.Serialize(negativeAgentDividendCarryForward, _JsonSerializerOptions),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
+
+        if (!string.IsNullOrWhiteSpace(modifyUserId))
+            requestContent.Headers.Add("ModifyUserId", modifyUserId);
+
+        var response = await _client
+            .PutAsync($"/api/agent/negative-agent-dividend-carry-forward/{agentId}", requestContent, cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
 }
