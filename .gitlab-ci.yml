@@ -22,15 +22,7 @@ stages:
   - deploy-prod
 
 build-code:
-  stage: build
-  script:
-    - dotnet build -c $BuildConfiguration
-  only:
-    - merge_requests
-    - main
-  cache:
-    key: $BuildCacheKey
-    untracked: true
+  extends: .build-code-template
 
 unit-test:
   stage: test
