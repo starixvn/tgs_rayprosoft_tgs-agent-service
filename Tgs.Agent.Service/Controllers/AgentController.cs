@@ -114,14 +114,7 @@ public class AgentController : ControllerBase
         => commandService.ExecuteAsync(
         new SetAgentInfoCommand(
                     agentId,
-                    request.ParentAgentId,
-                    request.AgentStatus,
-                    request.AgentLevelType,
-                    request.AgentConfigStatus,
-                    request.NegativeAgentDividendCarryForward,
-                    request.RealName,
-                    request.Remarks,
-                    request.EditorUsername),
+                    request.RealName),
             HttpContext.RequestAborted);
 
     [HttpPatch("{agentId}:contact", Name = "SetAgentContact")]
@@ -346,4 +339,34 @@ public class AgentController : ControllerBase
 
         return setService.ExecuteAsync(command, HttpContext.RequestAborted);
     }
+
+    [HttpPatch("{agentId}/one-layer", Name = "SetOneLayer")]
+    public ValueTask UpdateOneLayerAgentInfoAsync(
+        [FromServices] ICommandService<SetOneLayerAgentInfoCommand> commandService,
+        [FromBody] UpdateOneLayerAgentInfoViewModel request,
+        Guid agentId)
+        => commandService.ExecuteAsync(
+            new SetOneLayerAgentInfoCommand(
+                agentId,
+                request.ParentAgentId,
+                request.DividendPercentage,
+                request.Type,
+                request.NegativeAgentDividendCarryForward,
+                request.EditorUsername),
+            HttpContext.RequestAborted);
+
+    [HttpPatch("{agentId}/multiple-layer", Name = "SetMultipleLayer")]
+    public ValueTask UpdateMultipleLayerAgentInfoAsync(
+        [FromServices] ICommandService<SetMultipleLayerAgentInfoCommand> commandService,
+        [FromBody] UpdateMultipleLayerAgentInfoViewModel request,
+        Guid agentId)
+        => commandService.ExecuteAsync(
+            new SetMultipleLayerAgentInfoCommand(
+                agentId,
+                request.ParentAgentId,
+                request.Type,
+                request.NegativeAgentDividendCarryForward,
+                request.AgentDividendConditions,
+                request.EditorUsername),
+            HttpContext.RequestAborted);
 }

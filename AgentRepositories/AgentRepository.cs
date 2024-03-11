@@ -159,24 +159,16 @@ internal class AgentRepository : IAgentRepository
         _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async ValueTask SetAgentInfoAsync(UpdateAgentModel updateAgent,
-        CancellationToken cancellationToken = default)
+    public async ValueTask SetAgentInfoAsync(Guid agentId, string? realName, CancellationToken cancellationToken = default)
     {
         var agent = await _tgsContext.Agents
-            .FindAsync(new object?[] { updateAgent.AgentId }, cancellationToken: cancellationToken)
+            .FindAsync(new object?[] { agentId }, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
         if (agent is null)
             return;
 
-        agent.RealName = updateAgent.RealName;
-        agent.ParentAgentId = updateAgent.ParentAgentId;
-        agent.Status = (short)updateAgent.AgentStatus;
-        agent.LevelType = (short)updateAgent.AgentLevelType;
-        agent.AgentStatus = (short)updateAgent.AgentConfigStatus;
-        agent.Remarks = updateAgent.Remarks;
-        agent.NegativeAgentDividendCarryForward = updateAgent.NegativeAgentDividendCarryForward;
-        agent.UpdatedByUsername = updateAgent.EditorUsername;
+        agent.RealName = realName;
         agent.UpdatedOn = DateTime.UtcNow;
 
         _ = await _tgsContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -220,8 +212,16 @@ internal class AgentRepository : IAgentRepository
         CancellationToken cancellationToken = default)
     {
         var commissions = _tgsContext.AgentDividends
-            .Where(x => x.AgentId == agentId && x.SentOn == null)
+            .Where(x => x.AgentId == agentId &&
+                        x.SentOn == null &&
+                        x.ReferencedAgentDividendId == null &&
+                        x.BeforeDividendAmount == null)
             .ToAsyncEnumerable();
+
+        var total = await commissions.SumAsync(x => x.AgentDividendAmount, cancellationToken);
+
+        if(total >= 0)
+            return;
 
         await _tgsContext.AddRangeAsync(
                 commissions.Select(x => new AgentClearCommissionRecord
@@ -453,10 +453,7 @@ internal class AgentRepository : IAgentRepository
         return new AgentPathInfo(agent.Id, agent.NLevel, agent.Path.ToString());
     }
 
-    public async ValueTask UpdateSubAgentsPathAsync(
-        Guid agentId,
-        int agentNLevel,
-        string agentPath,
+    public async ValueTask UpdateSubAgentsPathAsync(AgentPathInfo agentPathInfo,
         string newParentAgentPath,
         CancellationToken cancellationToken = default)
     {
@@ -467,9 +464,9 @@ internal class AgentRepository : IAgentRepository
 
         var parameters = new Dictionary<string, object>
         {
-            { "@agentId", agentId },
-            { "@agentNlevel", agentNLevel },
-            { "@agentPah", agentPath },
+            { "@agentId", agentPathInfo.AgentId },
+            { "@agentNlevel", agentPathInfo.NLevel },
+            { "@agentPah", agentPathInfo.Path },
             { "@newAgentPath", newParentAgentPath }
         };
 
@@ -623,6 +620,65 @@ internal class AgentRepository : IAgentRepository
 
         _ = await _tgsContext
             .SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async Task UpdateAgentInfoAsync(Guid agentId,
+        LTree newAgentPath,
+        Guid? agentParentAgentId,
+        AgentLevelType agentLevelType,
+        AgentType agentType,
+        AgentConfigStatus agentStatus,
+        decimal agentDividendPercentage,
+        bool negativeAgentDividendCarryForward,
+        CancellationToken cancellationToken = default)
+    {
+        _ = await _tgsContext.Agents.Where(x => x.Id == agentId)
+            .ExecuteUpdateAsync(x => x.SetProperty(s => s.Path, newAgentPath)
+                    .SetProperty(s => s.ParentAgentId, agentParentAgentId)
+                    .SetProperty(s => s.LevelType, (short)agentLevelType)
+                    .SetProperty(s => s.Type, (short)agentType)
+                    .SetProperty(s => s.AgentStatus, (short)agentStatus)
+                    .SetProperty(s => s.DividendPercentage, agentDividendPercentage)
+                    .SetProperty(s => s.NegativeAgentDividendCarryForward, negativeAgentDividendCarryForward),
+                cancellationToken);
+
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async Task ResetSubAgentDividendPercentageAsync(Guid[] agentIds,
+        CancellationToken cancellationToken = default)
+    {
+        _ = await _tgsContext.Agents.Where(x => agentIds.Contains(x.Id))
+            .ExecuteUpdateAsync(x =>
+                x.SetProperty(s => s.DividendPercentage, 0M)
+                    .SetProperty(s => s.AgentStatus, (short)AgentConfigStatus.WaitForConfigurePercentage),
+                cancellationToken);
+
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async Task UpdateAgentMultipleLayerConditionsAsync(Guid agentId,
+        AgentDividendConditionModel[] agentDividendConditions,
+        CancellationToken cancellationToken = default)
+    {
+        _ = await _tgsContext.AgentDividendConditions.Where(x => x.AgentId == agentId)
+            .ExecuteDeleteAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        await _tgsContext.AgentDividendConditions.AddRangeAsync(agentDividendConditions.Select(x => new AgentDividendCondition
+            {
+                Rank = x.Rank,
+                NetProfit = x.NetProfit,
+                ActiveNumber = x.ActiveNumber,
+                DividendPercentage = x.DividendPercentage
+            }),
+            cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken)
             .ConfigureAwait(false);
     }
 }

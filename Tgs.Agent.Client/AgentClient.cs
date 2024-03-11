@@ -380,4 +380,30 @@ public class AgentClient : IAgentClient
 
         _ = response.EnsureSuccessStatusCode();
     }
+
+    public async ValueTask SetOneLayerAgentInfoAsync(SetOneLayerAgentInfoRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .PatchAsJsonAsync($"/api/agent/{request.AgentId}/one-layer",
+                request,
+                _JsonSerializerOptions,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
+
+    public async ValueTask SetMultipleLayerAgentInfoAsync(SetMultipleLayerAgentInfoRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .PatchAsJsonAsync($"/api/agent/{request.AgentId}/multiple-layer",
+                request,
+                _JsonSerializerOptions,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
 }

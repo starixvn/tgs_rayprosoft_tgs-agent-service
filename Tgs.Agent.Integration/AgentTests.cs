@@ -17,6 +17,9 @@ using Tgs.CashService.Client;
 using Tgs.Core.Infrastructures.Security;
 using Tgs.PlayerService.Client;
 using Tgs.SerialNumberGenerator;
+using AgentDividendConditionModel = Tgs.Agent.Client.Models.AgentDividendConditionModel;
+using AgentType = Tgs.Agent.Client.Models.Enums.AgentType;
+using ChildAgentInfoModel = Tgs.Agent.Client.Models.ChildAgentInfoModel;
 using EventAction = Tgs.Agent.Core.EventAction;
 
 namespace Tgs.Agent.IntegrationTest;
@@ -139,18 +142,10 @@ public class AgentTests
         var sut = new AgentClient(httpClient);
 
         var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
-        var parentAgentId = Guid.NewGuid();
 
         await sut.SetAgentInfoAsync(new(
             agentId,
-            parentAgentId,
-            Client.Models.Enums.AgentStatus.Enabled,
-            Client.Models.Enums.AgentLevelType.Agent,
-            Client.Models.Enums.AgentConfigStatus.WaitForConfigurePercentage,
-            true,
-            "",
-            null,
-            "editor"));
+            ""));
     }
 
     [Test]
@@ -579,7 +574,9 @@ public class AgentTests
 
         _ = fakeAgentRepository
             .Received(1)
-            .UpdateSubAgentsPathAsync(Arg.Is(agentId), Arg.Is(agentNLevel), Arg.Is(agentPath), Arg.Is(newParentPath), Arg.Any<CancellationToken>());
+            .UpdateSubAgentsPathAsync(Arg.Is(new AgentPathInfo(agentId, agentNLevel, agentPath)),
+                Arg.Is(newParentPath),
+                Arg.Any<CancellationToken>());
     }
 
     [Test]
@@ -735,5 +732,212 @@ public class AgentTests
         await sut.SetAgentNegativeAgentDividendCarryForwardAsync(agentId, negativeAgentDividendCarryForward, modifyUserId);
 
         Assert.AreEqual(true, agent.NegativeAgentDividendCarryForward);
+    }
+
+    [Test]
+    public async Task Set_Agent_One_Layer_Info()
+    {
+        var fakeAgentRepository = Substitute.For<IAgentRepository>();
+        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
+            => services.AddSingleton(fakeAgentRepository));
+
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+        var oldParentAgentId = Guid.NewGuid();
+        var newParentAgentId = Guid.Parse("7480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+        var brandId = Guid.NewGuid();
+
+        var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+        var agent = new Repositories.Entities.Agent
+        {
+            Id = agentId,
+            Status = (short)AgentStatus.Enabled,
+            BrandId = brandId,
+            Password = Array.Empty<byte>(),
+            Salt = Array.Empty<byte>(),
+            Username = "agentUsername",
+            RealName = "agentRealName",
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>(),
+            InvitationCode = "hgq0m0",
+            RegisteredOn = DateTime.UtcNow.AddMonths(-1),
+            NegativeAgentDividendCarryForward = false,
+            ParentAgentId = oldParentAgentId,
+            DividendPercentage = 5 
+        };
+
+        _ = await dbContext.Agents.AddAsync(agent);
+
+        _ = await dbContext.SaveChangesAsync();
+
+        _ = fakeAgentRepository.GetAgentByIdAsync(Arg.Is(agentId), Arg.Any<CancellationToken>())
+            .Returns(new AgentInfo(Id: agentId,
+                Username: "agentUsername",
+                null,
+                null,
+                null,
+                null,
+                null,
+                "inviteCode",
+                oldParentAgentId,
+                DateTimeOffset.UtcNow.AddMonths(-1),
+                AgentStatus.Enabled,
+                Core.Models.Enums.AgentType.Cash,
+                Core.Models.Enums.AgentLevelType.Chief,
+                5m,
+                0,
+                0m,
+                brandId,
+                Guid.NewGuid(),
+                null,
+                false));
+
+        _ = fakeAgentRepository.GetAgentPathInfoAsync(Arg.Is(agentId), Arg.Any<CancellationToken>())
+            .Returns(new AgentPathInfo(agentId, 1, agentId.ToString("N")));
+
+        _ = fakeAgentRepository.GetAgentPathInfoAsync(Arg.Is(newParentAgentId), Arg.Any<CancellationToken>())
+            .Returns(new AgentPathInfo(newParentAgentId, 1, newParentAgentId.ToString("N")));
+
+        _ = fakeAgentRepository.GetChildAgentInfosAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(new Core.Models.ChildAgentInfoModel[]
+            {
+                new Core.Models.ChildAgentInfoModel { AgentId = Guid.NewGuid() }
+            }.ToAsyncEnumerable());
+
+        var httpClient = web.CreateClient();
+
+        var sut = new AgentClient(httpClient);
+
+        await sut.SetOneLayerAgentInfoAsync(new SetOneLayerAgentInfoRequest(
+            agentId,
+            newParentAgentId,
+            10,
+            AgentType.Cash,
+            true,
+            ""));
+
+        await fakeAgentRepository.Received(1)
+            .UpdateAgentInfoAsync(agentId,
+                new LTree($"{newParentAgentId:N}.{agentId:N}"),
+                newParentAgentId,
+                AgentLevelType.Agent,
+                Core.Models.Enums.AgentType.Cash,
+                AgentConfigStatus.WaitForConfigurePercentage,
+                10,
+                true,
+                Arg.Any<CancellationToken>());
+
+        await fakeAgentRepository.ReceivedWithAnyArgs(1)
+            .ResetSubAgentDividendPercentageAsync(null!, default);
+
+        await fakeAgentRepository.ReceivedWithAnyArgs(1)
+            .UpdateSubAgentsPathAsync(null!, null!, default);
+    }
+
+    [Test]
+    public async Task Set_Agent_Multiple_Layer_Info()
+    {
+        var fakeAgentRepository = Substitute.For<IAgentRepository>();
+        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
+            => services.AddSingleton(fakeAgentRepository));
+
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+        var oldParentAgentId = Guid.NewGuid();
+        var newParentAgentId = Guid.Parse("7480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+        var brandId = Guid.NewGuid();
+
+        var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+        var agent = new Repositories.Entities.Agent
+        {
+            Id = agentId,
+            Status = (short)AgentStatus.Enabled,
+            BrandId = brandId,
+            Password = Array.Empty<byte>(),
+            Salt = Array.Empty<byte>(),
+            Username = "agentUsername",
+            RealName = "agentRealName",
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>(),
+            InvitationCode = "hgq0m0",
+            RegisteredOn = DateTime.UtcNow.AddMonths(-1),
+            NegativeAgentDividendCarryForward = false,
+            ParentAgentId = oldParentAgentId,
+            DividendPercentage = 5
+        };
+
+        _ = await dbContext.Agents.AddAsync(agent);
+
+        _ = await dbContext.SaveChangesAsync();
+
+        _ = fakeAgentRepository.GetAgentByIdAsync(Arg.Is(agentId), Arg.Any<CancellationToken>())
+            .Returns(new AgentInfo(Id: agentId,
+                Username: "agentUsername",
+                null,
+                null,
+                null,
+                null,
+                null,
+                "inviteCode",
+                oldParentAgentId,
+                DateTimeOffset.UtcNow.AddMonths(-1),
+                AgentStatus.Enabled,
+                Core.Models.Enums.AgentType.Cash,
+                Core.Models.Enums.AgentLevelType.Chief,
+                5m,
+                0,
+                0m,
+                brandId,
+                Guid.NewGuid(),
+                null,
+                false));
+
+        _ = fakeAgentRepository.GetAgentPathInfoAsync(Arg.Is(agentId), Arg.Any<CancellationToken>())
+            .Returns(new AgentPathInfo(agentId, 1, agentId.ToString("N")));
+
+        _ = fakeAgentRepository.GetAgentPathInfoAsync(Arg.Is(newParentAgentId), Arg.Any<CancellationToken>())
+            .Returns(new AgentPathInfo(newParentAgentId, 1, newParentAgentId.ToString("N")));
+
+        _ = fakeAgentRepository.GetChildAgentInfosAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(new Core.Models.ChildAgentInfoModel[]
+            {
+                new Core.Models.ChildAgentInfoModel { AgentId = Guid.NewGuid() }
+            }.ToAsyncEnumerable());
+
+        var httpClient = web.CreateClient();
+
+        var sut = new AgentClient(httpClient);
+
+        await sut.SetMultipleLayerAgentInfoAsync(new SetMultipleLayerAgentInfoRequest(
+            agentId,
+            newParentAgentId,
+            10,
+            AgentType.Cash,
+            true,
+            new AgentDividendConditionModel[]
+            {
+                new AgentDividendConditionModel(1,1,1,1)
+            },
+            ""));
+
+        await fakeAgentRepository.Received(1)
+            .UpdateAgentInfoAsync(agentId,
+                new LTree($"{newParentAgentId:N}.{agentId:N}"),
+                newParentAgentId,
+                AgentLevelType.Agent,
+                Core.Models.Enums.AgentType.Cash,
+                AgentConfigStatus.WaitForConfigurePercentage,
+                0,
+                true,
+                Arg.Any<CancellationToken>());
+
+        await fakeAgentRepository.ReceivedWithAnyArgs(0)
+            .ResetSubAgentDividendPercentageAsync(null!, default);
+
+        await fakeAgentRepository.ReceivedWithAnyArgs(1)
+            .UpdateSubAgentsPathAsync(null!, null!, default);
+
+        await fakeAgentRepository.ReceivedWithAnyArgs(1)
+            .UpdateAgentMultipleLayerConditionsAsync(default, null, default);
     }
 }

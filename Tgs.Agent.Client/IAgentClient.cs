@@ -72,4 +72,8 @@ public interface IAgentClient
         bool negativeAgentDividendCarryForward,
         string? modifyUserId = null,
         CancellationToken cancellationToken = default);
+
+    ValueTask SetOneLayerAgentInfoAsync(SetOneLayerAgentInfoRequest request, CancellationToken cancellationToken = default);
+
+    ValueTask SetMultipleLayerAgentInfoAsync(SetMultipleLayerAgentInfoRequest request, CancellationToken cancellationToken = default);
 }
