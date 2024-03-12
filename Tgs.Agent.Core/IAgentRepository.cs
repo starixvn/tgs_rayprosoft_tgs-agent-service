@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Core.Models.BrandContract;
 using Tgs.Agent.Core.Models.Enums;
@@ -22,7 +23,7 @@ public interface IAgentRepository
 
     public ValueTask SetAgentDividendPercentageAsync(Guid agentId, decimal dividendPercentage, CancellationToken cancellationToken = default);
 
-    public ValueTask SetAgentInfoAsync(UpdateAgentModel updateAgent, CancellationToken cancellationToken = default);
+    public ValueTask SetAgentInfoAsync(Guid agentId, string? realName, CancellationToken cancellationToken = default);
 
     public ValueTask SetAgentContactAsync(Guid agentId, string? email, string? phone, CancellationToken cancellationToken = default);
 
@@ -70,9 +71,7 @@ public interface IAgentRepository
         CancellationToken cancellationToken = default);
 
     ValueTask UpdateSubAgentsPathAsync(
-        Guid agentId,
-        int agentNLevel,
-        string agentPath,
+        AgentPathInfo agentPathInfo,
         string newParentAgentPath,
         CancellationToken cancellationToken = default);
 
@@ -101,4 +100,23 @@ public interface IAgentRepository
         CancellationToken cancellationToken = default);
 
     Task CreateAgentAsync(AgentModel agentModel, CancellationToken cancellationToken = default);
+
+    Task UpdateAgentInfoAsync(
+        Guid agentId, 
+        LTree newAgentPath,
+        Guid? agentParentAgentId,
+        AgentLevelType agentLevelType,
+        AgentType agentType,
+        AgentConfigStatus agentStatus,
+        decimal agentDividendPercentage,
+        bool negativeAgentDividendCarryForward,
+        CancellationToken cancellationToken = default);
+
+    Task ResetSubAgentDividendPercentageAsync(Guid[] agentIds, CancellationToken cancellationToken = default);
+
+    Task UpdateAgentMultipleLayerConditionsAsync(
+        Guid agentId,
+        AgentDividendConditionModel[] agentDividendConditions,
+        CancellationToken cancellationToken = default);
+
 }

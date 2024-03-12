@@ -20,19 +20,12 @@ public class SetAgentInfoTests
 
         var command = new SetAgentInfoCommand(
             agentId,
-            parentAgentId,
-            AgentStatus.Enabled,
-            AgentLevelType.Agent,
-            AgentConfigStatus.WaitForConfigurePercentage,
-            true,
-            "",
-            null,
-            "editor");
+            "realName");
 
         await sut.ExecuteAsync(command);
 
         _ = fakeAgentRepository
             .Received(1)
-            .SetAgentInfoAsync(Arg.Any<UpdateAgentModel>());
+            .SetAgentInfoAsync(Arg.Is(agentId), Arg.Is("realName"));
     }
 }

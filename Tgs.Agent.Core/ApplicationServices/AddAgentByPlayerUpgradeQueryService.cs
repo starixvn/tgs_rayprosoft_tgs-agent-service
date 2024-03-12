@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Tgs.Agent.Core.Models;
 using Tgs.PlayerService.Client;
 using Tgs.ServiceUtility;
@@ -15,10 +16,11 @@ internal class AddAgentByPlayerUpgradeQueryService(
     {
         var agentId = Guid.NewGuid();
 
-        logger.LogInformation("brand:{BrandId}, agent:{Agent}, currencyCode:{CurrencyCode}",
+        logger.LogInformation("brand:{BrandId}, agent:{Agent}, currencyCode:{CurrencyCode}, request: {command}",
             command.BrandId,
             agentId,
-            command.CurrencyCode);
+            command.CurrencyCode,
+            JsonSerializer.Serialize(command));
 
         var relationAgentId = await repository
             .CheckAgentPlayerRelationExistsAsync(command.PlayerCode, cancellationToken)

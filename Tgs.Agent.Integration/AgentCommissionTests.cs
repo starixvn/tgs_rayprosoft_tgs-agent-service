@@ -40,14 +40,27 @@ public class AgentCommission
         var fakeTgsContext = Substitute.For<TgsContext>();
         var fakeDbSet = Substitute.For<DbSet<AgentDividend>, IQueryable<AgentDividend>>();
 
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+        var clearByUserId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf33");
+
         var agentDividends = new AgentDividend[]
         {
             new()
             {
                 Id = 1,
-                AgentId = Guid.NewGuid(),
+                AgentId = agentId,
                 BrandId = Guid.NewGuid(),
                 AgentDividendAmount = 1,
+                SentOn = null
+            },
+            new()
+            {
+                Id = 2,
+                AgentId = agentId,
+                BrandId = Guid.NewGuid(),
+                AgentDividendAmount = -10,
+                BeforeDividendAmount = null,
+                ReferencedAgentDividendId = null,
                 SentOn = null
             }
         };
@@ -62,9 +75,6 @@ public class AgentCommission
         var httpClient = web.CreateClient();
 
         var sut = new AgentClient(httpClient);
-
-        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
-        var clearByUserId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf33");
 
         await sut.ClearAgentNegativeCommissionAsync(new(agentId, clearByUserId));
 
