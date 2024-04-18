@@ -16,13 +16,7 @@ public class CreateAgentRequest
     public string Phone { get; init; } = null!;
     public string Email { get; init; } = null!;
     public string Remarks { get; init; } = null!;
-    public decimal CardGameRebatePercentage { get; init; }
     public decimal CommissionPercentage { get; init; }
     public decimal DividendPercentage { get; init; }
-    public decimal LiveDealerRebatePercentage { get; init; }
-    public decimal LotteryRebatePercentage { get; init; }
-    public decimal SlotRebatePercentage { get; init; }
-    public decimal SportsRebatePercentage { get; init; }
-    public decimal VirtualSportsRebatePercentage { get; init; }
     public string EditorUsername { get; set; } = null!;
 }

@@ -76,4 +76,8 @@ public interface IAgentClient
     ValueTask SetOneLayerAgentInfoAsync(SetOneLayerAgentInfoRequest request, CancellationToken cancellationToken = default);
 
     ValueTask SetMultipleLayerAgentInfoAsync(SetMultipleLayerAgentInfoRequest request, CancellationToken cancellationToken = default);
+
+    ValueTask SetAgentProductFeeAsync(SetAgentProductFeeRequest request, CancellationToken cancellationToken = default);
+
+    ValueTask<AgentProductFeeInfo?> GetAgentProductFeeAsync(Guid agentId, CancellationToken cancellationToken = default);
 }

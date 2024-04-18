@@ -119,4 +119,17 @@ public interface IAgentRepository
         AgentDividendConditionModel[] agentDividendConditions,
         CancellationToken cancellationToken = default);
 
+    Task UpdateAgentProductFeeAsync(
+        Guid agentId,
+        decimal cardGameRebatePercentage,
+        decimal liveDealerRebatePercentage,
+        decimal lotteryRebatePercentage,
+        decimal slotRebatePercentage,
+        decimal sportsRebatePercentage,
+        decimal virtualSportsRebatePercentage,
+        string editorUsername,
+        Guid eventId,
+        CancellationToken cancellationToken = default);
+
+    public ValueTask<AgentProductFeeInfo?> GetAgentProductFeeAsync(Guid agentId, CancellationToken cancellationToken = default);
 }
