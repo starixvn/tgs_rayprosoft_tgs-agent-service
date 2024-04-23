@@ -10,7 +10,7 @@
     <PackageReference Include="JsonPatch.Net" Version="2.1.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
     <PackageReference Include="Tgs.Agent.Dividend.Client" Version="1.0.7" />
-    <PackageReference Include="Tgs.BrandCertificateClient" Version="0.1.5" />
+    <PackageReference Include="Tgs.BrandCertificateClient" Version="0.1.6" />
     <PackageReference Include="Tgs.CashService.Client" Version="0.2.9" />
     <PackageReference Include="Tgs.Core.Infrastructures.Security" Version="0.0.2" />
     <PackageReference Include="Tgs.Paging.AsyncEnumerable" Version="1.2.1" />
