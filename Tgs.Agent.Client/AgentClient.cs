@@ -410,7 +410,7 @@ public class AgentClient : IAgentClient
     public async ValueTask SetAgentProductFeeAsync(SetAgentProductFeeRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _client
-            .PatchAsJsonAsync($"/api/agent/product-fee/{request.AgentId}",
+            .PutAsJsonAsync($"/api/agent/product-fee/{request.AgentId}",
                 request,
                 _JsonSerializerOptions,
                 cancellationToken: cancellationToken)

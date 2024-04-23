@@ -26,6 +26,8 @@ public partial class TgsContext : DbContext
 
     public virtual DbSet<AgentEventSource> AgentEventSources { get; set; }
 
+    public virtual DbSet<AgentProductFee> AgentProductFees { get; set; }
+
     public virtual DbSet<Brand> Brands { get; set; }
 
     public virtual DbSet<BrandAgentDividendCondition> BrandAgentDividendConditions { get; set; }
@@ -47,6 +49,7 @@ public partial class TgsContext : DbContext
         modelBuilder.ApplyConfiguration(new Configurations.AgentDividendConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.AgentDividendConditionConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.AgentEventSourceConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.AgentProductFeeConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.BrandConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.BrandAgentDividendConditionConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.PlayerConfiguration());

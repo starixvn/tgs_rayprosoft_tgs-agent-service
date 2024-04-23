@@ -22,38 +22,56 @@ internal class SetAgentProductFeeCommandService(
         patchOperations =
         [
             .. patchOperations,
-            PatchOperation.Replace(JsonPointer.Parse("/cardGameRebatePercentage"),
-                    command.CardGameRebatePercentage),
-            PatchOperation.Replace(JsonPointer.Parse("/liveDealerRebatePercentage"),
-                    command.LiveDealerRebatePercentage),
-            PatchOperation.Replace(JsonPointer.Parse("/lotteryRebatePercentage"),
-                    command.LotteryRebatePercentage),
-            PatchOperation.Replace(JsonPointer.Parse("/slotRebatePercentage"),
-                    command.SlotRebatePercentage),
-            PatchOperation.Replace(JsonPointer.Parse("/sportsRebatePercentage"),
-                    command.SportsRebatePercentage),
-            PatchOperation.Replace(JsonPointer.Parse("/virtualSportsRebatePercentage"),
-                    command.VirtualSportsRebatePercentage),
+            PatchOperation.Replace(JsonPointer.Parse("/cardGamePercentage"),
+                    command.CardGamePercentage),
+            PatchOperation.Replace(JsonPointer.Parse("/liveDealerPercentage"),
+                    command.LiveDealerPercentage),
+            PatchOperation.Replace(JsonPointer.Parse("/lotteryPercentage"),
+                    command.LotteryPercentage),
+            PatchOperation.Replace(JsonPointer.Parse("/slotPercentage"),
+                    command.SlotPercentage),
+            PatchOperation.Replace(JsonPointer.Parse("/sportsPercentage"),
+                    command.SportsPercentage),
+            PatchOperation.Replace(JsonPointer.Parse("/virtualSportsPercentage"),
+                    command.VirtualSportsPercentage),
         ];
 
         var changeSets = new JsonPatch(patchOperations);
 
         var eventId = await serialNumberGenerator
             .GenerateAsync(cancellationToken)
-            .ConfigureAwait(false);
+        .ConfigureAwait(false);
 
-        await repository
-            .UpdateAgentProductFeeAsync(command.AgentId,
-                command.CardGameRebatePercentage,
-                command.LiveDealerRebatePercentage,
-                command.LotteryRebatePercentage,
-                command.SlotRebatePercentage,
-                command.SportsRebatePercentage,
-                command.VirtualSportsRebatePercentage,
-                command.EditorUsername,
-                eventId,
-                cancellationToken)
-            .ConfigureAwait(false);
+        var fee = await repository.GetAgentProductFeeAsync(command.AgentId, cancellationToken);
+
+        if (fee == null)
+        {
+            await repository
+                .CreateAgentProductFeeAsync(command.AgentId,
+                    command.CardGamePercentage,
+                    command.LiveDealerPercentage,
+                    command.LotteryPercentage,
+                    command.SlotPercentage,
+                    command.SportsPercentage,
+                    command.VirtualSportsPercentage,
+                    command.EditorUsername,
+                    cancellationToken)
+                .ConfigureAwait(false);
+        }
+        else
+        {
+            await repository
+                .UpdateAgentProductFeeAsync(command.AgentId,
+                    command.CardGamePercentage,
+                    command.LiveDealerPercentage,
+                    command.LotteryPercentage,
+                    command.SlotPercentage,
+                    command.SportsPercentage,
+                    command.VirtualSportsPercentage,
+                    command.EditorUsername,
+                    cancellationToken)
+                .ConfigureAwait(false);
+        }
 
         await repository.CreateAgentEventAsync(
             eventId,

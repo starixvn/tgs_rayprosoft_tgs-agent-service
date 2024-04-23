@@ -21,13 +21,7 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
 
             entity.HasIndex(e => e.BetLimitId, "ix_players_bet_limit_id");
 
-            entity.HasIndex(e => e.Username, "ix_players_username");
-
             entity.HasIndex(e => e.VipId, "ix_players_vip_id");
-
-            entity.HasIndex(e => e.Username, "ix_trgm_players_username")
-            .HasMethod("gin")
-            .HasOperators(new[] { "gin_trgm_ops" });
 
             entity.HasIndex(e => new { e.BrandId, e.AreaCode, e.Phone }, "ux_players_brand_phone").IsUnique();
 
@@ -45,7 +39,7 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
             entity.Property(e => e.Birthdate).HasColumnName("birthdate");
             entity.Property(e => e.Birthday)
             .HasMaxLength(4)
-            .HasComputedColumnSql("(lpad((date_part('month'::text, birthdate))::text, 2, '0'::text) || lpad((date_part('day'::text, birthdate))::text, 2, '0'::text))", true)
+            .HasComputedColumnSql("(lpad((EXTRACT(month FROM birthdate))::text, 2, '0'::text) || lpad((EXTRACT(day FROM birthdate))::text, 2, '0'::text))", true)
             .HasColumnName("birthday");
             entity.Property(e => e.BrandId).HasColumnName("brand_id");
             entity.Property(e => e.DefaultWalletCurrencyCode)
@@ -93,7 +87,6 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
 
             entity.HasOne(d => d.Agent).WithMany(p => p.Players)
             .HasForeignKey(d => d.AgentId)
-            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("fk_players_agents_agent_id");
 
             entity.HasOne(d => d.Brand).WithMany(p => p.Players)

@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
-using Tgs.Agent.Core.Models.BrandContract;
 using Tgs.Agent.Core.Models.Enums;
 using Tgs.Agent.Repositories.Entities;
 using Tgs.Core.Infrastructures.Utility;
@@ -682,30 +681,58 @@ internal class AgentRepository : IAgentRepository
             .ConfigureAwait(false);
     }
 
-    public async Task UpdateAgentProductFeeAsync(Guid agentId,
-        decimal cardGameRebatePercentage,
-        decimal liveDealerRebatePercentage,
-        decimal lotteryRebatePercentage,
-        decimal slotRebatePercentage,
-        decimal sportsRebatePercentage,
-        decimal virtualSportsRebatePercentage,
+    public async Task CreateAgentProductFeeAsync(Guid agentId,
+        decimal cardGamePercentage,
+        decimal liveDealerPercentage,
+        decimal lotteryPercentage,
+        decimal slotPercentage,
+        decimal sportsPercentage,
+        decimal virtualSportsPercentage,
         string editorUsername,
-        Guid eventId,
         CancellationToken cancellationToken = default)
     {
-        var agent = await _tgsContext.Agents.FirstAsync(x => x.Id == agentId, cancellationToken);
+        _ = await _tgsContext.AgentProductFees.AddAsync(new AgentProductFee
+            {
+                AgentId = agentId,
+                CardGamePercentage = cardGamePercentage,
+                LiveDealerPercentage = liveDealerPercentage,
+                LotteryPercentage = lotteryPercentage,
+                SlotPercentage = slotPercentage,
+                SportsPercentage = sportsPercentage,
+                VirtualSportsPercentage = virtualSportsPercentage,
+                CreatedByUsername = editorUsername,
+                UpdatedByUsername = editorUsername,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow
+            },
+            cancellationToken);
 
-        agent.CardGameRebatePercentage = cardGameRebatePercentage;
-        agent.LiveDealerRebatePercentage = liveDealerRebatePercentage;
-        agent.LotteryRebatePercentage = lotteryRebatePercentage;
-        agent.SlotRebatePercentage = slotRebatePercentage;
-        agent.SportsRebatePercentage = sportsRebatePercentage;
-        agent.VirtualSportsRebatePercentage = virtualSportsRebatePercentage;
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken);
+    }
+
+
+    public async Task UpdateAgentProductFeeAsync(Guid agentId,
+        decimal cardGamePercentage,
+        decimal liveDealerPercentage,
+        decimal lotteryPercentage,
+        decimal slotPercentage,
+        decimal sportsPercentage,
+        decimal virtualSportsPercentage,
+        string editorUsername,
+        CancellationToken cancellationToken = default)
+    {
+        var agent = await _tgsContext.AgentProductFees.FirstAsync(x => x.AgentId == agentId, cancellationToken);
+
+        agent.CardGamePercentage = cardGamePercentage;
+        agent.LiveDealerPercentage = liveDealerPercentage;
+        agent.LotteryPercentage = lotteryPercentage;
+        agent.SlotPercentage = slotPercentage;
+        agent.SportsPercentage = sportsPercentage;
+        agent.VirtualSportsPercentage = virtualSportsPercentage;
         agent.UpdatedByUsername = editorUsername;
         agent.UpdatedOn = DateTime.UtcNow;
-        agent.SnapshotEventId = eventId;
 
-        _ = _tgsContext.Agents.Update(agent);
+        _ = _tgsContext.AgentProductFees.Update(agent);
 
         _ = await _tgsContext.SaveChangesAsync(cancellationToken);
     }
@@ -713,16 +740,16 @@ internal class AgentRepository : IAgentRepository
     public async ValueTask<AgentProductFeeInfo?> GetAgentProductFeeAsync(Guid agentId,
         CancellationToken cancellationToken = default)
     {
-        var agent = await _tgsContext.Agents.FirstOrDefaultAsync(x => x.Id == agentId, cancellationToken);
+        var agent = await _tgsContext.AgentProductFees.FirstOrDefaultAsync(x => x.AgentId == agentId, cancellationToken);
 
         return agent == null
             ? null
-            : new AgentProductFeeInfo(agent.Id,
-                agent.CardGameRebatePercentage,
-                agent.LiveDealerRebatePercentage,
-                agent.LotteryRebatePercentage,
-                agent.SlotRebatePercentage,
-                agent.SportsRebatePercentage,
-                agent.VirtualSportsRebatePercentage);
+            : new AgentProductFeeInfo(agent.AgentId,
+                agent.CardGamePercentage,
+                agent.LiveDealerPercentage,
+                agent.LotteryPercentage,
+                agent.SlotPercentage,
+                agent.SportsPercentage,
+                agent.VirtualSportsPercentage);
     }
 }

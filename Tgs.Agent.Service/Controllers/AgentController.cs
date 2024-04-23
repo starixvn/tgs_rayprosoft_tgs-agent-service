@@ -371,12 +371,12 @@ public class AgentController : ControllerBase
         Guid agentId)
     {
         var command = new SetAgentProductFeeCommand(agentId,
-            request.CardGameRebatePercentage,
-            request.LiveDealerRebatePercentage,
-            request.LotteryRebatePercentage,
-            request.SlotRebatePercentage,
-            request.SportsRebatePercentage,
-            request.VirtualSportsRebatePercentage,
+            request.CardGamePercentage,
+            request.LiveDealerPercentage,
+            request.LotteryPercentage,
+            request.SlotPercentage,
+            request.SportsPercentage,
+            request.VirtualSportsPercentage,
             request.EditorUsername);
 
         return setService.ExecuteAsync(command, HttpContext.RequestAborted);
