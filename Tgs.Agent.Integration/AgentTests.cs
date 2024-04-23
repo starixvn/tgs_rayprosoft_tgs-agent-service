@@ -683,16 +683,20 @@ public class AgentTests
         Assert.NotNull(agentId);
 
         _ = fakeAgentRepository.Received(1)
-            .CreateAgentAsync(Arg.Is<AgentModel>(x =>
-                    x.ParentAgentId == request.ParentAgentId &&
-                    x.CardGameRebatePercentage == 10 &&
-                    x.LiveDealerRebatePercentage == 10 &&
-                    x.LotteryRebatePercentage == 10 &&
-                    x.SlotRebatePercentage == 10 &&
-                    x.SportsRebatePercentage == 10 &&
-                    x.VirtualSportsRebatePercentage == 10),
-                default);
+            .CreateAgentAsync(Arg.Any<AgentModel>(), default);
+
         _ = fakeAgentRepository.ReceivedWithAnyArgs(1).CreateAgentAsync(null!, default);
+
+        _ = fakeAgentRepository.Received(1)
+            .CreateAgentProductFeeAsync(Arg.Is(agentId),
+                Arg.Is(10M),
+                Arg.Is(10M),
+                Arg.Is(10M),
+                Arg.Is(10M),
+                Arg.Is(10M),
+                Arg.Is(10M),
+                Arg.Any<string>(),
+                Arg.Any<CancellationToken>());
     }
 
     [Test]

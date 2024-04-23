@@ -33,7 +33,7 @@ internal class AddAgentQueryService(
             agentId,
             command.CurrencyCode);
 
-        var fee = await brandServiceClient.GetBrandProductFeeInfoAsync(command.BrandId, cancellationToken);
+        var fee = await brandServiceClient.GetBrandProductFeeInfoAsync(command.BrandId,cancellationToken);
 
         var walletId = await cashServiceClient.CreateNewCashAsync(
             command.BrandId,
@@ -53,14 +53,14 @@ internal class AddAgentQueryService(
             Username = command.Username,
             BrandId = command.BrandId,
             LevelType = command.LevelType,
+            CardGameRebatePercentage = command.CardGameRebatePercentage,
             CommissionPercentage = command.CommissionPercentage,
             DividendPercentage = command.DividendPercentage,
-            CardGameRebatePercentage = fee?.CardGameRebatePercentage ?? 0,
-            LiveDealerRebatePercentage = fee?.LiveDealerRebatePercentage ?? 0,
-            LotteryRebatePercentage = fee?.LotteryRebatePercentage ?? 0,
-            SlotRebatePercentage = fee?.SlotRebatePercentage ?? 0,
-            SportsRebatePercentage = fee?.SportsRebatePercentage ?? 0,
-            VirtualSportsRebatePercentage = fee?.VirtualSportsRebatePercentage ?? 0,
+            LiveDealerRebatePercentage = command.LiveDealerRebatePercentage,
+            LotteryRebatePercentage = command.LotteryRebatePercentage,
+            SlotRebatePercentage = command.SlotRebatePercentage,
+            SportsRebatePercentage = command.SportsRebatePercentage,
+            VirtualSportsRebatePercentage = command.VirtualSportsRebatePercentage,
             ParentAgentId = command.ParentAgentId,
             Password = pwd,
             Salt = salt,
@@ -75,6 +75,16 @@ internal class AddAgentQueryService(
 
         await repository.CreateAgentAsync(agent, cancellationToken).ConfigureAwait(false);
 
+        await repository.CreateAgentProductFeeAsync(agentId,
+            fee?.CardGamePercentage ?? 0M,
+            fee?.LiveDealerPercentage ?? 0M,
+            fee?.LotteryPercentage ?? 0M,
+            fee?.SlotPercentage ?? 0M,
+            fee?.SportsPercentage ?? 0M,
+            fee?.VirtualSportsPercentage ?? 0M,
+            command.EditorUsername,
+            cancellationToken);
+
         var patchOperations = Array.Empty<PatchOperation>();
 
         patchOperations = [
@@ -84,6 +94,11 @@ internal class AddAgentQueryService(
                 JsonNode.Parse(JsonSerializer.Serialize(
                     agent,
                     AgentUtility.SerializerOptions))),
+            PatchOperation.Add(
+                JsonPointer.Parse(""),
+                JsonNode.Parse(JsonSerializer.Serialize(
+                    fee,
+                    AgentUtility.SerializerOptions)))
         ];
 
         var changeSets = new JsonPatch(patchOperations);
