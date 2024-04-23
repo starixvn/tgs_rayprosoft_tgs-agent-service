@@ -36,6 +36,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "dbo.agent_product_fees",
+         "ObjectType": 0
+      },
+      {
          "Name": "dbo.agents",
          "ObjectType": 0
       },

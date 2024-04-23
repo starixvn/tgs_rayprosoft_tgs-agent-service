@@ -1029,4 +1029,155 @@ public class AgentTests
         Assert.AreEqual(agentInfo.AgentId, actual!.AgentId);
     }
 
+    [Test]
+    public async Task Create_Agent_Product_Fee()
+    {
+        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+        var fakeSystemClock = Substitute.For<ISystemClock>();
+        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
+            => services
+                .AddSingleton(fakeSerialNumberGenerator)
+                .AddSingleton(fakeSystemClock));
+
+        var httpClient = web.CreateClient();
+
+        var sut = new AgentClient(httpClient);
+
+        var brandId = Guid.NewGuid();
+        var eventId = Guid.NewGuid();
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+        var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+
+        var agent = new Repositories.Entities.Agent
+        {
+            Id = agentId,
+            Status = (short)AgentStatus.Enabled,
+            BrandId = brandId,
+            Password = Array.Empty<byte>(),
+            Salt = Array.Empty<byte>(),
+            Username = "agentUsername",
+            RealName = "agentRealName",
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>(),
+            InvitationCode = "hgq0m0",
+            RegisteredOn = DateTime.UtcNow.AddMonths(-1),
+            NegativeAgentDividendCarryForward = false,
+            DividendPercentage = 5
+        };
+
+        _ = await dbContext.Agents.AddAsync(agent);
+
+        _ = await dbContext.SaveChangesAsync();
+
+        _ = fakeSerialNumberGenerator
+            .GenerateAsync(Arg.Any<CancellationToken>())
+            .Returns(eventId);
+
+        await sut.SetAgentProductFeeAsync(new SetAgentProductFeeRequest
+        {
+            AgentId = agentId,
+            CardGamePercentage = 10,
+            LiveDealerPercentage = 10,
+            LotteryPercentage = 10,
+            SlotPercentage = 10,
+            SportsPercentage = 10,
+            VirtualSportsPercentage = 10,
+            EditorUsername = "test"
+        });
+
+        var fee = await dbContext.AgentProductFees.FirstAsync(x => x.AgentId == agentId);
+
+        Assert.AreEqual(fee.AgentId,agentId);
+        Assert.AreEqual(fee.CardGamePercentage, 10);
+        Assert.AreEqual(fee.LiveDealerPercentage, 10);
+        Assert.AreEqual(fee.LotteryPercentage, 10);
+        Assert.AreEqual(fee.SlotPercentage, 10);
+        Assert.AreEqual(fee.SportsPercentage, 10);
+        Assert.AreEqual(fee.VirtualSportsPercentage, 10);
+    }
+
+    [Test]
+    public async Task Update_Agent_Product_Fee()
+    {
+        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+        var fakeSystemClock = Substitute.For<ISystemClock>();
+        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
+            => services
+                .AddSingleton(fakeSerialNumberGenerator)
+                .AddSingleton(fakeSystemClock));
+
+        var httpClient = web.CreateClient();
+
+        var sut = new AgentClient(httpClient);
+
+        var brandId = Guid.NewGuid();
+        var eventId = Guid.NewGuid();
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+        var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+
+        var agent = new Repositories.Entities.Agent
+        {
+            Id = agentId,
+            Status = (short)AgentStatus.Enabled,
+            BrandId = brandId,
+            Password = Array.Empty<byte>(),
+            Salt = Array.Empty<byte>(),
+            Username = "agentUsername",
+            RealName = "agentRealName",
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>(),
+            InvitationCode = "hgq0m0",
+            RegisteredOn = DateTime.UtcNow.AddMonths(-1),
+            NegativeAgentDividendCarryForward = false,
+            DividendPercentage = 5
+        };
+
+        _ = await dbContext.Agents.AddAsync(agent);
+        _ = await dbContext.AgentProductFees.AddAsync(new AgentProductFee
+        {
+            AgentId = agentId,
+            CardGamePercentage = 10,
+            LiveDealerPercentage = 10,
+            LotteryPercentage = 10,
+            SlotPercentage = 10,
+            SportsPercentage = 10,
+            VirtualSportsPercentage = 10,
+            CreatedByUsername = "test",
+            UpdatedByUsername = "test",
+            CreatedOn = DateTime.UtcNow,
+            UpdatedOn = DateTime.UtcNow
+        });
+
+        _ = await dbContext.SaveChangesAsync();
+
+        _ = fakeSerialNumberGenerator
+            .GenerateAsync(Arg.Any<CancellationToken>())
+            .Returns(eventId);
+
+        await sut.SetAgentProductFeeAsync(new SetAgentProductFeeRequest
+        {
+            AgentId = agentId,
+            CardGamePercentage = 20,
+            LiveDealerPercentage = 20,
+            LotteryPercentage = 20,
+            SlotPercentage = 20,
+            SportsPercentage = 20,
+            VirtualSportsPercentage = 20,
+            EditorUsername = "test"
+        });
+
+        var fee = await dbContext.AgentProductFees.FirstAsync(x => x.AgentId == agentId);
+
+        Assert.AreEqual(fee.AgentId, agentId);
+        Assert.AreEqual(fee.CardGamePercentage, 20);
+        Assert.AreEqual(fee.LiveDealerPercentage, 20);
+        Assert.AreEqual(fee.LotteryPercentage, 20);
+        Assert.AreEqual(fee.SlotPercentage, 20);
+        Assert.AreEqual(fee.SportsPercentage, 20);
+        Assert.AreEqual(fee.VirtualSportsPercentage, 20);
+    }
 }
