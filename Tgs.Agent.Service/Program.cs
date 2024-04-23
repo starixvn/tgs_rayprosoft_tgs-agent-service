@@ -98,7 +98,12 @@ builder.Services
         var config = sp.GetRequiredService<IConfiguration>();
         options.BaseUrl = config.GetValue<Uri>("AgentService:CashBaseUrl")!;
     })
-    .AddSecurity();
+    .AddSecurity()
+    .AddBrandServiceClient((options, sp) =>
+    {
+        var config = sp.GetRequiredService<IConfiguration>();
+        options.BrandCertificateBaseUrl = config.GetValue<Uri>("AgentService:BrandCertificateUrl")!;
+    });
 
 builder.Services
     .AddAgentDividendClient((options, sp) =>

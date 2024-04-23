@@ -12,12 +12,14 @@ using Tgs.Agent.Core;
 using Tgs.Agent.Core.Models;
 using Tgs.Agent.Core.Models.Enums;
 using Tgs.Agent.Repositories.Entities;
+using Tgs.BrandCertificate.Clients;
 using Tgs.CashService;
 using Tgs.CashService.Client;
 using Tgs.Core.Infrastructures.Security;
 using Tgs.PlayerService.Client;
 using Tgs.SerialNumberGenerator;
 using AgentDividendConditionModel = Tgs.Agent.Client.Models.AgentDividendConditionModel;
+using AgentProductFeeInfo = Tgs.Agent.Client.Models.AgentProductFeeInfo;
 using AgentType = Tgs.Agent.Client.Models.Enums.AgentType;
 using ChildAgentInfoModel = Tgs.Agent.Client.Models.ChildAgentInfoModel;
 using EventAction = Tgs.Agent.Core.EventAction;
@@ -30,6 +32,7 @@ public class AgentTests
     public async Task Get_Agent_Info()
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
+
         await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
             services.AddSingleton(fakeAgentRepository));
 
@@ -76,6 +79,7 @@ public class AgentTests
         GetAgentInfoByUsernameRequest request)
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
+
         await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
             services.AddSingleton(fakeAgentRepository));
 
@@ -97,6 +101,7 @@ public class AgentTests
     public async Task Get_Child_Agent_Infos()
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
+
         await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
             services.AddSingleton(fakeAgentRepository));
 
@@ -134,6 +139,7 @@ public class AgentTests
     public async Task Set_Agent_Info()
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
+
         await using var web = TestSiteHelper.GetAgentServiceTestHost(services
             => services.AddSingleton(fakeAgentRepository));
 
@@ -152,6 +158,7 @@ public class AgentTests
     public async Task Set_Agent_Contact()
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
+
         await using var web = TestSiteHelper.GetAgentServiceTestHost(services
             => services.AddSingleton(fakeAgentRepository));
 
@@ -168,6 +175,7 @@ public class AgentTests
     public async Task Set_Agent_Dividend_Percentage()
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
+
         await using var web = TestSiteHelper.GetAgentServiceTestHost(services
             => services.AddSingleton(fakeAgentRepository));
 
@@ -584,10 +592,12 @@ public class AgentTests
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
         var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
+        var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 
         await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
             services.AddSingleton(fakeAgentRepository)
-                .AddSingleton(fakeCashServiceClient));
+                .AddSingleton(fakeCashServiceClient)
+                .AddSingleton(fakeBrandServiceClient));
 
         _ = fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(), Arg.Any<string>(),
             Arg.Any<string>(),
@@ -604,20 +614,14 @@ public class AgentTests
             BrandId = Guid.NewGuid(),
             CurrencyCode = "CNY",
             LevelType = Client.Models.Enums.AgentLevelType.Agent,
-            CardGameRebatePercentage = 0,
             CommissionPercentage = 0,
             DividendPercentage = 0,
-            LiveDealerRebatePercentage = 0,
-            LotteryRebatePercentage = 0,
-            SlotRebatePercentage = 0,
-            SportsRebatePercentage = 0,
-            VirtualSportsRebatePercentage = 0,
             ParentAgentId = Guid.NewGuid(),
             Password = "password",
             RealName = "RealName",
             Email = "email",
             Phone = "phone",
-            Type = Client.Models.Enums.AgentType.Cash,
+            Type = AgentType.Cash,
             Remarks = "remarks",
             EditorUsername = "EditorUsername"
         };
@@ -629,6 +633,65 @@ public class AgentTests
         Assert.NotNull(agentId);
 
         _ = fakeAgentRepository.Received(1).CreateAgentAsync(Arg.Is<AgentModel>(x => x.ParentAgentId == request.ParentAgentId), default);
+        _ = fakeAgentRepository.ReceivedWithAnyArgs(1).CreateAgentAsync(null!, default);
+    }
+
+    [Test]
+    public async Task Create_An_Agent_With_Brand_Product_Fee()
+    {
+        var fakeAgentRepository = Substitute.For<IAgentRepository>();
+        var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
+        var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+
+        await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
+            services.AddSingleton(fakeAgentRepository)
+                .AddSingleton(fakeCashServiceClient)
+                .AddSingleton(fakeBrandServiceClient));
+
+        _ = fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(), Arg.Any<string>(),
+            Arg.Any<string>(),
+            Arg.Is(CashType.Agent),
+            Arg.Any<CancellationToken>()).Returns(Guid.NewGuid());
+
+        _ = fakeBrandServiceClient.GetBrandProductFeeInfoAsync(Arg.Any<Guid>())
+            .Returns(new BrandProductFeeInfo(Guid.NewGuid(), 10, 10, 10, 10, 10, 10));
+
+        var httpClient = web.CreateClient();
+
+        var sut = new AgentClient(httpClient);
+
+        var request = new CreateAgentRequest
+        {
+            Username = "username",
+            BrandId = Guid.NewGuid(),
+            CurrencyCode = "CNY",
+            LevelType = Client.Models.Enums.AgentLevelType.Agent,
+            CommissionPercentage = 0,
+            DividendPercentage = 0,
+            ParentAgentId = Guid.NewGuid(),
+            Password = "password",
+            RealName = "RealName",
+            Email = "email",
+            Phone = "phone",
+            Type = AgentType.Cash,
+            Remarks = "remarks",
+            EditorUsername = "EditorUsername"
+        };
+
+        var agentId = await sut.CreateAgentAsync(request);
+
+        Assert.NotNull(agentId);
+
+        _ = fakeAgentRepository.Received(1)
+            .CreateAgentAsync(Arg.Is<AgentModel>(x =>
+                    x.ParentAgentId == request.ParentAgentId &&
+                    x.CardGameRebatePercentage == 10 &&
+                    x.LiveDealerRebatePercentage == 10 &&
+                    x.LotteryRebatePercentage == 10 &&
+                    x.SlotRebatePercentage == 10 &&
+                    x.SportsRebatePercentage == 10 &&
+                    x.VirtualSportsRebatePercentage == 10),
+                default);
         _ = fakeAgentRepository.ReceivedWithAnyArgs(1).CreateAgentAsync(null!, default);
     }
 
@@ -738,6 +801,7 @@ public class AgentTests
     public async Task Set_Agent_One_Layer_Info()
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
+
         await using var web = TestSiteHelper.GetAgentServiceTestHost(services
             => services.AddSingleton(fakeAgentRepository));
 
@@ -940,4 +1004,29 @@ public class AgentTests
         await fakeAgentRepository.ReceivedWithAnyArgs(1)
             .UpdateAgentMultipleLayerConditionsAsync(default, null, default);
     }
+
+    [Test]
+    [AutoData]
+    public async Task Get_Agent_Product_Fee(
+        Core.Models.AgentProductFeeInfo agentInfo)
+    {
+        var fakeAgentRepository = Substitute.For<IAgentRepository>();
+
+        await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
+            services.AddSingleton(fakeAgentRepository));
+
+        var httpClient = web.CreateClient();
+
+        var sut = new AgentClient(httpClient);
+
+        _ = fakeAgentRepository
+            .GetAgentProductFeeAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(agentInfo);
+
+        var actual = await sut.GetAgentProductFeeAsync(agentInfo.AgentId);
+
+        Assert.NotNull(actual);
+        Assert.AreEqual(agentInfo.AgentId, actual!.AgentId);
+    }
+
 }

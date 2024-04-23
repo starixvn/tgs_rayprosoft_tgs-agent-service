@@ -681,4 +681,48 @@ internal class AgentRepository : IAgentRepository
         _ = await _tgsContext.SaveChangesAsync(cancellationToken)
             .ConfigureAwait(false);
     }
+
+    public async Task UpdateAgentProductFeeAsync(Guid agentId,
+        decimal cardGameRebatePercentage,
+        decimal liveDealerRebatePercentage,
+        decimal lotteryRebatePercentage,
+        decimal slotRebatePercentage,
+        decimal sportsRebatePercentage,
+        decimal virtualSportsRebatePercentage,
+        string editorUsername,
+        Guid eventId,
+        CancellationToken cancellationToken = default)
+    {
+        var agent = await _tgsContext.Agents.FirstAsync(x => x.Id == agentId, cancellationToken);
+
+        agent.CardGameRebatePercentage = cardGameRebatePercentage;
+        agent.LiveDealerRebatePercentage = liveDealerRebatePercentage;
+        agent.LotteryRebatePercentage = lotteryRebatePercentage;
+        agent.SlotRebatePercentage = slotRebatePercentage;
+        agent.SportsRebatePercentage = sportsRebatePercentage;
+        agent.VirtualSportsRebatePercentage = virtualSportsRebatePercentage;
+        agent.UpdatedByUsername = editorUsername;
+        agent.UpdatedOn = DateTime.UtcNow;
+        agent.SnapshotEventId = eventId;
+
+        _ = _tgsContext.Agents.Update(agent);
+
+        _ = await _tgsContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async ValueTask<AgentProductFeeInfo?> GetAgentProductFeeAsync(Guid agentId,
+        CancellationToken cancellationToken = default)
+    {
+        var agent = await _tgsContext.Agents.FirstOrDefaultAsync(x => x.Id == agentId, cancellationToken);
+
+        return agent == null
+            ? null
+            : new AgentProductFeeInfo(agent.Id,
+                agent.CardGameRebatePercentage,
+                agent.LiveDealerRebatePercentage,
+                agent.LotteryRebatePercentage,
+                agent.SlotRebatePercentage,
+                agent.SportsRebatePercentage,
+                agent.VirtualSportsRebatePercentage);
+    }
 }

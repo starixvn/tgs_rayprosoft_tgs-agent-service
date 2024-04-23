@@ -4,9 +4,11 @@ using NSubstitute;
 using Tgs.Agent.Core;
 using Tgs.Agent.Core.ApplicationServices;
 using Tgs.Agent.Core.Models;
+using Tgs.BrandCertificate.Clients;
 using Tgs.CashService;
 using Tgs.CashService.Client;
 using Tgs.Core.Infrastructures.Security;
+using Tgs.SerialNumberGenerator;
 
 namespace Agent.Core.UnitTests;
 
@@ -18,10 +20,14 @@ public class AddAgentQueryTests
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
         var fakePasswordHandler = Substitute.For<IPasswordHandler>();
         var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
-
+        var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+        
         var sut = new AddAgentQueryService(fakeAgentRepository,
             fakePasswordHandler,
             fakeCashServiceClient,
+            fakeBrandServiceClient,
+            fakeSerialNumberGenerator,
             NullLogger<AddAgentQueryService>.Instance);
 
         var password = "password";

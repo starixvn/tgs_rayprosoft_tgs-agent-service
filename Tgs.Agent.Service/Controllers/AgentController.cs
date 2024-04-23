@@ -280,14 +280,8 @@ public class AgentController : ControllerBase
             BrandId = request.BrandId,
             LevelType = request.LevelType,
             CurrencyCode = request.CurrencyCode,
-            CardGameRebatePercentage = request.CardGameRebatePercentage,
             CommissionPercentage = request.CommissionPercentage,
             DividendPercentage = request.DividendPercentage,
-            LiveDealerRebatePercentage = request.LiveDealerRebatePercentage,
-            LotteryRebatePercentage = request.LotteryRebatePercentage,
-            SlotRebatePercentage = request.SlotRebatePercentage,
-            SportsRebatePercentage = request.SportsRebatePercentage,
-            VirtualSportsRebatePercentage = request.VirtualSportsRebatePercentage,
             ParentAgentId = request.ParentAgentId,
             Password = request.Password,
             RealName = request.RealName,
@@ -369,4 +363,28 @@ public class AgentController : ControllerBase
                 request.AgentDividendConditions,
                 request.EditorUsername),
             HttpContext.RequestAborted);
+
+    [HttpPut("product-fee/{agentId}", Name = "SetProductFee")]
+    public ValueTask SetAgentProductFeeAsync(
+        [FromServices] ICommandService<SetAgentProductFeeCommand> setService,
+        [FromBody] SetAgentProductFeeViewModel request,
+        Guid agentId)
+    {
+        var command = new SetAgentProductFeeCommand(agentId,
+            request.CardGameRebatePercentage,
+            request.LiveDealerRebatePercentage,
+            request.LotteryRebatePercentage,
+            request.SlotRebatePercentage,
+            request.SportsRebatePercentage,
+            request.VirtualSportsRebatePercentage,
+            request.EditorUsername);
+
+        return setService.ExecuteAsync(command, HttpContext.RequestAborted);
+    }
+
+    [HttpGet("product-fee/{agentId}", Name = "GetProductFee")]
+    public ValueTask<AgentProductFeeInfo?> GetAgentProductFeeAsync(
+        [FromServices] IGetService<GetAgentProductFeeInfoQuery, AgentProductFeeInfo?> setService,
+        Guid agentId)
+        => setService.GetAsync(new GetAgentProductFeeInfoQuery(agentId), HttpContext.RequestAborted);
 }

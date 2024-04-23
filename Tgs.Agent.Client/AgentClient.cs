@@ -406,4 +406,30 @@ public class AgentClient : IAgentClient
 
         _ = response.EnsureSuccessStatusCode();
     }
+
+    public async ValueTask SetAgentProductFeeAsync(SetAgentProductFeeRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .PatchAsJsonAsync($"/api/agent/product-fee/{request.AgentId}",
+                request,
+                _JsonSerializerOptions,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
+
+    public async ValueTask<AgentProductFeeInfo?> GetAgentProductFeeAsync(Guid agentId,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _client
+            .GetAsync($"/api/agent/product-fee/{agentId}", cancellationToken)
+            .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+
+        var contentJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+        return string.IsNullOrEmpty(contentJson) ? null : JsonSerializer.Deserialize<AgentProductFeeInfo>(contentJson, _JsonSerializerOptions);
+    }
 }
