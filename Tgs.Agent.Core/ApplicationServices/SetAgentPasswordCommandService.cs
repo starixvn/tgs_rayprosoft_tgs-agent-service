@@ -7,21 +7,15 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Agent.Core.ApplicationServices;
 
-internal class SetAgentPasswordCommandService : ICommandService<SetAgentPasswordCommand>
+internal class SetAgentPasswordCommandService(
+    IAgentRepository repository,
+    IPasswordHandler passwordHandler,
+    ISerialNumberGenerator serialNumberGenerator)
+    : ICommandService<SetAgentPasswordCommand>
 {
-    private readonly IAgentRepository _repository;
-    private readonly IPasswordHandler _passwordHandler;
-    private readonly ISerialNumberGenerator _serialNumberGenerator;
-
-    public SetAgentPasswordCommandService(
-        IAgentRepository repository,
-        IPasswordHandler passwordHandler,
-        ISerialNumberGenerator serialNumberGenerator)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _passwordHandler = passwordHandler ?? throw new ArgumentNullException(nameof(passwordHandler));
-        _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
-    }
+    private readonly IAgentRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly IPasswordHandler _passwordHandler = passwordHandler ?? throw new ArgumentNullException(nameof(passwordHandler));
+    private readonly ISerialNumberGenerator _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
 
     public async ValueTask ExecuteAsync(SetAgentPasswordCommand command, CancellationToken cancellationToken = default)
     {

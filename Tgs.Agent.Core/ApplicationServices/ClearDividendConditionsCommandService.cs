@@ -2,14 +2,10 @@
 
 namespace Tgs.Agent.Core.ApplicationServices;
 
-internal class ClearDividendConditionsCommandService : ICommandService<ClearDividendConditionsCommand>
+internal class ClearDividendConditionsCommandService(IAgentRepository repository)
+    : ICommandService<ClearDividendConditionsCommand>
 {
-    private readonly IAgentRepository _repository;
-
-    public ClearDividendConditionsCommandService(IAgentRepository repository)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    }
+    private readonly IAgentRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
     public ValueTask ExecuteAsync(ClearDividendConditionsCommand command, CancellationToken cancellationToken = default)
         => _repository.ClearAgentDividendConditionsAsync(command.AgentId, cancellationToken);

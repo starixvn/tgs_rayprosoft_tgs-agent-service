@@ -6,15 +6,8 @@ using OpenTelemetry.Exporter;
 
 namespace Tgs.Agent.IntegrationTest;
 
-internal class TestAgentApplication : WebApplicationFactory<Program>
+internal class TestAgentApplication(Action<IWebHostBuilder>? webHostConfigure = null) : WebApplicationFactory<Program>
 {
-    private readonly Action<IWebHostBuilder>? _webHostConfigure;
-
-    public TestAgentApplication(Action<IWebHostBuilder>? webHostConfigure = null)
-    {
-        _webHostConfigure = webHostConfigure;
-    }
-
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         _ = builder.ConfigureAppConfiguration(builder => builder.Sources.Clear());
@@ -25,6 +18,6 @@ internal class TestAgentApplication : WebApplicationFactory<Program>
                       Options.DefaultName,
                       exporterOptions => exporterOptions.Endpoint = null)));
 
-        _webHostConfigure?.Invoke(builder);
+        webHostConfigure?.Invoke(builder);
     }
 }

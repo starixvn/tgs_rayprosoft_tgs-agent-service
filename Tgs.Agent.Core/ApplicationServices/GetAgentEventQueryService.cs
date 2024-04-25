@@ -2,14 +2,9 @@
 
 namespace Tgs.Agent.Core.ApplicationServices;
 
-internal class GetAgentEventQueryService : IGetService<GetAgentEventQuery, EventInfo?>
+internal class GetAgentEventQueryService(IAgentRepository repository) : IGetService<GetAgentEventQuery, EventInfo?>
 {
-    private readonly IAgentRepository _repository;
-
-    public GetAgentEventQueryService(IAgentRepository repository)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    }
+    private readonly IAgentRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
     public ValueTask<EventInfo?> GetAsync(GetAgentEventQuery query, CancellationToken cancellationToken = default)
         => _repository.GetAgentEventAsync(query.EventId, cancellationToken);

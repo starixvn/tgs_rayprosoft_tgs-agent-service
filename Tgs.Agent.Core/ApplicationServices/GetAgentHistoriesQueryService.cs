@@ -2,15 +2,10 @@
 
 namespace Tgs.Agent.Core.ApplicationServices;
 
-internal class GetAgentHistoriesQueryService
+internal class GetAgentHistoriesQueryService(IAgentRepository repository)
     : IQueryService<GetAgentHistoriesQuery, AgentHistoryInfo>, IGetService<GetAgentHistoriesQuery, int>
 {
-    private readonly IAgentRepository _repository;
-
-    public GetAgentHistoriesQueryService(IAgentRepository repository)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    }
+    private readonly IAgentRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
     public ValueTask<int> GetAsync(GetAgentHistoriesQuery query, CancellationToken cancellationToken = default)
         => _repository.CountAgentEventAsync(new AgentEventQueryConditions(query.AgentId, query.From, query.To), cancellationToken);

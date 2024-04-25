@@ -2,12 +2,8 @@
 
 namespace Tgs.Agent.Repositories;
 
-internal class AgentDeleteDataCommand : DeleteDataCommand
+internal class AgentDeleteDataCommand(string name) : DeleteDataCommand(name)
 {
-    public AgentDeleteDataCommand(string name) : base(name)
-    {
-    }
-
     public override ValueTask ExecuteAsync(IDataCommandContext context, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();

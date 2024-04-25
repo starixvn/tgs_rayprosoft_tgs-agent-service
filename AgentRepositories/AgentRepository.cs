@@ -14,18 +14,13 @@ using TGS.Core.Infrastructures.Extensions;
 
 namespace Tgs.Agent.Repositories;
 
-internal class AgentRepository : IAgentRepository
+internal class AgentRepository(
+    TgsContext tgsContext,
+    ILogger<AgentRepository> logger)
+    : IAgentRepository
 {
-    private readonly TgsContext _tgsContext;
-    private readonly ILogger<AgentRepository> _logger;
-
-    public AgentRepository(
-        TgsContext tgsContext,
-        ILogger<AgentRepository> logger)
-    {
-        _tgsContext = tgsContext ?? throw new ArgumentNullException(nameof(tgsContext));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly TgsContext _tgsContext = tgsContext ?? throw new ArgumentNullException(nameof(tgsContext));
+    private readonly ILogger<AgentRepository> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public async ValueTask AddAgentAuditLogAsync(Guid agentId, AgentOperation operation, string editUsername, CancellationToken cancellationToken = default)
     {

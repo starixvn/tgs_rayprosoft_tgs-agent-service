@@ -2,15 +2,10 @@
 
 namespace Tgs.Agent.Core.ApplicationServices;
 
-internal class GetAgentAuditLogQueryService
+internal class GetAgentAuditLogQueryService(IAgentRepository repository)
     : IQueryService<GetAgentAuditLogQuery, AgentAuditLogInfo>, IGetService<GetAgentAuditLogQuery, int>
 {
-    private readonly IAgentRepository _repository;
-
-    public GetAgentAuditLogQueryService(IAgentRepository repository)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    }
+    private readonly IAgentRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
     public ValueTask<int> GetAsync(GetAgentAuditLogQuery query, CancellationToken cancellationToken = default)
         => _repository.CountAgentAuditLogsAsync(

@@ -2,12 +2,8 @@
 
 namespace Tgs.Agent.Repositories;
 
-internal class AgentPutDataCommand : PutDataCommand
+internal class AgentPutDataCommand(string name, string value) : PutDataCommand(name, value)
 {
-    public AgentPutDataCommand(string name, string value) : base(name, value)
-    {
-    }
-
     public override ValueTask ExecuteAsync(IDataCommandContext context, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
