@@ -22,4 +22,5 @@ public record AgentInfoModel(
     Guid BrandId,
     Guid DefaultWalletId,
     Guid? WalletId,
-    bool IsSetPayPassword);
+    bool IsSetPayPassword,
+    bool NegativeAgentDividendCarryForward);
