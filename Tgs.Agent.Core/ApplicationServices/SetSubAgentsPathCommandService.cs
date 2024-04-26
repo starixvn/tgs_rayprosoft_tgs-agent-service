@@ -3,18 +3,13 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Agent.Core.ApplicationServices;
 
-internal class SetSubAgentsPathCommandService : ICommandService<SetSubAgentsPathCommand>
+internal class SetSubAgentsPathCommandService(
+    IAgentRepository repository,
+    ILogger<SetSubAgentsPathCommandService> logger)
+    : ICommandService<SetSubAgentsPathCommand>
 {
-    private readonly IAgentRepository _repository;
-    private readonly ILogger<SetSubAgentsPathCommandService> _logger;
-
-    public SetSubAgentsPathCommandService(
-        IAgentRepository repository,
-        ILogger<SetSubAgentsPathCommandService> logger)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly IAgentRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly ILogger<SetSubAgentsPathCommandService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public async ValueTask ExecuteAsync(SetSubAgentsPathCommand command, CancellationToken cancellationToken = default)
     {

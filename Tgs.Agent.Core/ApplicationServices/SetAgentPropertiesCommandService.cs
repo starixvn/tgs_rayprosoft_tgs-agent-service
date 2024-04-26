@@ -6,21 +6,15 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Agent.Core.ApplicationServices;
 
-internal class SetAgentPropertiesCommandService : ICommandService<SetAgentPropertiesCommand>
+internal class SetAgentPropertiesCommandService(
+    IAgentRepository agentRepository,
+    IDataCommandBuilder dataCommandBuilder,
+    ISerialNumberGenerator serialNumberGenerator)
+    : ICommandService<SetAgentPropertiesCommand>
 {
-    private readonly IAgentRepository _agentRepository;
-    private readonly IDataCommandBuilder _dataCommandBuilder;
-    private readonly ISerialNumberGenerator _serialNumberGenerator;
-
-    public SetAgentPropertiesCommandService(
-        IAgentRepository agentRepository,
-        IDataCommandBuilder dataCommandBuilder,
-        ISerialNumberGenerator serialNumberGenerator)
-    {
-        _agentRepository = agentRepository ?? throw new ArgumentNullException(nameof(agentRepository));
-        _dataCommandBuilder = dataCommandBuilder ?? throw new ArgumentNullException(nameof(dataCommandBuilder));
-        _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
-    }
+    private readonly IAgentRepository _agentRepository = agentRepository ?? throw new ArgumentNullException(nameof(agentRepository));
+    private readonly IDataCommandBuilder _dataCommandBuilder = dataCommandBuilder ?? throw new ArgumentNullException(nameof(dataCommandBuilder));
+    private readonly ISerialNumberGenerator _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
 
     public async ValueTask ExecuteAsync(SetAgentPropertiesCommand command, CancellationToken cancellationToken = default)
     {

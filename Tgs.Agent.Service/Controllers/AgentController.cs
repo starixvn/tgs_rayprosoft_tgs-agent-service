@@ -47,7 +47,8 @@ public class AgentController : ControllerBase
             info.BrandId,
             info.DefaultWalletId,
             info.WalletId,
-            info.IsSetPayPassword);
+            info.IsSetPayPassword,
+            info.NegativeAgentDividendCarryForward);
     }
 
     [HttpGet("info/{brandId}/{username}", Name = "GetAgentInfoByUsername")]
@@ -82,7 +83,8 @@ public class AgentController : ControllerBase
             info.BrandId,
             info.DefaultWalletId,
             info.WalletId,
-            info.IsSetPayPassword);
+            info.IsSetPayPassword,
+            info.NegativeAgentDividendCarryForward);
     }
 
     [HttpGet("allChildAgents/{agentId:Guid}", Name = "GetChildAgentInfos")]
@@ -96,12 +98,15 @@ public class AgentController : ControllerBase
 
         foreach (var info in infos)
         {
-            yield return new ChildAgentInfoViewModel()
+            yield return new ChildAgentInfoViewModel
             {
                 AgentId = info.AgentId,
                 AgentUsername = info.AgentUsername,
+                RealName = info.RealName,
+                Status = info.Status,
                 ParentAgentId = info.ParentAgentId,
                 DividendPercentage = info.DividendPercentage,
+                RegisteredOn = info.RegisteredOn
             };
         }
     }

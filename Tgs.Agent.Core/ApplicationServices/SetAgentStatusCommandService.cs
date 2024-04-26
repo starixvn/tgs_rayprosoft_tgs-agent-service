@@ -6,21 +6,15 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Agent.Core.ApplicationServices;
 
-internal class SetAgentStatusCommandService : ICommandService<SetAgentStatusCommand>
+internal class SetAgentStatusCommandService(
+    IAgentRepository agentRepository,
+    ISystemClock systemClock,
+    ISerialNumberGenerator serialNumberGenerator)
+    : ICommandService<SetAgentStatusCommand>
 {
-    private readonly IAgentRepository _agentRepository;
-    private readonly ISystemClock _systemClock;
-    private readonly ISerialNumberGenerator _serialNumberGenerator;
-
-    public SetAgentStatusCommandService(
-        IAgentRepository agentRepository,
-        ISystemClock systemClock,
-        ISerialNumberGenerator serialNumberGenerator)
-    {
-        _agentRepository = agentRepository ?? throw new ArgumentNullException(nameof(agentRepository));
-        _systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
-        _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
-    }
+    private readonly IAgentRepository _agentRepository = agentRepository ?? throw new ArgumentNullException(nameof(agentRepository));
+    private readonly ISystemClock _systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
+    private readonly ISerialNumberGenerator _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
 
     public async ValueTask ExecuteAsync(SetAgentStatusCommand command, CancellationToken cancellationToken = default)
     {        

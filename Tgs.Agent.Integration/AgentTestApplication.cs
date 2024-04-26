@@ -13,13 +13,8 @@ using Tgs.Agent.Repositories.Entities;
 
 namespace Tgs.Agent.IntegrationTest;
 
-internal class AgentTestApplication : WebApplicationFactory<Program>
+internal class AgentTestApplication(Action<IWebHostBuilder>? webHostConfigure = null) : WebApplicationFactory<Program>
 {
-    private readonly Action<IWebHostBuilder>? _webHostConfigure;
-
-    public AgentTestApplication(Action<IWebHostBuilder>? webHostConfigure = null)
-        => _webHostConfigure = webHostConfigure;
-
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         _ = builder
@@ -47,6 +42,6 @@ internal class AgentTestApplication : WebApplicationFactory<Program>
                 return new TgsContext(dbContextOptionsBuilder.Options);
             })));
 
-        _webHostConfigure?.Invoke(builder);
+        webHostConfigure?.Invoke(builder);
     }
 }

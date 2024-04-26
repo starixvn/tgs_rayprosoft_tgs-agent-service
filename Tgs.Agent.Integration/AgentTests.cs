@@ -64,7 +64,8 @@ public class AgentTests
                 BrandId: Guid.Parse("4e86719f-243f-46f6-b010-5c758b7285af"),
                 DefaultWalletId: Guid.NewGuid(),
                 WalletId: null,
-                false));
+                false,
+                true));
 
         var actual = await sut.GetAgentInfoAsync(new(agentId));
 
@@ -241,7 +242,8 @@ public class AgentTests
             brandId,
             Guid.NewGuid(),
             null,
-            false));
+            false,
+            true));
 
         await sut.SetAgentPasswordAsync(new(agentId, password, modifyUserId));
 
@@ -309,7 +311,8 @@ public class AgentTests
             brandId,
             Guid.NewGuid(),
             null, 
-            false));
+            false,
+            true));
 
         await sut.SetAgentPayPasswordAsync(new(agentId, password, modifyUserId));
 
@@ -858,7 +861,8 @@ public class AgentTests
                 brandId,
                 Guid.NewGuid(),
                 null,
-                false));
+                false,
+                true));
 
         _ = fakeAgentRepository.GetAgentPathInfoAsync(Arg.Is(agentId), Arg.Any<CancellationToken>())
             .Returns(new AgentPathInfo(agentId, 1, agentId.ToString("N")));
@@ -958,7 +962,8 @@ public class AgentTests
                 brandId,
                 Guid.NewGuid(),
                 null,
-                false));
+                false,
+                true));
 
         _ = fakeAgentRepository.GetAgentPathInfoAsync(Arg.Is(agentId), Arg.Any<CancellationToken>())
             .Returns(new AgentPathInfo(agentId, 1, agentId.ToString("N")));

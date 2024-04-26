@@ -55,7 +55,8 @@ public class SetAgentPayPasswordTests
                 brandId,
                 Guid.NewGuid(),
                 null,
-                false));
+                false,
+                true));
 
 
         var sut = new SetAgentPayPasswordCommandService(fakeAgentRepository, fakePasswordHandler, fakeSerialNumberGenerator);
