@@ -96,6 +96,7 @@ internal class AddAgentQueryService(
             Type = agent.Type.ToString(),
             LevelType = agent.LevelType.ToString(),
             agent.DividendPercentage,
+            AgentDividendConditions = Array.Empty<AgentDividendConditionModel>(),
             agent.Remarks,
             Status = AgentStatus.Enabled,
             DefaultWalletId = walletId,

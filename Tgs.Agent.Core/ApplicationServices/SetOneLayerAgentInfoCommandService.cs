@@ -96,13 +96,13 @@ internal class SetOneLayerAgentInfoCommandService(
         patchOperations =
         [
             .. patchOperations,
-            PatchOperation.Replace(JsonPointer.Parse("/Username"),
+            PatchOperation.Replace(JsonPointer.Parse("/username"),
                 JsonNode.Parse(JsonSerializer.Serialize(agent.Username, AgentUtility.SerializerOptions))),
-            PatchOperation.Replace(JsonPointer.Parse("/Type"),
+            PatchOperation.Replace(JsonPointer.Parse("/type"),
                 JsonNode.Parse(JsonSerializer.Serialize(agent.Type.ToString(), AgentUtility.SerializerOptions))),
-            PatchOperation.Replace(JsonPointer.Parse("/LevelType"),
+            PatchOperation.Replace(JsonPointer.Parse("/levelType"),
                 JsonNode.Parse(JsonSerializer.Serialize(agentLevelType.ToString(), AgentUtility.SerializerOptions))),
-            PatchOperation.Replace(JsonPointer.Parse("/DividendPercentage"),
+            PatchOperation.Replace(JsonPointer.Parse("/dividendPercentage"),
                 JsonNode.Parse(JsonSerializer.Serialize(agentDividendPercentage, AgentUtility.SerializerOptions))),
         ];
 
