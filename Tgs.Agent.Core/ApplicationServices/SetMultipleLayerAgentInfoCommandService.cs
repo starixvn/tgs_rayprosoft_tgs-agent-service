@@ -1,6 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
+using Json.Patch;
+using Json.Pointer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Tgs.Agent.Core.Models.Enums;
+using Tgs.SerialNumberGenerator;
 using Tgs.ServiceUtility;
 
 namespace Tgs.Agent.Core.ApplicationServices;
@@ -8,6 +13,7 @@ namespace Tgs.Agent.Core.ApplicationServices;
 internal class SetMultipleLayerAgentInfoCommandService(
     IAgentRepository repository,
     ICommandService<AddAgentAuditLogCommand> commandService,
+    ISerialNumberGenerator serialNumberGenerator,
     ILogger<SetMultipleLayerAgentInfoCommandService> logger) : ICommandService<SetMultipleLayerAgentInfoCommand>
 {
     private readonly IAgentRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -75,5 +81,35 @@ internal class SetMultipleLayerAgentInfoCommandService(
             .ExecuteAsync(new AddAgentAuditLogCommand(command.AgentId, command.EditorUsername, operation),
                 cancellationToken)
             .ConfigureAwait(false);
+
+        var eventId = await serialNumberGenerator
+            .GenerateAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        var patchOperations = Array.Empty<PatchOperation>();
+
+        patchOperations =
+        [
+            .. patchOperations,
+            PatchOperation.Replace(JsonPointer.Parse("/Username"),
+                JsonNode.Parse(JsonSerializer.Serialize(agent.Username, AgentUtility.SerializerOptions))),
+            PatchOperation.Replace(JsonPointer.Parse("/Type"),
+                JsonNode.Parse(JsonSerializer.Serialize(agent.Type.ToString(), AgentUtility.SerializerOptions))),
+            PatchOperation.Replace(JsonPointer.Parse("/LevelType"),
+                JsonNode.Parse(JsonSerializer.Serialize(agentLevelType.ToString(), AgentUtility.SerializerOptions))),
+            PatchOperation.Replace(JsonPointer.Parse("/AgentDividendConditions"),
+                JsonNode.Parse(JsonSerializer.Serialize(command.AgentDividendConditions, AgentUtility.SerializerOptions))),
+        ];
+
+        var changeSets = new JsonPatch(patchOperations);
+
+        await repository.CreateAgentEventAsync(
+            eventId,
+            agent.BrandId,
+            agent.Id,
+            EventAction.Create,
+            JsonSerializer.SerializeToDocument(changeSets, AgentUtility.SerializerOptions),
+            command.EditorUsername,
+            cancellationToken).ConfigureAwait(false);
     }
 }

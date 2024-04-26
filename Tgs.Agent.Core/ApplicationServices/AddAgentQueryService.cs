@@ -4,6 +4,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Tgs.Agent.Core.Models;
+using Tgs.Agent.Core.Models.Enums;
 using Tgs.BrandCertificate.Clients;
 using Tgs.CashService;
 using Tgs.CashService.Client;
@@ -87,17 +88,31 @@ internal class AddAgentQueryService(
 
         var patchOperations = Array.Empty<PatchOperation>();
 
+        var createMainSnapshot = new
+        {
+            agent.BrandId,
+            agent.AgentId,
+            agent.Username,
+            Type = agent.Type.ToString(),
+            LevelType = agent.LevelType.ToString(),
+            agent.DividendPercentage,
+            agent.Remarks,
+            Status = AgentStatus.Enabled,
+            DefaultWalletId = walletId,
+            CardGamePercentage = fee?.CardGamePercentage ?? 0M,
+            LiveDealerPercentage = fee?.LiveDealerPercentage ?? 0M,
+            LotteryPercentage = fee?.LotteryPercentage ?? 0M,
+            SlotPercentage = fee?.SlotPercentage ?? 0M,
+            SportsPercentage = fee?.SportsPercentage ?? 0M,
+            VirtualSportsPercentage = fee?.VirtualSportsPercentage ?? 0M,
+        };
+
         patchOperations = [
             .. patchOperations,
             PatchOperation.Add(
                 JsonPointer.Parse(""),
                 JsonNode.Parse(JsonSerializer.Serialize(
-                    agent,
-                    AgentUtility.SerializerOptions))),
-            PatchOperation.Add(
-                JsonPointer.Parse(""),
-                JsonNode.Parse(JsonSerializer.Serialize(
-                    fee,
+                    createMainSnapshot,
                     AgentUtility.SerializerOptions)))
         ];
 
