@@ -356,7 +356,6 @@ public class AgentController : ControllerBase
                 request.ParentAgentId,
                 request.DividendPercentage,
                 request.Type,
-                request.NegativeAgentDividendCarryForward,
                 request.EditorUsername),
             HttpContext.RequestAborted);
 
@@ -370,7 +369,6 @@ public class AgentController : ControllerBase
                 agentId,
                 request.ParentAgentId,
                 request.Type,
-                request.NegativeAgentDividendCarryForward,
                 request.AgentDividendConditions,
                 request.EditorUsername),
             HttpContext.RequestAborted);

@@ -33,8 +33,8 @@ public class AgentTests
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
-            services.AddSingleton(fakeAgentRepository));
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)));
 
         var httpClient = web.CreateClient();
 
@@ -81,8 +81,8 @@ public class AgentTests
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
-            services.AddSingleton(fakeAgentRepository));
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)));
 
         var httpClient = web.CreateClient();
 
@@ -103,8 +103,8 @@ public class AgentTests
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
-            services.AddSingleton(fakeAgentRepository));
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)));
 
         var httpClient = web.CreateClient();
 
@@ -141,8 +141,8 @@ public class AgentTests
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services.AddSingleton(fakeAgentRepository));
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)));
 
         var httpClient = web.CreateClient();
 
@@ -160,8 +160,8 @@ public class AgentTests
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services.AddSingleton(fakeAgentRepository));
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)));
 
         var httpClient = web.CreateClient();
 
@@ -177,8 +177,8 @@ public class AgentTests
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services.AddSingleton(fakeAgentRepository));
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)));
 
         var httpClient = web.CreateClient();
 
@@ -196,11 +196,10 @@ public class AgentTests
         var fakePasswordHandler = Substitute.For<IPasswordHandler>();
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services
-                .AddSingleton(fakeAgentRepository)
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)
                 .AddSingleton(fakePasswordHandler)
-                .AddSingleton(fakeSerialNumberGenerator));
+                .AddSingleton(fakeSerialNumberGenerator)));
 
         var httpClient = web.CreateClient();
 
@@ -265,11 +264,11 @@ public class AgentTests
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
         var fakePasswordHandler = Substitute.For<IPasswordHandler>();
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services.AddSingleton(fakeAgentRepository)
+
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)
                 .AddSingleton(fakePasswordHandler)
-                .AddSingleton(fakeSerialNumberGenerator)
-            );
+                .AddSingleton(fakeSerialNumberGenerator)));
 
         var httpClient = web.CreateClient();
 
@@ -332,8 +331,9 @@ public class AgentTests
     public async Task 設置代理屬性()
     {
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services.AddSingleton(fakeSerialNumberGenerator));
+
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeSerialNumberGenerator)));
 
         var httpClient = web.CreateClient();
 
@@ -384,10 +384,10 @@ public class AgentTests
     {
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
         var fakeSystemClock = Substitute.For<ISystemClock>();
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services
-                .AddSingleton(fakeSerialNumberGenerator)
-                .AddSingleton(fakeSystemClock));
+
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeSerialNumberGenerator)
+                .AddSingleton(fakeSystemClock)));
 
         var httpClient = web.CreateClient();
 
@@ -437,10 +437,10 @@ public class AgentTests
     {
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
         var fakeSystemClock = Substitute.For<ISystemClock>();
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services
-                .AddSingleton(fakeSerialNumberGenerator)
-                .AddSingleton(fakeSystemClock));
+
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeSerialNumberGenerator)
+                .AddSingleton(fakeSystemClock)));
 
         var httpClient = web.CreateClient();
 
@@ -480,10 +480,10 @@ public class AgentTests
     {
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
         var fakeSystemClock = Substitute.For<ISystemClock>();
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services
-                .AddSingleton(fakeSerialNumberGenerator)
-                .AddSingleton(fakeSystemClock));
+
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeSerialNumberGenerator)
+                .AddSingleton(fakeSystemClock)));
 
         var httpClient = web.CreateClient();
 
@@ -521,10 +521,10 @@ public class AgentTests
     {
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
         var fakeSystemClock = Substitute.For<ISystemClock>();
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services
-                .AddSingleton(fakeSerialNumberGenerator)
-                .AddSingleton(fakeSystemClock));
+
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeSerialNumberGenerator)
+                .AddSingleton(fakeSystemClock)));
 
         var httpClient = web.CreateClient();
 
@@ -561,9 +561,8 @@ public class AgentTests
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services
-                .AddSingleton(fakeAgentRepository));
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)));
 
         var httpClient = web.CreateClient();
 
@@ -597,10 +596,10 @@ public class AgentTests
         var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
         var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
-            services.AddSingleton(fakeAgentRepository)
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)
                 .AddSingleton(fakeCashServiceClient)
-                .AddSingleton(fakeBrandServiceClient));
+                .AddSingleton(fakeBrandServiceClient)));
 
         _ = fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(), Arg.Any<string>(),
             Arg.Any<string>(),
@@ -646,10 +645,10 @@ public class AgentTests
         var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
         var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
-            services.AddSingleton(fakeAgentRepository)
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)
                 .AddSingleton(fakeCashServiceClient)
-                .AddSingleton(fakeBrandServiceClient));
+                .AddSingleton(fakeBrandServiceClient)));
 
         _ = fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(), Arg.Any<string>(),
             Arg.Any<string>(),
@@ -709,10 +708,10 @@ public class AgentTests
         var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
         var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
-            services.AddSingleton(fakeAgentRepository)
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)
                 .AddSingleton(fakeCashServiceClient)
-                .AddSingleton(fakePlayerServiceClient));
+                .AddSingleton(fakePlayerServiceClient)));
 
         _ = fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(), Arg.Any<string>(),
             Arg.Any<string>(),
@@ -755,10 +754,10 @@ public class AgentTests
     {
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
         var fakeSystemClock = Substitute.For<ISystemClock>();
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services
-                .AddSingleton(fakeSerialNumberGenerator)
-                .AddSingleton(fakeSystemClock));
+
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeSerialNumberGenerator)
+                .AddSingleton(fakeSystemClock)));
 
         var httpClient = web.CreateClient();
 
@@ -809,8 +808,8 @@ public class AgentTests
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services.AddSingleton(fakeAgentRepository));
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)));
 
         var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
         var oldParentAgentId = Guid.NewGuid();
@@ -885,7 +884,6 @@ public class AgentTests
             newParentAgentId,
             10,
             AgentType.Cash,
-            true,
             ""));
 
         await fakeAgentRepository.Received(1)
@@ -896,7 +894,6 @@ public class AgentTests
                 Core.Models.Enums.AgentType.Cash,
                 AgentConfigStatus.WaitForConfigurePercentage,
                 10,
-                true,
                 Arg.Any<CancellationToken>());
 
         await fakeAgentRepository.ReceivedWithAnyArgs(1)
@@ -910,8 +907,9 @@ public class AgentTests
     public async Task Set_Agent_Multiple_Layer_Info()
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services.AddSingleton(fakeAgentRepository));
+
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)));
 
         var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
         var oldParentAgentId = Guid.NewGuid();
@@ -984,9 +982,7 @@ public class AgentTests
         await sut.SetMultipleLayerAgentInfoAsync(new SetMultipleLayerAgentInfoRequest(
             agentId,
             newParentAgentId,
-            10,
             AgentType.Cash,
-            true,
             new AgentDividendConditionModel[]
             {
                 new AgentDividendConditionModel(1,1,1,1)
@@ -1001,7 +997,6 @@ public class AgentTests
                 Core.Models.Enums.AgentType.Cash,
                 AgentConfigStatus.WaitForConfigurePercentage,
                 0,
-                true,
                 Arg.Any<CancellationToken>());
 
         await fakeAgentRepository.ReceivedWithAnyArgs(0)
@@ -1011,7 +1006,7 @@ public class AgentTests
             .UpdateSubAgentsPathAsync(null!, null!, default);
 
         await fakeAgentRepository.ReceivedWithAnyArgs(1)
-            .UpdateAgentMultipleLayerConditionsAsync(default, null, default);
+            .UpdateAgentMultipleLayerConditionsAsync(default, null!, default);
     }
 
     [Test]
@@ -1021,8 +1016,8 @@ public class AgentTests
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
-            services.AddSingleton(fakeAgentRepository));
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)));
 
         var httpClient = web.CreateClient();
 
@@ -1043,10 +1038,10 @@ public class AgentTests
     {
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
         var fakeSystemClock = Substitute.For<ISystemClock>();
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services
-                .AddSingleton(fakeSerialNumberGenerator)
-                .AddSingleton(fakeSystemClock));
+
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeSerialNumberGenerator)
+                .AddSingleton(fakeSystemClock)));
 
         var httpClient = web.CreateClient();
 
@@ -1112,10 +1107,10 @@ public class AgentTests
     {
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
         var fakeSystemClock = Substitute.For<ISystemClock>();
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services
-                .AddSingleton(fakeSerialNumberGenerator)
-                .AddSingleton(fakeSystemClock));
+
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeSerialNumberGenerator)
+                .AddSingleton(fakeSystemClock)));
 
         var httpClient = web.CreateClient();
 

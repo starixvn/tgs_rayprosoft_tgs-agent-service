@@ -629,7 +629,6 @@ internal class AgentRepository(
         AgentType agentType,
         AgentConfigStatus agentStatus,
         decimal agentDividendPercentage,
-        bool negativeAgentDividendCarryForward,
         CancellationToken cancellationToken = default)
     {
         _ = await _tgsContext.Agents.Where(x => x.Id == agentId)
@@ -638,8 +637,7 @@ internal class AgentRepository(
                     .SetProperty(s => s.LevelType, (short)agentLevelType)
                     .SetProperty(s => s.Type, (short)agentType)
                     .SetProperty(s => s.AgentStatus, (short)agentStatus)
-                    .SetProperty(s => s.DividendPercentage, agentDividendPercentage)
-                    .SetProperty(s => s.NegativeAgentDividendCarryForward, negativeAgentDividendCarryForward),
+                    .SetProperty(s => s.DividendPercentage, agentDividendPercentage),
                 cancellationToken);
 
         _ = await _tgsContext.SaveChangesAsync(cancellationToken)

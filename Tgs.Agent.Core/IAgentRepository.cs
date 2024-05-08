@@ -109,7 +109,6 @@ public interface IAgentRepository
         AgentType agentType,
         AgentConfigStatus agentStatus,
         decimal agentDividendPercentage,
-        bool negativeAgentDividendCarryForward,
         CancellationToken cancellationToken = default);
 
     Task ResetSubAgentDividendPercentageAsync(Guid[] agentIds, CancellationToken cancellationToken = default);

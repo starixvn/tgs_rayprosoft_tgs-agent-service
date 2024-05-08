@@ -14,8 +14,9 @@ namespace Tgs.Agent.IntegrationTest
         public async Task Add_Agent_Audit_Log()
         {
             var fakeAgentRepository = Substitute.For<IAgentRepository>();
-            await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
-                services.AddSingleton(fakeAgentRepository));
+
+            await using var web = new AgentTestApplication(builder
+                => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)));
 
             var httpClient = web.CreateClient();
 
@@ -34,8 +35,9 @@ namespace Tgs.Agent.IntegrationTest
         public async Task 查詢代理操作紀錄()
         {
             var fakeAgentRepository = Substitute.For<IAgentRepository>();
-            await using var web = TestSiteHelper.GetAgentServiceTestHost(services =>
-                services.AddSingleton(fakeAgentRepository));
+
+            await using var web = new AgentTestApplication(builder
+                => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)));
 
             var httpClient = web.CreateClient();
 
