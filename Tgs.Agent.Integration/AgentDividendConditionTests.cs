@@ -13,8 +13,8 @@ public class AgentDividendConditionTests
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services.AddSingleton(fakeAgentRepository));
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)));
 
         var httpClient = web.CreateClient();
 

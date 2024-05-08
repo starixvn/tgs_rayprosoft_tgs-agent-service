@@ -17,9 +17,9 @@ public class AgentCommission
     {
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
         var fakeCommand = Substitute.For<ICommandService<ClearNegativeCommissionCommand>>();
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services.AddSingleton(fakeAgentRepository)
-                .AddSingleton(fakeCommand));
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)
+                .AddSingleton(fakeCommand)));
 
         var httpClient = web.CreateClient();
 
@@ -69,8 +69,8 @@ public class AgentCommission
 
         _ = fakeTgsContext.AgentDividends.Returns(fakeAgentDividends);
 
-        await using var web = TestSiteHelper.GetAgentServiceTestHost(services
-            => services.AddSingleton(fakeTgsContext));
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeTgsContext)));
 
         var httpClient = web.CreateClient();
 

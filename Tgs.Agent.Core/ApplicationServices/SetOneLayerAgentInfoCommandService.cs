@@ -62,13 +62,13 @@ internal class SetOneLayerAgentInfoCommandService(
             ? AgentLevelType.Agent
             : AgentLevelType.Chief;
 
-        var agentType = command.Type;
-
         var agentDividendPercentage = command.DividendPercentage;
 
         var agentStatus = agent.ParentAgentId != newParentAgent?.AgentId
             ? AgentConfigStatus.WaitForConfigurePercentage
             : AgentConfigStatus.DoneForConfigurePercentage;
+
+        var agentType = command.Type;
 
         await _repository.UpdateAgentInfoAsync(command.AgentId,
             newAgentPath,
@@ -77,7 +77,6 @@ internal class SetOneLayerAgentInfoCommandService(
             agentType,
             agentStatus,
             agentDividendPercentage,
-            command.NegativeAgentDividendCarryForward,
             cancellationToken);
 
         var operation = agent.ParentAgentId != newParentAgent?.AgentId ? AgentOperation.Agent : AgentOperation.Info;
@@ -86,6 +85,8 @@ internal class SetOneLayerAgentInfoCommandService(
             .ExecuteAsync(new AddAgentAuditLogCommand(command.AgentId, command.EditorUsername, operation),
                 cancellationToken)
             .ConfigureAwait(false);
+
+        var parentAgent = command.ParentAgentId is not null ? await repository.GetAgentByIdAsync(command.ParentAgentId.Value, cancellationToken) : null;
 
         var eventId = await serialNumberGenerator
             .GenerateAsync(cancellationToken)
@@ -98,8 +99,8 @@ internal class SetOneLayerAgentInfoCommandService(
             .. patchOperations,
             PatchOperation.Replace(JsonPointer.Parse("/username"),
                 JsonNode.Parse(JsonSerializer.Serialize(agent.Username, AgentUtility.SerializerOptions))),
-            PatchOperation.Replace(JsonPointer.Parse("/type"),
-                JsonNode.Parse(JsonSerializer.Serialize(agent.Type.ToString(), AgentUtility.SerializerOptions))),
+            PatchOperation.Replace(JsonPointer.Parse("/parentAgentUsername"),
+                JsonNode.Parse(JsonSerializer.Serialize(parentAgent?.Username, AgentUtility.SerializerOptions))),
             PatchOperation.Replace(JsonPointer.Parse("/levelType"),
                 JsonNode.Parse(JsonSerializer.Serialize(agentLevelType.ToString(), AgentUtility.SerializerOptions))),
             PatchOperation.Replace(JsonPointer.Parse("/dividendPercentage"),
@@ -112,7 +113,7 @@ internal class SetOneLayerAgentInfoCommandService(
             eventId,
             agent.BrandId,
             agent.Id,
-            EventAction.Create,
+            EventAction.Update,
             JsonSerializer.SerializeToDocument(changeSets, AgentUtility.SerializerOptions),
             command.EditorUsername,
             cancellationToken).ConfigureAwait(false);

@@ -6,6 +6,5 @@ public record SetMultipleLayerAgentInfoCommand(
     Guid AgentId,
     Guid? ParentAgentId,
     AgentType Type,
-    bool NegativeAgentDividendCarryForward,
     AgentDividendConditionModel[] AgentDividendConditions,
     string EditorUsername);

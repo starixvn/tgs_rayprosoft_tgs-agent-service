@@ -88,18 +88,18 @@ internal class AddAgentQueryService(
 
         var patchOperations = Array.Empty<PatchOperation>();
 
+        var parentAgent = command.ParentAgentId is not null ? await repository.GetAgentByIdAsync(command.ParentAgentId.Value, cancellationToken) : null;
+
         var createMainSnapshot = new
         {
-            agent.BrandId,
-            agent.AgentId,
             agent.Username,
+            ParentAgentUsername = parentAgent?.Username,
             Type = agent.Type.ToString(),
             LevelType = agent.LevelType.ToString(),
             agent.DividendPercentage,
             AgentDividendConditions = Array.Empty<AgentDividendConditionModel>(),
             agent.Remarks,
             Status = AgentStatus.Enabled,
-            DefaultWalletId = walletId,
             CardGamePercentage = fee?.CardGamePercentage ?? 0M,
             LiveDealerPercentage = fee?.LiveDealerPercentage ?? 0M,
             LotteryPercentage = fee?.LotteryPercentage ?? 0M,

@@ -6,5 +6,4 @@ public record SetOneLayerAgentInfoRequest(
     Guid? ParentAgentId,
     decimal DividendPercentage,
     AgentType Type,
-    bool NegativeAgentDividendCarryForward,
     string EditorUsername);
