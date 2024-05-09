@@ -7,4 +7,4 @@ public record AgentProductFeeInfo(
     decimal LotteryPercentage,
     decimal SlotPercentage,
     decimal SportsPercentage,
-    decimal VirtualSportPercentage);
+    decimal VirtualSportsPercentage);
