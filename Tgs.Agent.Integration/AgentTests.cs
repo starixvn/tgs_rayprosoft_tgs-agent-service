@@ -707,16 +707,21 @@ public class AgentTests
         var fakeAgentRepository = Substitute.For<IAgentRepository>();
         var fakePlayerServiceClient = Substitute.For<IPlayerServiceClient>();
         var fakeCashServiceClient = Substitute.For<ICashServiceClient>();
-
+        var fakeBrandServiceClient = Substitute.For<IBrandServiceClient>();
+        
         await using var web = new AgentTestApplication(builder
             => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)
                 .AddSingleton(fakeCashServiceClient)
-                .AddSingleton(fakePlayerServiceClient)));
+                .AddSingleton(fakePlayerServiceClient)
+                .AddSingleton(fakeBrandServiceClient)));
 
         _ = fakeCashServiceClient.CreateNewCashAsync(Arg.Any<Guid>(), Arg.Any<string>(),
             Arg.Any<string>(),
             Arg.Is(CashType.Agent),
             Arg.Any<CancellationToken>()).Returns(Guid.NewGuid());
+
+        fakeBrandServiceClient.GetBrandProductFeeInfoAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(new BrandProductFeeInfo(Guid.NewGuid(), 10, 10, 10, 10, 10, 10));
 
         var httpClient = web.CreateClient();
 
@@ -734,7 +739,7 @@ public class AgentTests
             null,
             "test",
             Client.Models.Enums.AgentLevelType.Agent,
-            Client.Models.Enums.AgentType.Cash,
+            AgentType.Cash,
             null,
             null,
             true);
