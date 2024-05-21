@@ -76,7 +76,15 @@ internal class AddAgentQueryService(
 
         await repository.CreateAgentAsync(agent, cancellationToken).ConfigureAwait(false);
 
-        await repository.CreateAgentProductFeeAsync(agentId,
+        await repository.CreateAgentProductFeeAsync(
+            agent.BrandId, 
+            agentId,
+            fee?.CardGamePercentage ?? 0M,
+            fee?.LiveDealerPercentage ?? 0M,
+            fee?.LotteryPercentage ?? 0M,
+            fee?.SlotPercentage ?? 0M,
+            fee?.SportsPercentage ?? 0M,
+            fee?.VirtualSportsPercentage ?? 0M,
             fee?.CardGamePercentage ?? 0M,
             fee?.LiveDealerPercentage ?? 0M,
             fee?.LotteryPercentage ?? 0M,

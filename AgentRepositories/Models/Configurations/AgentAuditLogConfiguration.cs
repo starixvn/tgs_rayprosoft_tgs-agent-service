@@ -20,18 +20,18 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
             entity.HasIndex(e => e.AgentId, "ix_agent_audit_logs_agent_id");
 
             entity.Property(e => e.Id)
-            .ValueGeneratedNever()
-            .HasColumnName("id");
+                .ValueGeneratedNever()
+                .HasColumnName("id");
             entity.Property(e => e.AgentId).HasColumnName("agent_id");
             entity.Property(e => e.CreatedByUsername)
-            .HasMaxLength(32)
-            .HasColumnName("created_by_username");
+                .HasMaxLength(32)
+                .HasColumnName("created_by_username");
             entity.Property(e => e.CreatedOn).HasColumnName("created_on");
             entity.Property(e => e.Operation).HasColumnName("operation");
 
             entity.HasOne(d => d.Agent).WithMany(p => p.AgentAuditLogs)
-            .HasForeignKey(d => d.AgentId)
-            .HasConstraintName("fk_agent_audit_logs_agent_id");
+                .HasForeignKey(d => d.AgentId)
+                .HasConstraintName("fk_agent_audit_logs_agent_id");
 
             OnConfigurePartial(entity);
         }

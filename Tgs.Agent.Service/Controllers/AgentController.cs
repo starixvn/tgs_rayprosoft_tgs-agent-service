@@ -380,12 +380,18 @@ public class AgentController : ControllerBase
         Guid agentId)
     {
         var command = new SetAgentProductFeeCommand(agentId,
-            request.CardGamePercentage,
-            request.LiveDealerPercentage,
-            request.LotteryPercentage,
-            request.SlotPercentage,
-            request.SportsPercentage,
-            request.VirtualSportsPercentage,
+            request.CurrentCardGamePercentage,
+            request.CurrentLiveDealerPercentage,
+            request.CurrentLotteryPercentage,
+            request.CurrentSlotPercentage,
+            request.CurrentSportsPercentage,
+            request.CurrentVirtualSportsPercentage,
+            request.NextCardGamePercentage,
+            request.NextLiveDealerPercentage,
+            request.NextLotteryPercentage,
+            request.NextSlotPercentage,
+            request.NextSportsPercentage,
+            request.NextVirtualSportsPercentage,
             request.EditorUsername);
 
         return setService.ExecuteAsync(command, HttpContext.RequestAborted);

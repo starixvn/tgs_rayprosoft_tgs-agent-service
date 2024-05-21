@@ -18,14 +18,14 @@ namespace Tgs.Agent.Repositories.Entities.Configurations
             entity.ToTable("agent_event_source", "dbo");
 
             entity.Property(e => e.Id)
-            .ValueGeneratedNever()
-            .HasColumnName("id");
+                .ValueGeneratedNever()
+                .HasColumnName("id");
             entity.Property(e => e.Action).HasColumnName("action");
             entity.Property(e => e.AgentId).HasColumnName("agent_id");
             entity.Property(e => e.BrandId).HasColumnName("brand_id");
             entity.Property(e => e.ChangeSets)
-            .HasColumnType("jsonb")
-            .HasColumnName("change_sets");
+                .HasColumnType("jsonb")
+                .HasColumnName("change_sets");
             entity.Property(e => e.CreatedOn).HasColumnName("created_on");
             entity.Property(e => e.ModifyUser).HasColumnName("modify_user");
 
