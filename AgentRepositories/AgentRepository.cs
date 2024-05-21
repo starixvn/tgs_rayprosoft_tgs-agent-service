@@ -679,25 +679,40 @@ internal class AgentRepository(
             .ConfigureAwait(false);
     }
 
-    public async Task CreateAgentProductFeeAsync(Guid agentId,
-        decimal cardGamePercentage,
-        decimal liveDealerPercentage,
-        decimal lotteryPercentage,
-        decimal slotPercentage,
-        decimal sportsPercentage,
-        decimal virtualSportsPercentage,
+    public async Task CreateAgentProductFeeAsync(
+        Guid brandId, 
+        Guid agentId,
+        decimal currentCardGamePercentage,
+        decimal currentLiveDealerPercentage,
+        decimal currentLotteryPercentage,
+        decimal currentSlotPercentage,
+        decimal currentSportsPercentage,
+        decimal currentVirtualSportsPercentage,
+        decimal nextCardGamePercentage,
+        decimal nextLiveDealerPercentage,
+        decimal nextLotteryPercentage,
+        decimal nextSlotPercentage,
+        decimal nextSportsPercentage,
+        decimal nextVirtualSportsPercentage,
         string editorUsername,
         CancellationToken cancellationToken = default)
     {
         _ = await _tgsContext.AgentProductFees.AddAsync(new AgentProductFee
             {
+                BrandId = brandId,
                 AgentId = agentId,
-                CardGamePercentage = cardGamePercentage,
-                LiveDealerPercentage = liveDealerPercentage,
-                LotteryPercentage = lotteryPercentage,
-                SlotPercentage = slotPercentage,
-                SportsPercentage = sportsPercentage,
-                VirtualSportsPercentage = virtualSportsPercentage,
+                CurrentCardGamePercentage = currentCardGamePercentage,
+                CurrentLiveDealerPercentage = currentLiveDealerPercentage,
+                CurrentLotteryPercentage = currentLotteryPercentage,
+                CurrentSlotPercentage = currentSlotPercentage,
+                CurrentSportsPercentage = currentSportsPercentage,
+                CurrentVirtualSportsPercentage = currentVirtualSportsPercentage,
+                NextCardGamePercentage = nextCardGamePercentage,
+                NextLiveDealerPercentage = nextLiveDealerPercentage,
+                NextLotteryPercentage = nextLotteryPercentage,
+                NextSlotPercentage = nextSlotPercentage,
+                NextSportsPercentage = nextSportsPercentage,
+                NextVirtualSportsPercentage = nextVirtualSportsPercentage,
                 CreatedByUsername = editorUsername,
                 UpdatedByUsername = editorUsername,
                 CreatedOn = DateTime.UtcNow,
@@ -708,25 +723,36 @@ internal class AgentRepository(
         _ = await _tgsContext.SaveChangesAsync(cancellationToken);
     }
 
-
     public async Task UpdateAgentProductFeeAsync(Guid agentId,
-        decimal cardGamePercentage,
-        decimal liveDealerPercentage,
-        decimal lotteryPercentage,
-        decimal slotPercentage,
-        decimal sportsPercentage,
-        decimal virtualSportsPercentage,
+        decimal currentCardGamePercentage,
+        decimal currentLiveDealerPercentage,
+        decimal currentLotteryPercentage,
+        decimal currentSlotPercentage,
+        decimal currentSportsPercentage,
+        decimal currentVirtualSportsPercentage,
+        decimal nextCardGamePercentage,
+        decimal nextLiveDealerPercentage,
+        decimal nextLotteryPercentage,
+        decimal nextSlotPercentage,
+        decimal nextSportsPercentage,
+        decimal nextVirtualSportsPercentage,
         string editorUsername,
         CancellationToken cancellationToken = default)
     {
         var agent = await _tgsContext.AgentProductFees.FirstAsync(x => x.AgentId == agentId, cancellationToken);
 
-        agent.CardGamePercentage = cardGamePercentage;
-        agent.LiveDealerPercentage = liveDealerPercentage;
-        agent.LotteryPercentage = lotteryPercentage;
-        agent.SlotPercentage = slotPercentage;
-        agent.SportsPercentage = sportsPercentage;
-        agent.VirtualSportsPercentage = virtualSportsPercentage;
+        agent.CurrentCardGamePercentage = currentCardGamePercentage;
+        agent.CurrentLiveDealerPercentage = currentLiveDealerPercentage;
+        agent.CurrentLotteryPercentage = currentLotteryPercentage;
+        agent.CurrentSlotPercentage = currentSlotPercentage;
+        agent.CurrentSportsPercentage = currentSportsPercentage;
+        agent.CurrentVirtualSportsPercentage = currentVirtualSportsPercentage;
+        agent.NextCardGamePercentage = nextCardGamePercentage;
+        agent.NextLiveDealerPercentage = nextLiveDealerPercentage;
+        agent.NextLotteryPercentage = nextLotteryPercentage;
+        agent.NextSlotPercentage = nextSlotPercentage;
+        agent.NextSportsPercentage = nextSportsPercentage;
+        agent.NextVirtualSportsPercentage = nextVirtualSportsPercentage;
         agent.UpdatedByUsername = editorUsername;
         agent.UpdatedOn = DateTime.UtcNow;
 
@@ -743,11 +769,23 @@ internal class AgentRepository(
         return agent == null
             ? null
             : new AgentProductFeeInfo(agent.AgentId,
-                agent.CardGamePercentage,
-                agent.LiveDealerPercentage,
-                agent.LotteryPercentage,
-                agent.SlotPercentage,
-                agent.SportsPercentage,
-                agent.VirtualSportsPercentage);
+                agent.PreviousCardGamePercentage,
+                agent.PreviousLiveDealerPercentage,
+                agent.PreviousLotteryPercentage,
+                agent.PreviousSlotPercentage,
+                agent.PreviousSportsPercentage,
+                agent.PreviousVirtualSportsPercentage,
+                agent.CurrentCardGamePercentage,
+                agent.CurrentLiveDealerPercentage,
+                agent.CurrentLotteryPercentage,
+                agent.CurrentSlotPercentage,
+                agent.CurrentSportsPercentage,
+                agent.CurrentVirtualSportsPercentage,
+                agent.NextCardGamePercentage,
+                agent.NextLiveDealerPercentage,
+                agent.NextLotteryPercentage,
+                agent.NextSlotPercentage,
+                agent.NextSportsPercentage,
+                agent.NextVirtualSportsPercentage);
     }
 }

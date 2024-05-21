@@ -19,9 +19,7 @@ using Tgs.Core.Infrastructures.Security;
 using Tgs.PlayerService.Client;
 using Tgs.SerialNumberGenerator;
 using AgentDividendConditionModel = Tgs.Agent.Client.Models.AgentDividendConditionModel;
-using AgentProductFeeInfo = Tgs.Agent.Client.Models.AgentProductFeeInfo;
 using AgentType = Tgs.Agent.Client.Models.Enums.AgentType;
-using ChildAgentInfoModel = Tgs.Agent.Client.Models.ChildAgentInfoModel;
 using EventAction = Tgs.Agent.Core.EventAction;
 
 namespace Tgs.Agent.IntegrationTest;
@@ -690,7 +688,13 @@ public class AgentTests
         _ = fakeAgentRepository.ReceivedWithAnyArgs(1).CreateAgentAsync(null!, default);
 
         _ = fakeAgentRepository.Received(1)
-            .CreateAgentProductFeeAsync(Arg.Is(agentId),
+            .CreateAgentProductFeeAsync(Arg.Is(request.BrandId), Arg.Is(agentId),
+                Arg.Is(10M),
+                Arg.Is(10M),
+                Arg.Is(10M),
+                Arg.Is(10M),
+                Arg.Is(10M),
+                Arg.Is(10M),
                 Arg.Is(10M),
                 Arg.Is(10M),
                 Arg.Is(10M),
@@ -1087,28 +1091,40 @@ public class AgentTests
         await sut.SetAgentProductFeeAsync(new SetAgentProductFeeRequest
         {
             AgentId = agentId,
-            CardGamePercentage = 10,
-            LiveDealerPercentage = 10,
-            LotteryPercentage = 10,
-            SlotPercentage = 10,
-            SportsPercentage = 10,
-            VirtualSportsPercentage = 10,
+            CurrentCardGamePercentage = 10,
+            CurrentLiveDealerPercentage = 10,
+            CurrentLotteryPercentage = 10,
+            CurrentSlotPercentage = 10,
+            CurrentSportsPercentage = 10,
+            CurrentVirtualSportsPercentage = 10,
+            NextCardGamePercentage = 10,
+            NextLiveDealerPercentage = 10,
+            NextLotteryPercentage = 10,
+            NextSlotPercentage = 10,
+            NextSportsPercentage = 10,
+            NextVirtualSportsPercentage = 10,
             EditorUsername = "test"
         });
 
         var fee = await dbContext.AgentProductFees.FirstAsync(x => x.AgentId == agentId);
 
         Assert.AreEqual(fee.AgentId,agentId);
-        Assert.AreEqual(fee.CardGamePercentage, 10);
-        Assert.AreEqual(fee.LiveDealerPercentage, 10);
-        Assert.AreEqual(fee.LotteryPercentage, 10);
-        Assert.AreEqual(fee.SlotPercentage, 10);
-        Assert.AreEqual(fee.SportsPercentage, 10);
-        Assert.AreEqual(fee.VirtualSportsPercentage, 10);
+        Assert.AreEqual(fee.CurrentCardGamePercentage, 10);
+        Assert.AreEqual(fee.CurrentLiveDealerPercentage, 10);
+        Assert.AreEqual(fee.CurrentLotteryPercentage, 10);
+        Assert.AreEqual(fee.CurrentSlotPercentage, 10);
+        Assert.AreEqual(fee.CurrentSportsPercentage, 10);
+        Assert.AreEqual(fee.CurrentVirtualSportsPercentage, 10);
+        Assert.AreEqual(fee.NextCardGamePercentage, 10);
+        Assert.AreEqual(fee.NextLiveDealerPercentage, 10);
+        Assert.AreEqual(fee.NextLotteryPercentage, 10);
+        Assert.AreEqual(fee.NextSlotPercentage, 10);
+        Assert.AreEqual(fee.NextSportsPercentage, 10);
+        Assert.AreEqual(fee.NextVirtualSportsPercentage, 10);
     }
 
     [Test]
-    public async Task Update_Agent_Product_Fee()
+    public async Task Update_Current_Agent_Product_Fee()
     {
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
         var fakeSystemClock = Substitute.For<ISystemClock>();
@@ -1149,12 +1165,18 @@ public class AgentTests
         _ = await dbContext.AgentProductFees.AddAsync(new AgentProductFee
         {
             AgentId = agentId,
-            CardGamePercentage = 10,
-            LiveDealerPercentage = 10,
-            LotteryPercentage = 10,
-            SlotPercentage = 10,
-            SportsPercentage = 10,
-            VirtualSportsPercentage = 10,
+            CurrentCardGamePercentage = 10,
+            CurrentLiveDealerPercentage = 10,
+            CurrentLotteryPercentage = 10,
+            CurrentSlotPercentage = 10,
+            CurrentSportsPercentage = 10,
+            CurrentVirtualSportsPercentage = 10,
+            NextCardGamePercentage = 10,
+            NextLiveDealerPercentage = 10,
+            NextLotteryPercentage = 10,
+            NextSlotPercentage = 10,
+            NextSportsPercentage = 10,
+            NextVirtualSportsPercentage = 10,
             CreatedByUsername = "test",
             UpdatedByUsername = "test",
             CreatedOn = DateTime.UtcNow,
@@ -1170,23 +1192,137 @@ public class AgentTests
         await sut.SetAgentProductFeeAsync(new SetAgentProductFeeRequest
         {
             AgentId = agentId,
-            CardGamePercentage = 20,
-            LiveDealerPercentage = 20,
-            LotteryPercentage = 20,
-            SlotPercentage = 20,
-            SportsPercentage = 20,
-            VirtualSportsPercentage = 20,
+            CurrentCardGamePercentage = 20,
+            CurrentLiveDealerPercentage = 20,
+            CurrentLotteryPercentage = 20,
+            CurrentSlotPercentage = 20,
+            CurrentSportsPercentage = 20,
+            CurrentVirtualSportsPercentage = 20,
+            NextCardGamePercentage = 20,
+            NextLiveDealerPercentage = 20,
+            NextLotteryPercentage = 20,
+            NextSlotPercentage = 20,
+            NextSportsPercentage = 20,
+            NextVirtualSportsPercentage = 20,
             EditorUsername = "test"
         });
 
         var fee = await dbContext.AgentProductFees.FirstAsync(x => x.AgentId == agentId);
 
         Assert.AreEqual(fee.AgentId, agentId);
-        Assert.AreEqual(fee.CardGamePercentage, 20);
-        Assert.AreEqual(fee.LiveDealerPercentage, 20);
-        Assert.AreEqual(fee.LotteryPercentage, 20);
-        Assert.AreEqual(fee.SlotPercentage, 20);
-        Assert.AreEqual(fee.SportsPercentage, 20);
-        Assert.AreEqual(fee.VirtualSportsPercentage, 20);
+        Assert.AreEqual(fee.CurrentCardGamePercentage, 20);
+        Assert.AreEqual(fee.CurrentLiveDealerPercentage, 20);
+        Assert.AreEqual(fee.CurrentLotteryPercentage, 20);
+        Assert.AreEqual(fee.CurrentSlotPercentage, 20);
+        Assert.AreEqual(fee.CurrentSportsPercentage, 20);
+        Assert.AreEqual(fee.CurrentVirtualSportsPercentage, 20);
+        Assert.AreEqual(fee.NextCardGamePercentage, 20);
+        Assert.AreEqual(fee.NextLiveDealerPercentage, 20);
+        Assert.AreEqual(fee.NextLotteryPercentage, 20);
+        Assert.AreEqual(fee.NextSlotPercentage, 20);
+        Assert.AreEqual(fee.NextSportsPercentage, 20);
+        Assert.AreEqual(fee.NextVirtualSportsPercentage, 20);
     }
+
+    [Test]
+    public async Task Update_Next_Agent_Product_Fee()
+    {
+        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+        var fakeSystemClock = Substitute.For<ISystemClock>();
+
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeSerialNumberGenerator)
+                .AddSingleton(fakeSystemClock)));
+
+        var httpClient = web.CreateClient();
+
+        var sut = new AgentClient(httpClient);
+
+        var brandId = Guid.NewGuid();
+        var eventId = Guid.NewGuid();
+        var agentId = Guid.Parse("8480c811-879b-41e0-8b8b-bd0c9cdbdf31");
+
+        var dbContext = web.Services.GetRequiredService<TgsContext>();
+
+
+        var agent = new Repositories.Entities.Agent
+        {
+            Id = agentId,
+            Status = (short)AgentStatus.Enabled,
+            BrandId = brandId,
+            Password = Array.Empty<byte>(),
+            Salt = Array.Empty<byte>(),
+            Username = "agentUsername",
+            RealName = "agentRealName",
+            WithdrawPassword = Array.Empty<byte>(),
+            WithdrawSalt = Array.Empty<byte>(),
+            InvitationCode = "hgq0m0",
+            RegisteredOn = DateTime.UtcNow.AddMonths(-1),
+            NegativeAgentDividendCarryForward = false,
+            DividendPercentage = 5
+        };
+
+        _ = await dbContext.Agents.AddAsync(agent);
+        _ = await dbContext.AgentProductFees.AddAsync(new AgentProductFee
+        {
+            AgentId = agentId,
+            CurrentCardGamePercentage = 10,
+            CurrentLiveDealerPercentage = 10,
+            CurrentLotteryPercentage = 10,
+            CurrentSlotPercentage = 10,
+            CurrentSportsPercentage = 10,
+            CurrentVirtualSportsPercentage = 10,
+            NextCardGamePercentage = 10,
+            NextLiveDealerPercentage = 10,
+            NextLotteryPercentage = 10,
+            NextSlotPercentage = 10,
+            NextSportsPercentage = 10,
+            NextVirtualSportsPercentage = 10,
+            CreatedByUsername = "test",
+            UpdatedByUsername = "test",
+            CreatedOn = DateTime.UtcNow,
+            UpdatedOn = DateTime.UtcNow
+        });
+
+        _ = await dbContext.SaveChangesAsync();
+
+        _ = fakeSerialNumberGenerator
+            .GenerateAsync(Arg.Any<CancellationToken>())
+            .Returns(eventId);
+
+        await sut.SetAgentProductFeeAsync(new SetAgentProductFeeRequest
+        {
+            AgentId = agentId,
+            CurrentCardGamePercentage = 10,
+            CurrentLiveDealerPercentage = 20,
+            CurrentLotteryPercentage = 30,
+            CurrentSlotPercentage = 40,
+            CurrentSportsPercentage = 50,
+            CurrentVirtualSportsPercentage = 60,
+            NextCardGamePercentage = 70,
+            NextLiveDealerPercentage = 80,
+            NextLotteryPercentage = 90,
+            NextSlotPercentage = 21,
+            NextSportsPercentage = 22,
+            NextVirtualSportsPercentage = 23,
+            EditorUsername = "test"
+        });
+
+        var fee = await dbContext.AgentProductFees.FirstAsync(x => x.AgentId == agentId);
+
+        Assert.AreEqual(fee.AgentId, agentId);
+        Assert.AreEqual(fee.CurrentCardGamePercentage, 10);
+        Assert.AreEqual(fee.CurrentLiveDealerPercentage, 20);
+        Assert.AreEqual(fee.CurrentLotteryPercentage, 30);
+        Assert.AreEqual(fee.CurrentSlotPercentage, 40);
+        Assert.AreEqual(fee.CurrentSportsPercentage, 50);
+        Assert.AreEqual(fee.CurrentVirtualSportsPercentage, 60);
+        Assert.AreEqual(fee.NextCardGamePercentage, 70);
+        Assert.AreEqual(fee.NextLiveDealerPercentage, 80);
+        Assert.AreEqual(fee.NextLotteryPercentage, 90);
+        Assert.AreEqual(fee.NextSlotPercentage, 21);
+        Assert.AreEqual(fee.NextSportsPercentage, 22);
+        Assert.AreEqual(fee.NextVirtualSportsPercentage, 23);
+    }
+
 }

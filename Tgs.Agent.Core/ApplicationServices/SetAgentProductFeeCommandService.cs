@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Json.Patch;
 using Json.Pointer;
+using Tgs.Agent.Core.Models;
 using Tgs.SerialNumberGenerator;
 using Tgs.ServiceUtility;
 
@@ -17,69 +18,144 @@ internal class SetAgentProductFeeCommandService(
             .GetAgentByIdAsync(command.AgentId, cancellationToken)
             .ConfigureAwait(false);
 
-        var patchOperations = Array.Empty<PatchOperation>();
-
-        patchOperations =
-        [
-            .. patchOperations,
-            PatchOperation.Replace(JsonPointer.Parse("/cardGamePercentage"),
-                    command.CardGamePercentage),
-            PatchOperation.Replace(JsonPointer.Parse("/liveDealerPercentage"),
-                    command.LiveDealerPercentage),
-            PatchOperation.Replace(JsonPointer.Parse("/lotteryPercentage"),
-                    command.LotteryPercentage),
-            PatchOperation.Replace(JsonPointer.Parse("/slotPercentage"),
-                    command.SlotPercentage),
-            PatchOperation.Replace(JsonPointer.Parse("/sportsPercentage"),
-                    command.SportsPercentage),
-            PatchOperation.Replace(JsonPointer.Parse("/virtualSportsPercentage"),
-                    command.VirtualSportsPercentage),
-        ];
-
-        var changeSets = new JsonPatch(patchOperations);
-
-        var eventId = await serialNumberGenerator
-            .GenerateAsync(cancellationToken)
-        .ConfigureAwait(false);
-
         var fee = await repository.GetAgentProductFeeAsync(command.AgentId, cancellationToken);
 
         if (fee == null)
         {
             await repository
-                .CreateAgentProductFeeAsync(command.AgentId,
-                    command.CardGamePercentage,
-                    command.LiveDealerPercentage,
-                    command.LotteryPercentage,
-                    command.SlotPercentage,
-                    command.SportsPercentage,
-                    command.VirtualSportsPercentage,
+                .CreateAgentProductFeeAsync(
+                    agentInfo!.BrandId, 
+                    command.AgentId,
+                    command.CurrentCardGamePercentage,
+                    command.CurrentLiveDealerPercentage,
+                    command.CurrentLotteryPercentage,
+                    command.CurrentSlotPercentage,
+                    command.CurrentSportsPercentage,
+                    command.CurrentVirtualSportsPercentage,
+                    command.NextCardGamePercentage,
+                    command.NextLiveDealerPercentage,
+                    command.NextLotteryPercentage,
+                    command.NextSlotPercentage,
+                    command.NextSportsPercentage,
+                    command.NextVirtualSportsPercentage,
                     command.EditorUsername,
                     cancellationToken)
                 .ConfigureAwait(false);
+
+            await CreateLogAsync(agentInfo, fee, command, EventAction.Create);
         }
         else
         {
             await repository
                 .UpdateAgentProductFeeAsync(command.AgentId,
-                    command.CardGamePercentage,
-                    command.LiveDealerPercentage,
-                    command.LotteryPercentage,
-                    command.SlotPercentage,
-                    command.SportsPercentage,
-                    command.VirtualSportsPercentage,
+                    command.CurrentCardGamePercentage,
+                    command.CurrentLiveDealerPercentage,
+                    command.CurrentLotteryPercentage,
+                    command.CurrentSlotPercentage,
+                    command.CurrentSportsPercentage,
+                    command.CurrentVirtualSportsPercentage,
+                    command.NextCardGamePercentage,
+                    command.NextLiveDealerPercentage,
+                    command.NextLotteryPercentage,
+                    command.NextSlotPercentage,
+                    command.NextSportsPercentage,
+                    command.NextVirtualSportsPercentage,
                     command.EditorUsername,
                     cancellationToken)
                 .ConfigureAwait(false);
+
+            await CreateLogAsync(agentInfo, fee, command, EventAction.Update);
         }
+    }
+
+    private async Task CreateLogAsync(AgentInfo? agentInfo, AgentProductFeeInfo? feeInfo, SetAgentProductFeeCommand command, EventAction action)
+    {
+        var eventId = await serialNumberGenerator
+            .GenerateAsync()
+            .ConfigureAwait(false);
+
+        var patchOperations = Enumerable.Empty<PatchOperation>();
+
+        if (feeInfo?.CurrentCardGamePercentage != command.CurrentCardGamePercentage)
+        {
+            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/currentCardGamePercentage"),
+                command.CurrentCardGamePercentage));
+        }
+
+        if (feeInfo?.CurrentLiveDealerPercentage != command.CurrentLiveDealerPercentage)
+        {
+            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/currentLiveDealerPercentage"),
+                command.CurrentLiveDealerPercentage));
+        }
+
+        if (feeInfo?.CurrentLotteryPercentage != command.CurrentLotteryPercentage)
+        {
+            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/currentLotteryPercentage"),
+                command.CurrentLotteryPercentage));
+        }
+
+        if (feeInfo?.CurrentSlotPercentage != command.CurrentSlotPercentage)
+        {
+            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/currentSlotPercentage"),
+                command.CurrentSlotPercentage));
+        }
+
+        if (feeInfo?.CurrentSportsPercentage != command.CurrentSportsPercentage)
+        {
+            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/currentSportsPercentage"),
+                command.CurrentSportsPercentage));
+        }
+
+        if (feeInfo?.CurrentVirtualSportsPercentage != command.CurrentVirtualSportsPercentage)
+        {
+            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/currentCardGamePercentage"),
+                command.CurrentVirtualSportsPercentage));
+        }
+
+        if (feeInfo?.NextCardGamePercentage != command.NextCardGamePercentage)
+        {
+            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/nextCardGamePercentage"),
+                command.NextCardGamePercentage));
+        }
+
+        if (feeInfo?.NextLiveDealerPercentage != command.NextLiveDealerPercentage)
+        {
+            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/nextLiveDealerPercentage"),
+                command.NextLiveDealerPercentage));
+        }
+
+        if (feeInfo?.NextLotteryPercentage != command.NextLotteryPercentage)
+        {
+            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/nextLotteryPercentage"),
+                command.NextLotteryPercentage));
+        }
+
+        if (feeInfo?.NextSlotPercentage != command.NextSlotPercentage)
+        {
+            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/nextSlotPercentage"),
+                command.NextSlotPercentage));
+        }
+
+        if (feeInfo?.NextSportsPercentage != command.NextSportsPercentage)
+        {
+            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/nextSportsPercentage"),
+                command.NextSportsPercentage));
+        }
+
+        if (feeInfo?.NextVirtualSportsPercentage != command.NextVirtualSportsPercentage)
+        {
+            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/nextCardGamePercentage"),
+                command.NextVirtualSportsPercentage));
+        }
+
+        var changeSets = new JsonPatch(patchOperations);
 
         await repository.CreateAgentEventAsync(
             eventId,
             agentInfo!.BrandId,
             command.AgentId,
-            EventAction.Update,
+            action,
             JsonSerializer.SerializeToDocument(changeSets, AgentUtility.SerializerOptions),
-            command.EditorUsername,
-            cancellationToken).ConfigureAwait(false);
+            command.EditorUsername).ConfigureAwait(false);
     }
 }

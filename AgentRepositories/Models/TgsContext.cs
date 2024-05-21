@@ -40,8 +40,7 @@ public partial class TgsContext : DbContext
     {
         modelBuilder
             .HasPostgresExtension("ltree")
-            .HasPostgresExtension("pg_trgm")
-            .HasPostgresExtension("uuid-ossp");
+            .HasPostgresExtension("pg_trgm");
 
         modelBuilder.ApplyConfiguration(new Configurations.AgentConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.AgentAuditLogConfiguration());
