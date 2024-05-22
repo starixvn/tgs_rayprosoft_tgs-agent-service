@@ -108,7 +108,7 @@ internal class SetAgentProductFeeCommandService(
 
         if (feeInfo?.CurrentVirtualSportsPercentage != command.CurrentVirtualSportsPercentage)
         {
-            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/currentCardGamePercentage"),
+            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/currentVirtualSportsPercentage"),
                 command.CurrentVirtualSportsPercentage));
         }
 
@@ -144,7 +144,7 @@ internal class SetAgentProductFeeCommandService(
 
         if (feeInfo?.NextVirtualSportsPercentage != command.NextVirtualSportsPercentage)
         {
-            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/nextCardGamePercentage"),
+            patchOperations = patchOperations.Append(PatchOperation.Replace(JsonPointer.Parse("/nextVirtualSportsPercentage"),
                 command.NextVirtualSportsPercentage));
         }
 
