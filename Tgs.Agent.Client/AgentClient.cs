@@ -432,4 +432,22 @@ public class AgentClient : IAgentClient
 
         return string.IsNullOrEmpty(contentJson) ? null : JsonSerializer.Deserialize<AgentProductFeeInfo>(contentJson, _JsonSerializerOptions);
     }
+
+    public async IAsyncEnumerable<AgentNameInfo> GetAgentNamesAsync(Guid brandId)
+    {
+        using var response = await _client.GetAsync($"/api/agent/{brandId}/agent-names", HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+
+        var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+
+        var infos = JsonSerializer.DeserializeAsyncEnumerable<AgentNameInfo>(
+            responseStream,
+            _JsonSerializerOptions);
+
+        await foreach (var info in infos)
+        {
+            yield return info!;
+        }
+    }
 }
