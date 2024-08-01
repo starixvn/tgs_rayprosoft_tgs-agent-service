@@ -402,4 +402,11 @@ public class AgentController : ControllerBase
         [FromServices] IGetService<GetAgentProductFeeInfoQuery, AgentProductFeeInfo?> setService,
         Guid agentId)
         => setService.GetAsync(new GetAgentProductFeeInfoQuery(agentId), HttpContext.RequestAborted);
+
+    [HttpGet("{brandId}/agent-names", Name = "GetAgentNames")]
+    public IAsyncEnumerable<AgentNameInfoViewModel> GetAgentNamesAsync(
+        [FromServices] IQueryService<GetAgentNamesQuery, AgentNameInfo> setService,
+        Guid brandId)
+        => setService.QueryAsync(new GetAgentNamesQuery(brandId), HttpContext.RequestAborted)
+            .Select(x => new AgentNameInfoViewModel(x.AgentId, x.Username));
 }

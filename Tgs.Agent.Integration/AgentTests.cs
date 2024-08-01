@@ -1325,4 +1325,26 @@ public class AgentTests
         Assert.AreEqual(fee.NextVirtualSportsPercentage, 23);
     }
 
+    [Test]
+    [AutoData]
+    public async Task Get_Agent_Names(IEnumerable<Core.Models.AgentNameInfo> agentNameInfos)
+    {
+        var fakeAgentRepository = Substitute.For<IAgentRepository>();
+
+        await using var web = new AgentTestApplication(builder
+            => builder.ConfigureServices(services => services.AddSingleton(fakeAgentRepository)));
+
+        var httpClient = web.CreateClient();
+
+        var sut = new AgentClient(httpClient);
+
+        _ = fakeAgentRepository
+            .GetAgentNamesAsync(Arg.Any<Guid>())
+            .Returns(agentNameInfos.ToAsyncEnumerable());
+
+        var actual = await sut.GetAgentNamesAsync(Guid.NewGuid()).ToArrayAsync();
+
+        Assert.NotNull(actual);
+        Assert.Greater(actual.Length, 0);
+    }
 }

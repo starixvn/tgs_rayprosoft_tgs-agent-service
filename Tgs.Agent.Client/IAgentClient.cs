@@ -80,4 +80,6 @@ public interface IAgentClient
     ValueTask SetAgentProductFeeAsync(SetAgentProductFeeRequest request, CancellationToken cancellationToken = default);
 
     ValueTask<AgentProductFeeInfo?> GetAgentProductFeeAsync(Guid agentId, CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<AgentNameInfo> GetAgentNamesAsync(Guid brandId);
 }

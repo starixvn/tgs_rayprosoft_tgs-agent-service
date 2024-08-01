@@ -788,4 +788,8 @@ internal class AgentRepository(
                 agent.NextSportsPercentage,
                 agent.NextVirtualSportsPercentage);
     }
+
+    public IAsyncEnumerable<AgentNameInfo> GetAgentNamesAsync(Guid brandId)
+        => _tgsContext.Agents.Where(x => x.BrandId == brandId).Select(x => new AgentNameInfo(x.Id, x.Username))
+            .ToAsyncEnumerable();
 }

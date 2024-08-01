@@ -154,4 +154,7 @@ public interface IAgentRepository
         CancellationToken cancellationToken = default);
 
     public ValueTask<AgentProductFeeInfo?> GetAgentProductFeeAsync(Guid agentId, CancellationToken cancellationToken = default);
+
+    public IAsyncEnumerable<AgentNameInfo> GetAgentNamesAsync(Guid brandId);
+
 }
