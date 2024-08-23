@@ -4,6 +4,7 @@ using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Tgs.PlayerService.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,8 @@ builder.Configuration.AddJsonFile("appsettings.json",
         reloadOnChange: true);
 
 builder.WebHost.UseUrls($"http://0.0.0.0:{builder.Configuration["HostingPort"]}");
+
+builder.WebHost.UseSentry();
 
 // Add services to the container.
 builder.Services
@@ -54,9 +57,8 @@ builder.Services
 
 builder.Services
     .AddOpenTelemetry()
-    .WithTracing(builder => builder
-        .SetResourceBuilder(ResourceBuilder.CreateDefault()
-            .AddEnvironmentVariableDetector())
+    .ConfigureResource(_ => _.AddService(builder.Configuration.GetValue<string>("Otel:OTEL_SERVICE_NAME")))
+    .WithTracing(traceProviderBuilder => traceProviderBuilder
         .AddSource("Tgs.*")
         .AddSource("TGS.*")
         .AddAspNetCoreInstrumentation()
@@ -66,7 +68,7 @@ builder.Services
             options.SetDbStatementForText = true;
         })
         .AddProfileViewExporter()
-        .AddOtlpExporter())
+        .AddOtlpExporter(options => options.Endpoint = builder.Configuration.GetValue<Uri>("Otel:OTEL_COLLECTOR")))
     .Services
     .Configure<AspNetCoreTraceInstrumentationOptions>(options =>
     {
@@ -130,9 +132,11 @@ builder.Services
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<ExceptionMiddleware>();
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionMiddleware>();
 // Configure the HTTP request pipeline.
 app.UseSwaggerUI();
 
